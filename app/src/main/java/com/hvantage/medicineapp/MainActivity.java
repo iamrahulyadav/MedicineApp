@@ -1,5 +1,6 @@
 package com.hvantage.medicineapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -11,11 +12,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.hvantage.medicineapp.adapter.CategoryAdapter;
 import com.hvantage.medicineapp.adapter.HomeProductAdapter;
 import com.hvantage.medicineapp.model.CategoryModel;
 import com.hvantage.medicineapp.model.ProductModel;
+import com.hvantage.medicineapp.util.RecyclerItemClickListener;
 
 import java.util.ArrayList;
 
@@ -57,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         catList.add(new CategoryModel(1, "Ayurvedic", R.drawable.cat_ayurvedic));
         catList.add(new CategoryModel(1, "Homeopathy", R.drawable.cat_homeo));
         adapter.notifyDataSetChanged();
+
+
     }
 
     private void initDrawer(Toolbar toolbar) {
@@ -79,13 +84,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         adapter2 = new HomeProductAdapter(MainActivity.this, productList);
         recylcer_view2.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false));
         recylcer_view2.setAdapter(adapter2);
+        recylcer_view2.addOnItemTouchListener(new RecyclerItemClickListener(MainActivity.this, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                startActivity(new Intent(MainActivity.this, ProductDetailActivity.class));
+            }
 
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        }));
         productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
         productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
         productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
         productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
         productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
         adapter2.notifyDataSetChanged();
+
     }
 
     private void setProduct2() {
@@ -93,7 +109,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         adapter3 = new HomeProductAdapter(MainActivity.this, productList2);
         recylcer_view3.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false));
         recylcer_view3.setAdapter(adapter3);
+        recylcer_view3.addOnItemTouchListener(new RecyclerItemClickListener(MainActivity.this, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                startActivity(new Intent(MainActivity.this, ProductDetailActivity.class));
+            }
 
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        }));
         productList2.add(new ProductModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
         productList2.add(new ProductModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
         productList2.add(new ProductModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));

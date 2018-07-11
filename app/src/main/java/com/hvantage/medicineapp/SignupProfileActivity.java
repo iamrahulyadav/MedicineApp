@@ -63,7 +63,7 @@ public class SignupProfileActivity extends AppCompatActivity implements View.OnC
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSubmit:
-                startActivity(new Intent(context, MainActivity.class));
+                startActivity(new Intent(SignupProfileActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 break;
         }
     }
