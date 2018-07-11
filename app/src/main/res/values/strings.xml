@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Medicine App</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Login/Signup</string>
+    <string name="nav_header_subtitle">What are you looking for?</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="title_activity_main">Medicine App</string>
+    <string name="search_box_hint">Search here for any priscription medicine</string>
+    <string name="action_cart">Cart</string>
+    <string name="welcome_text">Welcome to Medicine App</string>
+    <string name="otp_sent_text">We sent an otp to the number</string>
+</resources>

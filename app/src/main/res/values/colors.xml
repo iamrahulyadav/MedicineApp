@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#0889d4</color>
+    <color name="colorPrimaryDark">#0889d4</color>
+    <color name="colorAccent">#0889d4</color>
+    <color name="colorWhite">#fff</color>
+    <color name="colorBlack">#111</color>
+    <color name="colorActivityBackground">#f2f2f2</color>
+    <color name="colorDivider">#f0f0f0</color>
+    <color name="colorTextHeading">#4b4b4b</color>
+    <color name="colorTextSubHeading">#767676</color>
+    <color name="colorGray">#cacaca</color>
+    <color name="colorError">#ed3b00</color>
+    <color name="colorSuccess">#18ca71</color>
+    <color name="colorWarning">#18a6ca</color>
+    <color name="colorToolbarTitle">#ceffffff</color>
+</resources>
