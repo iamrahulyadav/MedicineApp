@@ -1,4 +1,4 @@
-package com.hvantage.medicineapp;
+package com.hvantage.medicineapp.activity;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.HomeProductAdapter;
 import com.hvantage.medicineapp.model.ProductModel;
 

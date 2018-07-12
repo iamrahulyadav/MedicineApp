@@ -1,4 +1,4 @@
-package com.hvantage.medicineapp;
+package com.hvantage.medicineapp.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,11 +11,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.adapter.WelcomePagerAdapter;
+
 public class WelcomeActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ViewPager mPager;
     private int[] layouts = {R.layout.page0, R.layout.page1, R.layout.page2, R.layout.page3, R.layout.page4};
-    private MpagerAdapter mpagerAdapter;
+    private WelcomePagerAdapter welcomePagerAdapter;
     private LinearLayout dots_layout;
     private ImageView[] dots;
     private TextView BnNext;
@@ -33,8 +36,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
         setContentView(R.layout.activity_slide_welcome);
         mPager = (ViewPager) findViewById(R.id.viewPager);
-        mpagerAdapter = new MpagerAdapter(layouts, this);
-        mPager.setAdapter(mpagerAdapter);
+        welcomePagerAdapter = new WelcomePagerAdapter(layouts, this);
+        mPager.setAdapter(welcomePagerAdapter);
         dots_layout = (LinearLayout) findViewById(R.id.dotslayout);
         BnNext = (TextView) findViewById(R.id.bnNext);
         BnSkip = (TextView) findViewById(R.id.bnSkip);

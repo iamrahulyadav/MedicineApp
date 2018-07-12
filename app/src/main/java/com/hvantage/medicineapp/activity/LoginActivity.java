@@ -1,4 +1,4 @@
-package com.hvantage.medicineapp;
+package com.hvantage.medicineapp.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ScrollView;
 
+import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.util.Functions;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {

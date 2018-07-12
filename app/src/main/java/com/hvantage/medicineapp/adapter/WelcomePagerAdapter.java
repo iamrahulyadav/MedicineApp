@@ -1,4 +1,4 @@
-package com.hvantage.medicineapp;
+package com.hvantage.medicineapp.adapter;
 
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
@@ -10,12 +10,12 @@ import android.view.ViewGroup;
  * Created by Kirti Tiwari on 13-10-2017.
  */
 
-public class MpagerAdapter extends PagerAdapter {
+public class WelcomePagerAdapter extends PagerAdapter {
     private int[] layouts;
     private Context context;
     private LayoutInflater layoutInflater ;
 
-    public MpagerAdapter(int[] layouts, Context context)
+    public WelcomePagerAdapter(int[] layouts, Context context)
     {
         this.layouts = layouts;
         this.context = context;

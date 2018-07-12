@@ -1,4 +1,4 @@
-package com.hvantage.medicineapp;
+package com.hvantage.medicineapp.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +15,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.util.Functions;
 
 public class SignupMobileActivity extends AppCompatActivity implements View.OnClickListener {

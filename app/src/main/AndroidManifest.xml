@@ -14,36 +14,36 @@
             android:resource="@array/preloaded_fonts" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".SplashActivity"
+            android:name=".activity.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activity.LoginActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".SignupMobileActivity"
+            android:name=".activity.SignupMobileActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".SignupOTPActivity"
+            android:name=".activity.SignupOTPActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".SignupProfileActivity"
+            android:name=".activity.SignupProfileActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".WelcomeActivity"
+            android:name=".activity.WelcomeActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden">
@@ -54,7 +54,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ProductDetailActivity"
+            android:name=".activity.ProductDetailActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar">
 

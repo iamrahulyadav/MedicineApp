@@ -1,4 +1,4 @@
-package com.hvantage.medicineapp;
+package com.hvantage.medicineapp.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.CategoryAdapter;
 import com.hvantage.medicineapp.adapter.HomeProductAdapter;
 import com.hvantage.medicineapp.model.CategoryModel;
@@ -60,8 +61,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         catList.add(new CategoryModel(1, "Ayurvedic", R.drawable.cat_ayurvedic));
         catList.add(new CategoryModel(1, "Homeopathy", R.drawable.cat_homeo));
         adapter.notifyDataSetChanged();
-
-
     }
 
     private void initDrawer(Toolbar toolbar) {
