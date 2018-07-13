@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
@@ -28,10 +29,17 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
+import com.hvantage.medicineapp.model.PrescriptionModel;
+import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.GridSpacingItemDecoration;
 import com.hvantage.medicineapp.util.ProgressBar;
@@ -294,7 +302,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
 
     }
 
-    class ImageTask extends AsyncTask<Bitmap, Void, Void> {
+    class ImageTask extends AsyncTask<Bitmap, String, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -308,13 +316,48 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
             bitmapImage.compress(Bitmap.CompressFormat.PNG, 30, byteArrayOutputStream);
             byte[] byteArray = byteArrayOutputStream.toByteArray();
             String Encoded_userimage = Base64.encodeToString(byteArray, Base64.DEFAULT);
-            Log.d(TAG, "Picture Image :-" + Encoded_userimage);
-            publishProgress();
+
+
+            publishProgress(Encoded_userimage);
             return null;
         }
 
-        private void publishProgress() {
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            String image_base64 = values[0];
+            Log.d(TAG, "onProgressUpdate: image_base64 >> " + image_base64);
+            String key = FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+                    .child(AppConstants.FIREBASE_KEY.CART)
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                    .push().getKey();
+            PrescriptionModel data = new PrescriptionModel(key, image_base64);
+            FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+                    .child(AppConstants.FIREBASE_KEY.CART)
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                    .child(key)
+                    .setValue(data)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            // Write was successful!
+                            // ...
+                            Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // Write failed
+                            // ...
+                            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
             hideProgressDialog();
+
         }
+
     }
 }

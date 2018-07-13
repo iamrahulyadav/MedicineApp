@@ -9,7 +9,7 @@ public class AppConstants {
         public static final String USERS = "users";
         public static final String PRODUCTS = "products";
 
-        public static final String CART = "store_cart";
+        public static final String CART = "order_cart";
         public static final String APP = "store_db";
 
     }
