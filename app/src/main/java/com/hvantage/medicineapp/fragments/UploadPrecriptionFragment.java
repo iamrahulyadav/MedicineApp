@@ -34,6 +34,9 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
@@ -83,8 +86,49 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
             intraction.actionbarsetTitle("Upload Presciption");
         }
         init();
-        setCategory();
+        setRecyclerView();
+        getData();
         return rootView;
+    }
+
+    private void getData() {
+        showProgressDialog();
+        FirebaseDatabase.getInstance().getReference()
+                .child(AppConstants.APP_NAME)
+                .child(AppConstants.FIREBASE_KEY.CART)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                .child(AppConstants.FIREBASE_KEY.PRESCRIPTION)
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        PrescriptionModel data = dataSnapshot.getValue(PrescriptionModel.class);
+                        if (data != null) {
+                            catList.add(data);
+                            adapter.notifyDataSetChanged();
+                        }
+                        hideProgressDialog();
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        hideProgressDialog();
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                        hideProgressDialog();
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                        hideProgressDialog();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        hideProgressDialog();
+                    }
+                });
     }
 
     private void init() {
@@ -93,7 +137,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
         btnUpload.setOnClickListener(this);
     }
 
-    private void setCategory() {
+    private void setRecyclerView() {
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
         adapter = new UploadedPreAdapter(context, catList);
         recylcer_view.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
@@ -316,8 +360,6 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
             bitmapImage.compress(Bitmap.CompressFormat.PNG, 30, byteArrayOutputStream);
             byte[] byteArray = byteArrayOutputStream.toByteArray();
             String Encoded_userimage = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
-
             publishProgress(Encoded_userimage);
             return null;
         }
@@ -335,6 +377,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
             FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
                     .child(AppConstants.FIREBASE_KEY.CART)
                     .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                    .child(AppConstants.FIREBASE_KEY.PRESCRIPTION)
                     .child(key)
                     .setValue(data)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -342,22 +385,24 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                         public void onSuccess(Void aVoid) {
                             // Write was successful!
                             // ...
-                            catList.add(data);
-                            adapter.notifyDataSetChanged();
+                            hideProgressDialog();
+
+                            //catList.add(data);
+                            //adapter.notifyDataSetChanged();
                             Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
+
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             // Write failed
+                            hideProgressDialog();
                             // ...
                             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
                         }
                     });
 
-
-            hideProgressDialog();
 
         }
 

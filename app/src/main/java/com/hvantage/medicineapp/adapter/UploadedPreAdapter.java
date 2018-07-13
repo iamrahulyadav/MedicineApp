@@ -26,7 +26,6 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
     Context context;
     ArrayList<PrescriptionModel> arrayList;
 
-
     public UploadedPreAdapter(Context context, ArrayList<PrescriptionModel> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
@@ -34,7 +33,6 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.uploaded_pres_item_layout, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
@@ -122,9 +120,7 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-
         ImageView image, imgRemove;
-
         public ViewHolder(View itemView) {
             super(itemView);
             image = (ImageView) itemView.findViewById(R.id.image);
