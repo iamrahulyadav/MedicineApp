@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.SignupMobileActivity">
+    tools:context=".activity.LoginActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -13,12 +13,12 @@
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
-            app:contentInsetLeft="0dp"
-            app:contentInsetStart="0dp"
-            app:contentInsetStartWithNavigation="0dp"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
+            app:contentInsetLeft="0dp"
+            app:contentInsetStart="0dp"
+            app:contentInsetStartWithNavigation="0dp"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
             <TextView
@@ -29,9 +29,9 @@
                 android:layout_gravity="center"
                 android:fontFamily="@font/quicksand_bold"
                 android:gravity="center"
-                android:text="Signup"
                 android:maxLines="1"
                 android:singleLine="true"
+                android:text="Login"
                 android:textColor="@color/colorToolbarTitle" />
         </android.support.v7.widget.Toolbar>
 

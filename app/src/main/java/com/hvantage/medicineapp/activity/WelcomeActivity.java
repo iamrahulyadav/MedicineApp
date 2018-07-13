@@ -1,7 +1,10 @@
 package com.hvantage.medicineapp.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +19,7 @@ import com.hvantage.medicineapp.adapter.WelcomePagerAdapter;
 
 public class WelcomeActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final int REQUEST_ALL_PERMISSIONS = 100;
     private ViewPager mPager;
     private int[] layouts = {R.layout.page0, R.layout.page1, R.layout.page2, R.layout.page3, R.layout.page4};
     private WelcomePagerAdapter welcomePagerAdapter;
@@ -44,7 +48,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
         BnNext.setOnClickListener(this);
         BnSkip.setOnClickListener(this);
 
-        BnSkip.setVisibility(View.INVISIBLE);
+//        BnSkip.setVisibility(View.INVISIBLE);
         createDots(0);
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -56,7 +60,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             public void onPageSelected(int position) {
                 createDots(position);
                 if (position == 0) {
-                    BnSkip.setVisibility(View.INVISIBLE);
+                    //BnSkip.setVisibility(View.INVISIBLE);
                 } else if (layouts.length == 1) {
                     BnSkip.setVisibility(View.VISIBLE);
                 } else if (position == layouts.length - 1) {
@@ -73,6 +77,8 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
 
             }
         });
+
+        checkPermission();
     }
 
     private void createDots(int current_position) {
@@ -125,5 +131,27 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
             //new PreferenceManager(this).writePreference();
         }
     }
+
+    private boolean checkPermission() {
+        if ((ContextCompat.checkSelfPermission(WelcomeActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(WelcomeActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(WelcomeActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
+            if ((ActivityCompat.shouldShowRequestPermissionRationale(WelcomeActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                    && (ActivityCompat.shouldShowRequestPermissionRationale(WelcomeActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE))) {
+            } else {
+                ActivityCompat.requestPermissions(WelcomeActivity.this,
+                        new String[]{
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.CAMERA,
+                        },
+                        REQUEST_ALL_PERMISSIONS);
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
 
 }

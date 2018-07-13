@@ -3,41 +3,47 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
     <item
-        android:id="@+id/nav_camera"
+        android:id="@+id/nav_home"
         android:icon="@drawable/action_home"
         android:title="Home" />
     <item
-        android:id="@+id/nav_gallery"
+        android:id="@+id/nav_upload_pre"
         android:icon="@drawable/action_upload_rx"
         android:title="Upload Prescription" />
 
     <item
+        android:id="@+id/nav_vault"
         android:icon="@drawable/action_vault"
         android:title="Vault" />
 
     <item
-        android:id="@+id/nav_slideshow"
+        android:id="@+id/nav_orders"
         android:icon="@drawable/action_bag"
         android:title="My Orders" />
 
 
     <item
+        android:id="@+id/nav_myaccount"
         android:icon="@drawable/action_user"
         android:title="My Account" />
 
     <item
+        android:id="@+id/nav_discount_offer"
         android:icon="@drawable/action_discount_offers"
         android:title="Discount &amp; Offers" />
 
     <item
+        android:id="@+id/nav_cust_support"
         android:icon="@drawable/action_customer_support"
         android:title="Customer Support" />
 
     <item
+        android:id="@+id/nav_share"
         android:icon="@drawable/action_share"
         android:title="Refer &amp; Earn" />
 
     <item
+        android:id="@+id/nav_logout"
         android:icon="@drawable/action_logout"
         android:title="Log out" />
 

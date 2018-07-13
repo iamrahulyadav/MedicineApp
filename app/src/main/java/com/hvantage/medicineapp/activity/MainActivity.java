@@ -1,129 +1,147 @@
 package com.hvantage.medicineapp.activity;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.adapter.CategoryAdapter;
-import com.hvantage.medicineapp.adapter.HomeProductAdapter;
-import com.hvantage.medicineapp.model.CategoryModel;
-import com.hvantage.medicineapp.model.ProductModel;
-import com.hvantage.medicineapp.util.RecyclerItemClickListener;
+import com.hvantage.medicineapp.fragments.HomeFragment;
+import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
+import com.hvantage.medicineapp.util.FragmentIntraction;
 
-import java.util.ArrayList;
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, FragmentIntraction {
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
-    ArrayList<CategoryModel> catList = new ArrayList<CategoryModel>();
-    ArrayList<ProductModel> productList = new ArrayList<ProductModel>();
-    ArrayList<ProductModel> productList2 = new ArrayList<ProductModel>();
-    private RecyclerView recylcer_view;
-    private CategoryAdapter adapter;
-    private RecyclerView recylcer_view2;
-    private HomeProductAdapter adapter2;
-    private RecyclerView recylcer_view3;
-    private HomeProductAdapter adapter3;
+    private static final String TAG = "MainActivity";
+    private static final int REQUEST_ALL_PERMISSIONS = 100;
+    private TextView toolbar_title;
+    private FirebaseAuth auth;
+    private Context context;
+    private NavigationView navigationView;
+    private TextView tvLogin, tvUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.app_bar_main);
+        context = this;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar_title = (TextView) toolbar.findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);
         initDrawer(toolbar);
+        setDefaultFragment();
 
+        auth = FirebaseAuth.getInstance();
+        if (auth.getCurrentUser() == null) {
+            hideMenus();
+            tvUsername.setVisibility(View.GONE);
+            tvLogin.setVisibility(View.VISIBLE);
+        } else {
+            tvUsername.setVisibility(View.VISIBLE);
+            tvLogin.setVisibility(View.GONE);
+            Log.e(TAG, "onCreate: uid >> " + auth.getCurrentUser().getUid());
+            Log.e(TAG, "onCreate: name >> " + auth.getCurrentUser().getDisplayName());
+            Log.e(TAG, "onCreate: phone >> " + auth.getCurrentUser().getPhoneNumber());
+            tvUsername.setText("Hello, " + auth.getCurrentUser().getDisplayName());
+        }
     }
 
-    private void setCategory() {
-        recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
-        adapter = new CategoryAdapter(MainActivity.this, catList);
-        recylcer_view.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false));
-        recylcer_view.setAdapter(adapter);
-
-        catList.add(new CategoryModel(1, "Prescriptions", R.drawable.cat_prescription));
-        catList.add(new CategoryModel(1, "OTC", R.drawable.cat_otc));
-        catList.add(new CategoryModel(1, "Diabetes", R.drawable.cat_diabetes));
-        catList.add(new CategoryModel(1, "Baby & Mother", R.drawable.cat_baby_mother));
-        catList.add(new CategoryModel(1, "Personal Care", R.drawable.cat_personal_care));
-        catList.add(new CategoryModel(1, "Wellness", R.drawable.cat_wellness));
-        catList.add(new CategoryModel(1, "Health Aid", R.drawable.cat_aid));
-        catList.add(new CategoryModel(1, "Ayurvedic", R.drawable.cat_ayurvedic));
-        catList.add(new CategoryModel(1, "Homeopathy", R.drawable.cat_homeo));
-        adapter.notifyDataSetChanged();
+    private boolean checkPermission() {
+        if ((ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
+            if ((ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                    && (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE))) {
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.CAMERA,
+                        },
+                        REQUEST_ALL_PERMISSIONS);
+            }
+            return false;
+        } else {
+            return true;
+        }
     }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_ALL_PERMISSIONS: {
+                for (int i = 0; i < grantResults.length; i++) {
+                    if (grantResults.length > 0 && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                        //permission granted
+                    } else {
+                        Toast.makeText(MainActivity.this, "Permission Denied.", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+            break;
+        }
+    }
+
+    private void hideMenus() {
+        Menu nav_Menu = navigationView.getMenu();
+        nav_Menu.findItem(R.id.nav_upload_pre).setVisible(false);
+        nav_Menu.findItem(R.id.nav_vault).setVisible(false);
+        nav_Menu.findItem(R.id.nav_orders).setVisible(false);
+        nav_Menu.findItem(R.id.nav_myaccount).setVisible(false);
+        nav_Menu.findItem(R.id.nav_logout).setVisible(false);
+    }
+
+    private void setDefaultFragment() {
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction ft = manager.beginTransaction();
+        ft.replace(R.id.main_container, new HomeFragment());
+        ft.commitAllowingStateLoss();
+    }
+
 
     private void initDrawer(Toolbar toolbar) {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        setCategory();
-        setProduct();
-        setProduct2();
-
-    }
-
-    private void setProduct() {
-        recylcer_view2 = (RecyclerView) findViewById(R.id.recylcer_view2);
-        adapter2 = new HomeProductAdapter(MainActivity.this, productList);
-        recylcer_view2.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false));
-        recylcer_view2.setAdapter(adapter2);
-        recylcer_view2.addOnItemTouchListener(new RecyclerItemClickListener(MainActivity.this, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
+        tvLogin = (TextView) navigationView.getHeaderView(0).findViewById(R.id.tvLogin);
+        tvUsername = (TextView) navigationView.getHeaderView(0).findViewById(R.id.tvUsername);
+        tvLogin.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(View view, int position) {
-                startActivity(new Intent(MainActivity.this, ProductDetailActivity.class));
+            public void onClick(View view) {
+                startActivity(new Intent(context, LoginActivity.class));
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
             }
+        });
 
-            @Override
-            public void onItemLongClick(View view, int position) {
-
-            }
-        }));
-        productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        adapter2.notifyDataSetChanged();
-
-    }
-
-    private void setProduct2() {
-        recylcer_view3 = (RecyclerView) findViewById(R.id.recylcer_view3);
-        adapter3 = new HomeProductAdapter(MainActivity.this, productList2);
-        recylcer_view3.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false));
-        recylcer_view3.setAdapter(adapter3);
-        recylcer_view3.addOnItemTouchListener(new RecyclerItemClickListener(MainActivity.this, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                startActivity(new Intent(MainActivity.this, ProductDetailActivity.class));
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-
-            }
-        }));
-        productList2.add(new ProductModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
-        productList2.add(new ProductModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
-        productList2.add(new ProductModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
-        productList2.add(new ProductModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
-        adapter3.notifyDataSetChanged();
     }
 
 
@@ -155,9 +173,61 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
-
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction ft = manager.beginTransaction();
+        Fragment fragment;
+        switch (id) {
+            case R.id.nav_home:
+                fragment = new HomeFragment();
+                ft.replace(R.id.main_container, fragment);
+                ft.commitAllowingStateLoss();
+                clearBackStack();
+                break;
+            case R.id.nav_upload_pre:
+                fragment = new UploadPrecriptionFragment();
+                ft.replace(R.id.main_container, fragment);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+                break;
+            case R.id.nav_logout:
+                logoutAlert();
+                break;
+        }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void clearBackStack() {
+        FragmentManager manager = getSupportFragmentManager();
+        if (manager.getBackStackEntryCount() > 0) {
+            FragmentManager.BackStackEntry first = manager.getBackStackEntryAt(0);
+            manager.popBackStack(first.getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
+    }
+
+
+    private void logoutAlert() {
+        new AlertDialog.Builder(context)
+                .setMessage("Do you want to logout?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        FirebaseAuth.getInstance().signOut();
+                        startActivity(new Intent(context, LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .show();
+    }
+
+    @Override
+    public void actionbarsetTitle(String title) {
+        toolbar_title.setText(title);
     }
 }

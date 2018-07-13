@@ -14,4 +14,5 @@
     <color name="colorSuccess">#18ca71</color>
     <color name="colorWarning">#18a6ca</color>
     <color name="colorToolbarTitle">#ceffffff</color>
+    <color name="semiTransparent">#d5111111</color>
 </resources>

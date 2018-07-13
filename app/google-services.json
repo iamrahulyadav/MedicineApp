@@ -1,0 +1,967 @@
+{
+  "project_info": {
+    "project_number": "1084522127414",
+    "firebase_url": "https://project-2f91a.firebaseio.com",
+    "project_id": "project-2f91a",
+    "storage_bucket": "project-2f91a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:35783914c7c435da",
+        "android_client_info": {
+          "package_name": "co.hymntunes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-j5spo8hu2hv50th7jtp5p60vb3cq9263.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "co.hymntunes",
+            "certificate_hash": "eeefdc7447e2b1282999cea111a4630955e876b0"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:71b8eb0ec1ca8c04",
+        "android_client_info": {
+          "package_name": "co.restmall"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-n22d36730dqdnq76tq4spmle5sin5ug7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "co.restmall",
+            "certificate_hash": "366168f13770326f6b039f6803f54c35df1de8b9"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:0ef1e4a7ca1e964b",
+        "android_client_info": {
+          "package_name": "com.android.intrefico"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-76jhiojdtr3aj00d9pebfmti7smkjq4k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.intrefico",
+            "certificate_hash": "a754b2ed7fc0d3645b73e80cff9748df68a53a31"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:e5dd0e9638ffd939",
+        "android_client_info": {
+          "package_name": "com.dinehawaiipartner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:10d903a60070521d",
+        "android_client_info": {
+          "package_name": "com.ebutton"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-qii8rfhn7jiq9kc4rc2bctm2v29scfsu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ebutton",
+            "certificate_hash": "eeefdc7447e2b1282999cea111a4630955e876b0"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:aa5b8e6e90ca8f84",
+        "android_client_info": {
+          "package_name": "com.frogpond"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-lqa5rq75ls0t0ivngm4qpi05b0pa1u05.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.frogpond",
+            "certificate_hash": "769265f45383d6887bd357e5497cf7e30454da5c"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:453734ce137ac747",
+        "android_client_info": {
+          "package_name": "com.frogponddoctors"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-8pna82phopv1eg57l7p9d84k74dmj12n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.frogponddoctors",
+            "certificate_hash": "769265f45383d6887bd357e5497cf7e30454da5c"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:6378b4744308ee11",
+        "android_client_info": {
+          "package_name": "com.geotracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-1opaklptrq5gd2irijn2dq7kbunf99f8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.geotracker",
+            "certificate_hash": "eeefdc7447e2b1282999cea111a4630955e876b0"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:3739edcdf091dae3",
+        "android_client_info": {
+          "package_name": "com.homecheck.owner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-2m93nnqfl702tc4jos1gqkpkachkvkf0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.homecheck.owner",
+            "certificate_hash": "769265f45383d6887bd357e5497cf7e30454da5c"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:3dfd9baba987a671",
+        "android_client_info": {
+          "package_name": "com.homecheck.support"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-qodevrpbq6nnfvn0jkenjpv1bc5dju55.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.homecheck.support",
+            "certificate_hash": "2afbb0b9c6ff2c3b74a94e352cb3aa3b8e49b910"
+          }
+        },
+        {
+          "client_id": "1084522127414-hnh9brgpt2ne8qoikt2eqljkiiuh6k9f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.homecheck.support",
+            "certificate_hash": "769265f45383d6887bd357e5497cf7e30454da5c"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:08df0a3587ddd279",
+        "android_client_info": {
+          "package_name": "com.hvantage.medicineapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:174056dd5b3ffe83",
+        "android_client_info": {
+          "package_name": "com.hymnbook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-g7gdhh55hredb85ob5uficre4g81b22h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hymnbook",
+            "certificate_hash": "eeefdc7447e2b1282999cea111a4630955e876b0"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:0a6f46235a3985c8",
+        "android_client_info": {
+          "package_name": "com.invito"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-6mcpnp8pqtg92k8jbco1o6jb0j5rlir3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.invito",
+            "certificate_hash": "769265f45383d6887bd357e5497cf7e30454da5c"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:99abbacf9258bb09",
+        "android_client_info": {
+          "package_name": "com.mksingh.ballshooter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-g64109l72pcpe2sualpls78utctjihah.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mksingh.ballshooter",
+            "certificate_hash": "249c13acb232ece307e7f057c4deddc628a82e1c"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:18c44b5fe9cbb992",
+        "android_client_info": {
+          "package_name": "com.ownerrestaurent"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-afhoig3m20dvh5n18l26mq961hmofq14.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ownerrestaurent",
+            "certificate_hash": "279d40bba3039d978b4984dee1e32ce63a480ad1"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:38d6d08375bebe61",
+        "android_client_info": {
+          "package_name": "com.restaurantprototype"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-141288sdfj6gdrh2qofnhdargn7e0jqm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.restaurantprototype",
+            "certificate_hash": "279d40bba3039d978b4984dee1e32ce63a480ad1"
+          }
+        },
+        {
+          "client_id": "1084522127414-e2ijdomhpsj1rhrrrr4pnu0gkl9i0mrg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.restaurantprototype",
+            "certificate_hash": "249c13acb232ece307e7f057c4deddc628a82e1c"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:1d64a41ebb80589c",
+        "android_client_info": {
+          "package_name": "com.rk.restaurantdemo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-gi3cv1fqhsa8487ckdlsciuk4fvil8a1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rk.restaurantdemo",
+            "certificate_hash": "eeefdc7447e2b1282999cea111a4630955e876b0"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:8f803c12882add23",
+        "android_client_info": {
+          "package_name": "com.threemiledeals"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:72db0f371972c2a9",
+        "android_client_info": {
+          "package_name": "com.yberry.dinehawaii"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1084522127414:android:79f1d63fb3760836",
+        "android_client_info": {
+          "package_name": "roadrunadriver.com.roadruna"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1084522127414-u17sl9auvji2i1t94evsjof6m398c24f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "roadrunadriver.com.roadruna",
+            "certificate_hash": "eeefdc7447e2b1282999cea111a4630955e876b0"
+          }
+        },
+        {
+          "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy7Y14wTIWwuH-_-Ap9tOyWCoWXGg2uXM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1084522127414-ddna13petqtu3dv0smud0ks0s86k7knj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1084522127414-47o3i20hk03t1pcki2satinar049s6ji.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Dinehawaii.hvantage"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
