@@ -10,6 +10,8 @@ public class AppConstants {
         public static final String CART = "order_cart";
         public static final String PRESCRIPTION = "prescription ";
         public static final String CATEGORY = "category";
+        public static final String VAULT = "vault";
+        public static final String MY_FAMILY = "my_family";
     }
 
     public class CATEGORY {

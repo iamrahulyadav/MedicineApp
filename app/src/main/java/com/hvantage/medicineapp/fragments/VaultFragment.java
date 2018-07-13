@@ -5,6 +5,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +26,7 @@ public class VaultFragment extends Fragment implements View.OnClickListener {
     private View rootView;
     private FragmentIntraction intraction;
     private ProgressBar progressBar;
+    private CardView cardFamily, cardDoctors, cardReports, cardUploads;
 
     @Nullable
     @Override
@@ -40,12 +44,17 @@ public class VaultFragment extends Fragment implements View.OnClickListener {
 
 
     private void init() {
+        cardFamily = (CardView) rootView.findViewById(R.id.cardFamily);
+        cardDoctors = (CardView) rootView.findViewById(R.id.cardDoctors);
+        cardReports = (CardView) rootView.findViewById(R.id.cardReports);
+        cardUploads = (CardView) rootView.findViewById(R.id.cardUploads);
 
-
+        cardFamily.setOnClickListener(this);
+        cardDoctors.setOnClickListener(this);
+        cardReports.setOnClickListener(this);
+        cardUploads.setOnClickListener(this);
     }
 
-    private void setRecyclerView() {
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -67,7 +76,12 @@ public class VaultFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btnUpload:
+            case R.id.cardFamily:
+                FragmentManager manager = getFragmentManager();
+                FragmentTransaction ft = manager.beginTransaction();
+                ft.replace(R.id.main_container, new MyFamilyFragment());
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
                 break;
         }
     }
