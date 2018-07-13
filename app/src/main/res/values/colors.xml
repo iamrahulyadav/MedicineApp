@@ -10,7 +10,8 @@
     <color name="colorTextHeading">#4b4b4b</color>
     <color name="colorTextSubHeading">#767676</color>
     <color name="colorGray">#cacaca</color>
-    <color name="colorError">#ed3b00</color>
+    <color name="colorError">#ef4056</color>
+    <!--<color name="colorError">#ed3b00</color>-->
     <color name="colorSuccess">#18ca71</color>
     <color name="colorWarning">#18a6ca</color>
     <color name="colorToolbarTitle">#ceffffff</color>

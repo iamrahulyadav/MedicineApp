@@ -25,19 +25,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
@@ -46,15 +42,11 @@ import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.GridSpacingItemDecoration;
 import com.hvantage.medicineapp.util.ProgressBar;
-import com.theartofdev.edmodo.cropper.CropImage;
-import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import static android.app.Activity.RESULT_OK;
 
 
 public class UploadPrecriptionFragment extends Fragment implements View.OnClickListener {
@@ -98,13 +90,21 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 .child(AppConstants.FIREBASE_KEY.CART)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
                 .child(AppConstants.FIREBASE_KEY.PRESCRIPTION)
-                .addChildEventListener(new ChildEventListener() {
+                .orderByKey()
+                /*.addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                         PrescriptionModel data = dataSnapshot.getValue(PrescriptionModel.class);
                         if (data != null) {
                             catList.add(data);
                             adapter.notifyDataSetChanged();
+                        }
+
+                        if (adapter.getItemCount() >= 3) {
+                            btnUpload.setVisibility(View.GONE);
+                        } else {
+                            btnUpload.setVisibility(View.VISIBLE);
+
                         }
                         hideProgressDialog();
                     }
@@ -126,6 +126,35 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
+                        hideProgressDialog();
+                    }
+                });*/
+
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        catList.clear();
+                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                            PrescriptionModel data = postSnapshot.getValue(PrescriptionModel.class);
+                            if (data != null) {
+                                catList.add(data);
+                                adapter.notifyDataSetChanged();
+                            }
+
+                            if (adapter.getItemCount() >= 3) {
+                                btnUpload.setVisibility(View.GONE);
+                            } else {
+                                btnUpload.setVisibility(View.VISIBLE);
+
+                            }
+                        }
+                        hideProgressDialog();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // Getting Post failed, log a message
+                        Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
                         hideProgressDialog();
                     }
                 });
@@ -258,12 +287,8 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-             /*   catList.add(data.getData());
-                adapter.notifyDataSetChanged();*/
                 new ImageTask().execute(bitmap);
-                if (adapter.getItemCount() > 0)
-                    btnPlaceOrder.setVisibility(View.VISIBLE);
-//                startCropImageActivity(data.getData());
+
             } else if (requestCode == REQUEST_IMAGE_CAPTURE) {
                 File croppedImageFile1 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
                         + "/M4D/" + "report_img.jpg");
@@ -280,70 +305,9 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-               /* catList.add(outputFileUri);
-                adapter.notifyDataSetChanged();*/
                 new ImageTask().execute(bitmap);
-                if (adapter.getItemCount() > 0)
-                    btnPlaceOrder.setVisibility(View.VISIBLE);
-                //startCropImageActivity(outputFileUri);
-            } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-                CropImage.ActivityResult result = CropImage.getActivityResult(data);
-                if (resultCode == RESULT_OK) {
-                    Bitmap bitmap = null;
-                    try {
-                        bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), result.getUri());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    showPreviewDialog(bitmap);
-
-                } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-//                    Toast.makeText(this, "Cropping failed: " + result.getError(), Toast.LENGTH_LONG).show();
-                }
             }
         }
-    }
-
-    private void startCropImageActivity(Uri imageUri) {
-        CropImage.activity(imageUri)
-                .setGuidelines(CropImageView.Guidelines.ON)
-                .setMultiTouchEnabled(false)
-                .setAspectRatio(3, 4)
-                .setRequestedSize(320, 240)
-                .setScaleType(CropImageView.ScaleType.CENTER_INSIDE)
-                .start((Activity) context);
-    }
-
-    private void showPreviewDialog(final Bitmap bitmap) {
-        dialog = new Dialog(getActivity(), R.style.image_preview_dialog);
-        dialog.setContentView(R.layout.image_setup_layout);
-        Window window = dialog.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        dialog.getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        dialog.setCancelable(true);
-        dialog.setCanceledOnTouchOutside(false);
-
-        ImageView imageView = (ImageView) dialog.findViewById(R.id.image);
-
-        Button btnSave = (Button) dialog.findViewById(R.id.btnSave);
-        imageView.setImageBitmap(bitmap);
-
-        btnSave.setOnClickListener(new View.OnClickListener() {
-                                       @Override
-                                       public void onClick(View view) {
-//                                           catList.add(bitmap);
-                                           adapter.notifyDataSetChanged();
-                                           dialog.dismiss();
-                                           new ImageTask().execute(bitmap);
-                                       }
-                                   }
-        );
-
-
-        dialog.show();
-
-
     }
 
     class ImageTask extends AsyncTask<Bitmap, String, Void> {
@@ -403,8 +367,6 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                         }
                     });
 
-
         }
-
     }
 }
