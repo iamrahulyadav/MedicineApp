@@ -20,7 +20,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     Context context;
     ArrayList<CategoryModel> arrayList;
 
-
     public CategoryAdapter(Context context, ArrayList<CategoryModel> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
@@ -28,7 +27,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.category_item_layout, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
@@ -41,7 +39,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         Log.e(TAG, "onBindViewHolder: data >> " + data.getName());
         holder.tvTitle.setText(data.getName());
         holder.img.setImageResource(data.getImg());
-
     }
 
 
@@ -51,7 +48,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-
         ImageView img;
         TextView tvTitle;
 

@@ -15,5 +15,7 @@ public class AppConstants {
     public class CATEGORY {
         public static final String OTC = "OTC";
         public static final String PERSONAL_CARE = "Personal Care";
+        public static final String BABY_AND_MOTHER = "Baby & Mother";
+        public static final String WELLNESS = "Wellness";
     }
 }

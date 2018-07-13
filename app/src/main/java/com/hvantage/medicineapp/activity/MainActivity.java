@@ -29,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.fragments.HomeFragment;
 import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
+import com.hvantage.medicineapp.fragments.VaultFragment;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, FragmentIntraction {
@@ -185,6 +186,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_upload_pre:
                 fragment = new UploadPrecriptionFragment();
+                ft.replace(R.id.main_container, fragment);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+                break;
+            case R.id.nav_vault:
+                fragment = new VaultFragment();
                 ft.replace(R.id.main_container, fragment);
                 ft.addToBackStack(null);
                 ft.commitAllowingStateLoss();

@@ -71,9 +71,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         catList.add(new CategoryModel(1, "Prescriptions", R.drawable.cat_prescription));
         catList.add(new CategoryModel(1, AppConstants.CATEGORY.OTC, R.drawable.cat_otc));
         catList.add(new CategoryModel(1, AppConstants.CATEGORY.PERSONAL_CARE, R.drawable.cat_personal_care));
+        catList.add(new CategoryModel(1, AppConstants.CATEGORY.BABY_AND_MOTHER, R.drawable.cat_baby_mother));
+        catList.add(new CategoryModel(1, AppConstants.CATEGORY.WELLNESS, R.drawable.cat_wellness));
         catList.add(new CategoryModel(1, "Diabetes", R.drawable.cat_diabetes));
-        catList.add(new CategoryModel(1, "Baby & Mother", R.drawable.cat_baby_mother));
-        catList.add(new CategoryModel(1, "Wellness", R.drawable.cat_wellness));
         catList.add(new CategoryModel(1, "Health Aid", R.drawable.cat_aid));
         catList.add(new CategoryModel(1, "Ayurvedic", R.drawable.cat_ayurvedic));
         catList.add(new CategoryModel(1, "Homeopathy", R.drawable.cat_homeo));

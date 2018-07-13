@@ -5,12 +5,14 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,7 +22,9 @@ import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.BrowseCategoryAdapter;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
+import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
+import com.hvantage.medicineapp.util.RecyclerItemClickListener;
 
 import java.util.ArrayList;
 
@@ -36,6 +40,7 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
     private ArrayList<String> list = new ArrayList<String>();
     private ProgressBar progressBar;
     private String data;
+    private CardView cardEmptyText;
 
     @Nullable
     @Override
@@ -50,7 +55,10 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
         }
         init();
         setRecyclerView();
-        getData();
+        if (Functions.isConnectingToInternet(context))
+            getData();
+        else
+            Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
         return rootView;
     }
 
@@ -68,6 +76,10 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
                             list.add(postSnapshot.getKey().toString());
                         }
                         adapter.notifyDataSetChanged();
+                        if (adapter.getItemCount() > 0)
+                            cardEmptyText.setVisibility(View.GONE);
+                        else
+                            cardEmptyText.setVisibility(View.VISIBLE);
                         hideProgressDialog();
                     }
 
@@ -75,20 +87,36 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
                     public void onCancelled(DatabaseError databaseError) {
                         // Getting Post failed, log a message
                         Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                        if (adapter.getItemCount() > 0)
+                            cardEmptyText.setVisibility(View.GONE);
+                        else
+                            cardEmptyText.setVisibility(View.VISIBLE);
                         hideProgressDialog();
                     }
                 });
     }
 
     private void init() {
+        recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
+        cardEmptyText = (CardView) rootView.findViewById(R.id.cardEmptyText);
 
     }
 
     private void setRecyclerView() {
-        recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
         adapter = new BrowseCategoryAdapter(context, list);
         recylcer_view.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view.setAdapter(adapter);
+        recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        }));
         adapter.notifyDataSetChanged();
     }
 

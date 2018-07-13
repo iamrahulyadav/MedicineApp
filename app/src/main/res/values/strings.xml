@@ -12,4 +12,5 @@
     <string name="otp_sent_text">We sent an otp to the number</string>
     <string name="agree_text"><![CDATA[I agree to Terms of Use & Privacy Policy]]></string>
     <string name="upload_rx_text">We only accept valid prescription, with doctor\'s name and registration clearly visible.</string>
+    <string name="no_internet_text">No Internet Connection.</string>
 </resources>
