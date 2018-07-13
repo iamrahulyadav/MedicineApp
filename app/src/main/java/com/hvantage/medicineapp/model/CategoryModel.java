@@ -6,10 +6,10 @@ public class CategoryModel {
     int img;
     int id;
 
-    public CategoryModel(int i, String ayurvedic, int cat_ayurvedic) {
-        id = i;
-        name = ayurvedic;
-        img = cat_ayurvedic;
+    public CategoryModel(int id, String category_name, int icon_id) {
+        id = id;
+        name = category_name;
+        img = icon_id;
     }
 
     public int getId() {

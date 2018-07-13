@@ -7,11 +7,13 @@ public class AppConstants {
 
     public class FIREBASE_KEY {
         public static final String USERS = "users";
-        public static final String PRODUCTS = "products";
-
         public static final String CART = "order_cart";
-        public static final String APP = "store_db";
-
         public static final String PRESCRIPTION = "prescription ";
+        public static final String CATEGORY = "category";
+    }
+
+    public class CATEGORY {
+        public static final String OTC = "OTC";
+        public static final String PERSONAL_CARE = "Personal Care";
     }
 }

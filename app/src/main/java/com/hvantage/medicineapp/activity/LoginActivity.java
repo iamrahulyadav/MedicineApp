@@ -332,11 +332,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             showProgressDialog();
             Log.e(TAG, "saveData: name >> " + etName.getText().toString());
-            FirebaseUser user = mAuth.getCurrentUser();
-            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                    .setDisplayName(etName.getText().toString())
-                    .build();
-            user.updateProfile(profileUpdates);
+
             User data = new User(
                     mAuth.getCurrentUser().getUid(),
                     etName.getText().toString(),
@@ -349,7 +345,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             database.child(mAuth.getCurrentUser().getPhoneNumber()).setValue(data).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                            .setDisplayName(etName.getText().toString())
+                            .build();
+                    user.updateProfile(profileUpdates);
                     hideProgressDialog();
                     Snackbar.make(findViewById(android.R.id.content), "Registered.", Snackbar.LENGTH_SHORT).show();
                     startActivity(new Intent(LoginActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK));

@@ -51,8 +51,8 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final PrescriptionModel data = arrayList.get(position);
-        Log.e(TAG, "onBindViewHolder: data >> " + data);
-        final byte[] imageByteArray = Base64.decode(data.getImage_base64(), Base64.DEFAULT);
+        Log.d(TAG, "onBindViewHolder: data >> " + data);
+        byte[] imageByteArray = Base64.decode(data.getImage_base64(), Base64.DEFAULT);
         Glide.with(context)
                 .load(imageByteArray)
                 .crossFade()
@@ -67,7 +67,7 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
             @Override
             public void onClick(View view) {
                 Log.e(TAG, "onBindViewHolder: data >> " + data);
-                showPreviewDialog(imageByteArray);
+                showPreviewDialog(Base64.decode(data.getImage_base64(), Base64.DEFAULT));
             }
         });
         holder.imgRemove.setOnClickListener(new View.OnClickListener() {
@@ -149,8 +149,6 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
         Glide.with(context)
                 .load(imageByteArray)
                 .crossFade()
-                .centerCrop()
-                .override(100, 100)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(imgPreview);
 

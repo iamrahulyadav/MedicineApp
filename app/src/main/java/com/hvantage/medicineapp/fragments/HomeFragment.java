@@ -24,6 +24,7 @@ import com.hvantage.medicineapp.adapter.CategoryAdapter;
 import com.hvantage.medicineapp.adapter.HomeProductAdapter;
 import com.hvantage.medicineapp.model.CategoryModel;
 import com.hvantage.medicineapp.model.ProductModel;
+import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.RecyclerItemClickListener;
 
@@ -67,20 +68,40 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     private void setCategory() {
-        recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
-        adapter = new CategoryAdapter(context, catList);
-        recylcer_view.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        recylcer_view.setAdapter(adapter);
-
         catList.add(new CategoryModel(1, "Prescriptions", R.drawable.cat_prescription));
-        catList.add(new CategoryModel(1, "OTC", R.drawable.cat_otc));
+        catList.add(new CategoryModel(1, AppConstants.CATEGORY.OTC, R.drawable.cat_otc));
+        catList.add(new CategoryModel(1, AppConstants.CATEGORY.PERSONAL_CARE, R.drawable.cat_personal_care));
         catList.add(new CategoryModel(1, "Diabetes", R.drawable.cat_diabetes));
         catList.add(new CategoryModel(1, "Baby & Mother", R.drawable.cat_baby_mother));
-        catList.add(new CategoryModel(1, "Personal Care", R.drawable.cat_personal_care));
         catList.add(new CategoryModel(1, "Wellness", R.drawable.cat_wellness));
         catList.add(new CategoryModel(1, "Health Aid", R.drawable.cat_aid));
         catList.add(new CategoryModel(1, "Ayurvedic", R.drawable.cat_ayurvedic));
         catList.add(new CategoryModel(1, "Homeopathy", R.drawable.cat_homeo));
+
+        recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
+        adapter = new CategoryAdapter(context, catList);
+        recylcer_view.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+        recylcer_view.setAdapter(adapter);
+        recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                BrowseCategoryFragment fragment = new BrowseCategoryFragment();
+                Bundle args = new Bundle();
+                args.putString("data", catList.get(position).getName());
+                fragment.setArguments(args);
+                FragmentManager manager = getFragmentManager();
+                FragmentTransaction ft = manager.beginTransaction();
+                ft.replace(R.id.main_container, fragment);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        }));
+
         adapter.notifyDataSetChanged();
     }
 
@@ -89,7 +110,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         adapter2 = new HomeProductAdapter(context, productList);
         recylcer_view2.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         recylcer_view2.setAdapter(adapter2);
-        recylcer_view2.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
+        recylcer_view2.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view2, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 startActivity(new Intent(context, ProductDetailActivity.class));
@@ -114,7 +135,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         adapter3 = new HomeProductAdapter(context, productList2);
         recylcer_view3.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         recylcer_view3.setAdapter(adapter3);
-        recylcer_view3.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
+        recylcer_view3.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view2, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 startActivity(new Intent(context, ProductDetailActivity.class));

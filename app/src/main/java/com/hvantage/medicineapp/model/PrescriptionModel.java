@@ -26,4 +26,12 @@ public class PrescriptionModel {
     public void setImage_base64(String image_base64) {
         this.image_base64 = image_base64;
     }
+
+    @Override
+    public String toString() {
+        return "PrescriptionModel{" +
+                "key='" + key + '\'' +
+                ", image_base64='" + image_base64 + '\'' +
+                '}';
+    }
 }
