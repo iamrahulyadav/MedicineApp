@@ -65,7 +65,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private FragmentIntraction intraction;
     private RecyclerView recylcer_view;
     private UploadedPreAdapter adapter;
-    private ArrayList<Uri> catList = new ArrayList<Uri>();
+    private ArrayList<PrescriptionModel> catList = new ArrayList<PrescriptionModel>();
     private CardView btnUpload;
     private ProgressBar progressBar;
     private String userChoosenTask;
@@ -214,8 +214,8 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                catList.add(data.getData());
-                adapter.notifyDataSetChanged();
+             /*   catList.add(data.getData());
+                adapter.notifyDataSetChanged();*/
                 new ImageTask().execute(bitmap);
                 if (adapter.getItemCount() > 0)
                     btnPlaceOrder.setVisibility(View.VISIBLE);
@@ -236,8 +236,8 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                catList.add(outputFileUri);
-                adapter.notifyDataSetChanged();
+               /* catList.add(outputFileUri);
+                adapter.notifyDataSetChanged();*/
                 new ImageTask().execute(bitmap);
                 if (adapter.getItemCount() > 0)
                     btnPlaceOrder.setVisibility(View.VISIBLE);
@@ -331,7 +331,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                     .child(AppConstants.FIREBASE_KEY.CART)
                     .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
                     .push().getKey();
-            PrescriptionModel data = new PrescriptionModel(key, image_base64);
+            final PrescriptionModel data = new PrescriptionModel(key, image_base64);
             FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
                     .child(AppConstants.FIREBASE_KEY.CART)
                     .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
@@ -342,6 +342,8 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                         public void onSuccess(Void aVoid) {
                             // Write was successful!
                             // ...
+                            catList.add(data);
+                            adapter.notifyDataSetChanged();
                             Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
                         }
                     })

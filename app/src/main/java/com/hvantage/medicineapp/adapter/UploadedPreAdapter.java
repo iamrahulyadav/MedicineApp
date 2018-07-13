@@ -1,11 +1,10 @@
 package com.hvantage.medicineapp.adapter;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +15,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.model.PrescriptionModel;
 import com.hvantage.medicineapp.util.TouchImageView;
 
 import java.util.ArrayList;
@@ -24,10 +24,10 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
 
     private static final String TAG = "UploadedPreAdapter";
     Context context;
-    ArrayList<Uri> arrayList;
+    ArrayList<PrescriptionModel> arrayList;
 
 
-    public UploadedPreAdapter(Context context, ArrayList<Uri> arrayList) {
+    public UploadedPreAdapter(Context context, ArrayList<PrescriptionModel> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
     }
@@ -42,10 +42,18 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final Uri data = arrayList.get(position);
+        final PrescriptionModel data = arrayList.get(position);
         Log.e(TAG, "onBindViewHolder: data >> " + data);
+        byte[] imageByteArray = Base64.decode(data.getImage_base64(), Base64.DEFAULT);
+        Glide.with(context)
+                .load(imageByteArray)
+                .crossFade()
+                .centerCrop()
+                .override(100, 100)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(holder.image);
 //        holder.image.setImageBitmap(data);
-        if (data != null)
+        /*if (data != null)
             Glide.with(context)
                     .load(data)
                     .crossFade()
@@ -82,7 +90,7 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
                         })
                         .show();
             }
-        });
+        });*/
     }
 
     private void showPreviewDialog(Uri modal) {
