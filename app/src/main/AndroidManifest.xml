@@ -14,7 +14,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -38,11 +37,11 @@
             android:name=".activity.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+               <intent-filter>
+                   <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+                   <category android:name="android.intent.category.LAUNCHER" />
+               </intent-filter>
         </activity>
         <activity
             android:name=".activity.OldLoginActivity"
@@ -58,19 +57,33 @@
             android:name=".activity.WelcomeActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden">
-
-        </activity>
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
             android:name=".activity.ProductDetailActivity"
             android:label=""
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
-
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".activity.business.BusinessHomeActivity"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
+        </activity>
+        <activity
+            android:name=".activity.business.BusinessLoginActivity"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".activity.business.AddProductActivity"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

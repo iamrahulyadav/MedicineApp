@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.activity.business.BusinessLoginActivity;
 import com.hvantage.medicineapp.fragments.CartFragment;
 import com.hvantage.medicineapp.fragments.HomeFragment;
 import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
@@ -208,6 +209,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ft.replace(R.id.main_container, fragment);
                 ft.addToBackStack(null);
                 ft.commitAllowingStateLoss();
+                break;
+            case R.id.nav_business:
+                startActivity(new Intent(context, BusinessLoginActivity.class));
                 break;
             case R.id.nav_logout:
                 logoutAlert();
