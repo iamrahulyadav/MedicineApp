@@ -13,6 +13,7 @@ public class AppConstants {
         public static final String VAULT = "vault";
         public static final String MY_FAMILY = "my_family";
         public static final String MY_DOCTORS = "my_doctors";
+        public static final String MEDICINE = "medicine";
     }
 
     public class CATEGORY {

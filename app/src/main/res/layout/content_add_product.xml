@@ -63,7 +63,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="Drug Title"
+                android:hint="Category Name"
                 android:inputType="textCapWords"
                 android:paddingBottom="15dp"
                 android:paddingLeft="5dp"
@@ -100,12 +100,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:hint="Price (Each Pack)"
-                android:inputType="textCapWords"
+                android:inputType="numberDecimal"
                 android:paddingBottom="15dp"
                 android:paddingLeft="5dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                 android:textColor="@color/colorTextHeading" />
-
 
             <EditText
                 android:id="@+id/etDescription"
