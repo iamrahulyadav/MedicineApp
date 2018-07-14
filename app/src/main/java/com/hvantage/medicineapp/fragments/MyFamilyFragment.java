@@ -115,7 +115,15 @@ public class MyFamilyFragment extends Fragment implements View.OnClickListener {
         recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-
+                FragmentManager manager = getFragmentManager();
+                FragmentTransaction ft = manager.beginTransaction();
+                Fragment fragment = new AddFamilyFragment();
+                Bundle args = new Bundle();
+                args.putSerializable("data", list.get(position));
+                fragment.setArguments(args);
+                ft.replace(R.id.main_container, fragment);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
             }
 
             @Override

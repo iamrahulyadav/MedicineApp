@@ -31,4 +31,16 @@
         <item>AB-</item>
         <item><![CDATA[Don't Know]]></item>
     </string-array>
+
+    <string-array name="specialization">
+        <item>Select Specialization</item>
+        <item>Bacteriology</item>
+        <item>Cardiac Surgery</item>
+        <item>Cardiology</item>
+        <item>Clinical Immunology</item>
+        <item>Clinical Pharmacology</item>
+        <item>Colorectal Surgery</item>
+        <item>Community Medicine</item>
+        <item>Darmotology</item>
+    </string-array>
 </resources>

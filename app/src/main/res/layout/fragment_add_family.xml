@@ -25,6 +25,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="15dp"
                 android:elevation="5dp"
+                android:visibility="gone"
                 app:cardCornerRadius="40dp">
 
                 <ImageView
@@ -38,7 +39,7 @@
                 android:id="@+id/spinnerRelationship"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="20dp"
                 android:entries="@array/relation" />
 
             <View

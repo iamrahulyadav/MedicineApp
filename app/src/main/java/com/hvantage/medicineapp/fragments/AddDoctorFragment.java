@@ -22,41 +22,42 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.model.FamilyModel;
+import com.hvantage.medicineapp.model.DoctorModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 
 
-public class AddFamilyFragment extends Fragment implements View.OnClickListener {
+public class AddDoctorFragment extends Fragment implements View.OnClickListener {
 
-    private static final String TAG = "AddFamilyFragment";
+    private static final String TAG = "AddDoctorFragment";
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
     private ProgressBar progressBar;
-    private Spinner spinnerRelationship, spinnerGender, spinnerBG;
-    private EditText etName, etEmail, etPhoneNo, etHeight, etWeight, etAllergy;
+    private Spinner spinnerGender;
+    private EditText etName, etEmail, etPhoneNo, etAddress;
     private CardView btnSubmit;
-    private FamilyModel data = null;
+    private DoctorModel data = null;
+    private Spinner spinnerSpecialization;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         context = container.getContext();
-        rootView = inflater.inflate(R.layout.fragment_add_family, container, false);
+        rootView = inflater.inflate(R.layout.fragment_add_doctor, container, false);
 
         if (getArguments() != null) {
-            data = (FamilyModel) getArguments().getSerializable("data");
+            data = (DoctorModel) getArguments().getSerializable("data");
             Log.e(TAG, "onCreateView: data >> " + data);
         }
 
         if (intraction != null) {
             if (data == null)
-                intraction.actionbarsetTitle("Add Member");
+                intraction.actionbarsetTitle("Add Doctor");
             else
-                intraction.actionbarsetTitle("Member Details");
+                intraction.actionbarsetTitle("Doctor Details");
         }
 
 
@@ -65,41 +66,22 @@ public class AddFamilyFragment extends Fragment implements View.OnClickListener 
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
 
         if (data != null) {
-           /* spinnerRelationship.setEnabled(false);
-            spinnerGender.setEnabled(false);
-            spinnerBG.setEnabled(false);
-            etName.setEnabled(false);
-            etEmail.setEnabled(false);
-            etPhoneNo.setEnabled(false);
-            etHeight.setEnabled(false);
-            etWeight.setEnabled(false);
-            etAllergy.setEnabled(false);
-            btnSubmit.setVisibility(View.GONE);*/
-
             etName.setText(data.getName());
             etEmail.setText(data.getEmail());
             etPhoneNo.setText(data.getMobile_no());
-            etHeight.setText(data.getHeight());
-            etWeight.setText(data.getWeight());
-            etAllergy.setText(data.getKnown_allergies());
+            etAddress.setText(data.getAddress());
 
-            String[] arrayRelation = getResources().getStringArray(R.array.relation);
             String[] arrayGender = getResources().getStringArray(R.array.gender);
-            String[] arrayBG = getResources().getStringArray(R.array.blood_groups);
+            String[] arraySpe = getResources().getStringArray(R.array.specialization);
 
-            for (int i = 0; i < arrayRelation.length; i++) {
-                if (arrayRelation[i].equalsIgnoreCase(data.getRelation()))
-                    spinnerRelationship.setSelection(i);
+            for (int i = 0; i < arraySpe.length; i++) {
+                if (arraySpe[i].equalsIgnoreCase(data.getSpecialization()))
+                    spinnerSpecialization.setSelection(i);
             }
 
             for (int i = 0; i < arrayGender.length; i++) {
                 if (arrayGender[i].equalsIgnoreCase(data.getGender()))
                     spinnerGender.setSelection(i);
-            }
-
-            for (int i = 0; i < arrayBG.length; i++) {
-                if (arrayBG[i].equalsIgnoreCase(data.getBlood_group()))
-                    spinnerBG.setSelection(i);
             }
         }
         return rootView;
@@ -107,15 +89,12 @@ public class AddFamilyFragment extends Fragment implements View.OnClickListener 
 
 
     private void init() {
-        spinnerRelationship = (Spinner) rootView.findViewById(R.id.spinnerRelationship);
+        spinnerSpecialization = (Spinner) rootView.findViewById(R.id.spinnerSpecialization);
         spinnerGender = (Spinner) rootView.findViewById(R.id.spinnerGender);
-        spinnerBG = (Spinner) rootView.findViewById(R.id.spinnerBG);
         etName = (EditText) rootView.findViewById(R.id.etName);
         etEmail = (EditText) rootView.findViewById(R.id.etEmail);
         etPhoneNo = (EditText) rootView.findViewById(R.id.etPhoneNo);
-        etHeight = (EditText) rootView.findViewById(R.id.etHeight);
-        etWeight = (EditText) rootView.findViewById(R.id.etWeight);
-        etAllergy = (EditText) rootView.findViewById(R.id.etAllergy);
+        etAddress = (EditText) rootView.findViewById(R.id.etAddress);
         btnSubmit = (CardView) rootView.findViewById(R.id.btnSubmit);
         btnSubmit.setOnClickListener(this);
     }
@@ -142,16 +121,16 @@ public class AddFamilyFragment extends Fragment implements View.OnClickListener 
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSubmit:
-                if (spinnerRelationship.getSelectedItemPosition() == 0)
-                    Toast.makeText(context, "Select Relationship", Toast.LENGTH_SHORT).show();
-                else if (TextUtils.isEmpty(etName.getText().toString()))
-                    Toast.makeText(context, "Enter Name", Toast.LENGTH_SHORT).show();
+                if (TextUtils.isEmpty(etName.getText().toString()))
+                    Toast.makeText(context, "Enter Doctor Name", Toast.LENGTH_SHORT).show();
                 else if (TextUtils.isEmpty(etPhoneNo.getText().toString()))
                     Toast.makeText(context, "Enter Phone No.", Toast.LENGTH_SHORT).show();
                 else if (spinnerGender.getSelectedItemPosition() == 0)
                     Toast.makeText(context, "Select Gender", Toast.LENGTH_SHORT).show();
-                else if (spinnerBG.getSelectedItemPosition() == 0)
-                    Toast.makeText(context, "Select Blood Group", Toast.LENGTH_SHORT).show();
+                else if (spinnerSpecialization.getSelectedItemPosition() == 0)
+                    Toast.makeText(context, "Select Specialization", Toast.LENGTH_SHORT).show();
+                else if (TextUtils.isEmpty(etAddress.getText().toString()))
+                    Toast.makeText(context, "Enter Address", Toast.LENGTH_SHORT).show();
                 else {
                     if (data == null)
                         saveData();
@@ -167,23 +146,19 @@ public class AddFamilyFragment extends Fragment implements View.OnClickListener 
         Log.e(TAG, "updateData: key >> " + data.getKey());
         showProgressDialog();
         String key = data.getKey();
-        FamilyModel model = new FamilyModel(
+        DoctorModel model = new DoctorModel(
                 key,
                 etName.getText().toString(),
                 etEmail.getText().toString(),
                 etPhoneNo.getText().toString(),
-                String.valueOf(spinnerRelationship.getSelectedItem()),
                 String.valueOf(spinnerGender.getSelectedItem()),
-                String.valueOf(spinnerBG.getSelectedItem()),
-                etHeight.getText().toString(),
-                etWeight.getText().toString(),
-                etAllergy.getText().toString(),
-                "");
+                String.valueOf(spinnerSpecialization.getSelectedItem()),
+                etAddress.getText().toString());
         FirebaseDatabase.getInstance()
                 .getReference(AppConstants.APP_NAME)
                 .child(AppConstants.FIREBASE_KEY.VAULT)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                .child(AppConstants.FIREBASE_KEY.MY_FAMILY)
+                .child(AppConstants.FIREBASE_KEY.MY_DOCTORS)
                 .child(data.getKey())
                 .setValue(model)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -211,25 +186,21 @@ public class AddFamilyFragment extends Fragment implements View.OnClickListener 
                 .getReference(AppConstants.APP_NAME)
                 .child(AppConstants.FIREBASE_KEY.VAULT)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                .child(AppConstants.FIREBASE_KEY.MY_FAMILY)
+                .child(AppConstants.FIREBASE_KEY.MY_DOCTORS)
                 .push().getKey();
-        FamilyModel model = new FamilyModel(
+        DoctorModel model = new DoctorModel(
                 key,
                 etName.getText().toString(),
                 etEmail.getText().toString(),
                 etPhoneNo.getText().toString(),
-                String.valueOf(spinnerRelationship.getSelectedItem()),
                 String.valueOf(spinnerGender.getSelectedItem()),
-                String.valueOf(spinnerBG.getSelectedItem()),
-                etHeight.getText().toString(),
-                etWeight.getText().toString(),
-                etAllergy.getText().toString(),
-                "");
+                String.valueOf(spinnerSpecialization.getSelectedItem()),
+                etAddress.getText().toString());
         FirebaseDatabase.getInstance()
                 .getReference(AppConstants.APP_NAME)
                 .child(AppConstants.FIREBASE_KEY.VAULT)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                .child(AppConstants.FIREBASE_KEY.MY_FAMILY)
+                .child(AppConstants.FIREBASE_KEY.MY_DOCTORS)
                 .child(key)
                 .setValue(model)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {

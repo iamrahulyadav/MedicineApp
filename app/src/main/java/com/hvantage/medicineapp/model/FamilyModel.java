@@ -1,9 +1,25 @@
 package com.hvantage.medicineapp.model;
 
-public class FamilyModel {
+import java.io.Serializable;
+
+public class FamilyModel implements Serializable {
     String key, name, email, mobile_no, relation, gender, blood_group, height, weight, known_allergies, image;
 
     public FamilyModel() {
+    }
+
+    public FamilyModel(String key, String name, String email, String mobile_no, String relation, String gender, String blood_group, String height, String weight, String known_allergies, String image) {
+        this.key = key;
+        this.name = name;
+        this.email = email;
+        this.mobile_no = mobile_no;
+        this.relation = relation;
+        this.gender = gender;
+        this.blood_group = blood_group;
+        this.height = height;
+        this.weight = weight;
+        this.known_allergies = known_allergies;
+        this.image = image;
     }
 
     public String getKey() {
@@ -22,25 +38,14 @@ public class FamilyModel {
         this.relation = relation;
     }
 
-    public FamilyModel(String name, String email, String mobile_no, String relation, String gender, String blood_group, String height, String weight, String known_allergies, String image) {
-        this.name = name;
-        this.email = email;
-        this.mobile_no = mobile_no;
-        this.relation = relation;
-        this.gender = gender;
-        this.blood_group = blood_group;
-        this.height = height;
-        this.weight = weight;
-        this.known_allergies = known_allergies;
-        this.image = image;
-    }
-
     @Override
     public String toString() {
         return "FamilyModel{" +
-                "name='" + name + '\'' +
+                "key='" + key + '\'' +
+                ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", mobile_no='" + mobile_no + '\'' +
+                ", relation='" + relation + '\'' +
                 ", gender='" + gender + '\'' +
                 ", blood_group='" + blood_group + '\'' +
                 ", height='" + height + '\'' +

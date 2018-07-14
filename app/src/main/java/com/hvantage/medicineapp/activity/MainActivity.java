@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.fragments.CartFragment;
 import com.hvantage.medicineapp.fragments.HomeFragment;
 import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.fragments.VaultFragment;
@@ -123,6 +124,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ft.commitAllowingStateLoss();
     }
 
+    private void openCartFragment() {
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction ft = manager.beginTransaction();
+        ft.replace(R.id.main_container, new CartFragment());
+        ft.addToBackStack(null);
+        ft.commitAllowingStateLoss();
+    }
+
 
     private void initDrawer(Toolbar toolbar) {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -166,7 +175,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
+        switch (id) {
+            case R.id.action_cart:
+                openCartFragment();
+                break;
+        }
         return super.onOptionsItemSelected(item);
     }
 

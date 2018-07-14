@@ -1,10 +1,12 @@
 package com.hvantage.medicineapp.fragments;
 
 import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -15,8 +17,13 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ScrollView;
+import android.widget.Toast;
 
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
@@ -26,13 +33,18 @@ import com.hvantage.medicineapp.model.CategoryModel;
 import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
+import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.RecyclerItemClickListener;
 
 import java.util.ArrayList;
+import java.util.Locale;
+
+import static android.app.Activity.RESULT_OK;
 
 
 public class HomeFragment extends Fragment implements View.OnClickListener {
     private static final int REQUEST_ALL_PERMISSIONS = 100;
+    private final int REQ_CODE_SPEECH_INPUT = 100;
     ArrayList<CategoryModel> catList = new ArrayList<CategoryModel>();
     ArrayList<ProductModel> productList = new ArrayList<ProductModel>();
     ArrayList<ProductModel> productList2 = new ArrayList<ProductModel>();
@@ -46,6 +58,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private View rootView;
     private FragmentIntraction intraction;
     private CardView btnUpload;
+    private ImageView btnVoiceInput;
+    private EditText etSearch;
 
     @Nullable
     @Override
@@ -64,7 +78,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private void init() {
         btnUpload = (CardView) rootView.findViewById(R.id.btnUpload);
+        btnVoiceInput = (ImageView) rootView.findViewById(R.id.btnVoiceInput);
+        etSearch = (EditText) rootView.findViewById(R.id.etSearch);
         btnUpload.setOnClickListener(this);
+        btnVoiceInput.setOnClickListener(this);
+        ((ScrollView) rootView.findViewById(R.id.container)).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                Functions.hideSoftKeyboard(context, view);
+                return false;
+            }
+        });
     }
 
     private void setCategory() {
@@ -180,6 +204,22 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 ft.addToBackStack(null);
                 ft.commitAllowingStateLoss();
                 break;
+            case R.id.btnVoiceInput:
+                promptSpeechInput();
+                break;
+        }
+    }
+
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak Now");
+        try {
+            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(getActivity(), getString(R.string.speech_not_supported), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -201,6 +241,24 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             return false;
         } else {
             return true;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case REQ_CODE_SPEECH_INPUT: {
+                if (resultCode == RESULT_OK && null != data) {
+
+                    ArrayList<String> result = data
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    etSearch.setText(result.get(0));
+                }
+                break;
+            }
+
         }
     }
 
