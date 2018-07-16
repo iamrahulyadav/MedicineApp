@@ -1,10 +1,17 @@
 package com.hvantage.medicineapp.model;
 
-public class DrugModel {
-    String key, name, manufacturer, product_type, category_name, power, qty, price, desciption;
+import java.io.Serializable;
+
+public class DrugModel implements Serializable {
+    String key, name, manufacturer, product_type, category_name, power, qty, desciption;
+    double price;
     boolean prescription_required;
 
-    public DrugModel(String key, String name, String manufacturer, String product_type, String category_name, String power, String qty, String price, String desciption, boolean prescription_required) {
+
+    public DrugModel() {
+    }
+
+    public DrugModel(String key, String name, String manufacturer, String product_type, String category_name, String power, String qty, double price, String desciption, boolean prescription_required) {
         this.key = key;
         this.name = name;
         this.manufacturer = manufacturer;
@@ -65,11 +72,11 @@ public class DrugModel {
         this.qty = qty;
     }
 
-    public String getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 

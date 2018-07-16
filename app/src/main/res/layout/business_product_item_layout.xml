@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:foreground="?attr/selectableItemBackgroundBorderless"
+    app:cardBackgroundColor="@color/colorWhite"
+    app:cardCornerRadius="0dp"
+    app:cardElevation="0dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:drawableRight="@drawable/action_right_arrow"
+            android:drawableTint="@color/colorPrimary"
+            android:gravity="center_vertical"
+            android:padding="4dp"
+            android:singleLine="true"
+            android:text="Personal Care"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="@color/colorTextHeading" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.7dp"
+            android:layout_below="@id/tvTitle"
+            android:background="@color/colorDivider" />
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>
+

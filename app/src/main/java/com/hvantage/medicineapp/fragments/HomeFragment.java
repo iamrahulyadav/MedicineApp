@@ -3,6 +3,7 @@ package com.hvantage.medicineapp.fragments;
 import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -13,27 +14,37 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.adapter.CategoryAdapter;
 import com.hvantage.medicineapp.adapter.HomeProductAdapter;
+import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.CategoryModel;
+import com.hvantage.medicineapp.model.DrugModel;
 import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
+import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.RecyclerItemClickListener;
 
 import java.util.ArrayList;
@@ -43,6 +54,7 @@ import static android.app.Activity.RESULT_OK;
 
 
 public class HomeFragment extends Fragment implements View.OnClickListener {
+    private static final String TAG = "HomeFragment";
     private static final int REQUEST_ALL_PERMISSIONS = 100;
     private final int REQ_CODE_SPEECH_INPUT = 100;
     ArrayList<CategoryModel> catList = new ArrayList<CategoryModel>();
@@ -59,7 +71,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private FragmentIntraction intraction;
     private CardView btnUpload;
     private ImageView btnVoiceInput;
-    private EditText etSearch;
+    private AppCompatAutoCompleteTextView etSearch;
+    private ArrayList<String> list;
+    private ProgressBar progressBar;
 
     @Nullable
     @Override
@@ -70,16 +84,80 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             intraction.actionbarsetTitle(getResources().getString(R.string.app_name));
         }
         init();
+
+        list = new DBHelper(context).getMedicinesSearch();
+        Log.e(TAG, "onCreateView: list >> " + list);
         setCategory();
         setProduct();
         setProduct2();
+        setSearchBar();
         return rootView;
     }
 
+    private void setSearchBar() {
+        if (list != null) {
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, R.layout.auto_complete_text, list);
+            etSearch.setThreshold(1);
+            etSearch.setAdapter(adapter);
+            etSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Log.e(TAG, "onItemClick: text >> " + etSearch.getText().toString());
+                    if (Functions.isConnectingToInternet(context)) {
+                        showProgressDialog();
+                        FirebaseDatabase.getInstance().getReference()
+                                .child(AppConstants.APP_NAME)
+                                .child(AppConstants.FIREBASE_KEY.MEDICINE)
+                                .orderByChild("name")
+                                .equalTo(etSearch.getText().toString())
+                                .addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        hideProgressDialog();
+                                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                                            DrugModel data = postSnapshot.getValue(DrugModel.class);
+                                            Log.e(TAG, "onDataChange: data >> " + data);
+                                            startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", data));
+                                            etSearch.setText("");
+                                            break;
+                                        }
+
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        hideProgressDialog();
+                                        Log.w(TAG, "onCancelled >> ", databaseError.toException());
+                                    }
+                                });
+                    } else {
+                        Toast.makeText(context, "No internet connection", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+    }
+
+    private void showProgressDialog() {
+        progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                // TODO Auto-generated method stub
+            }
+        });
+    }
+
+    private void hideProgressDialog() {
+        if (progressBar != null)
+            progressBar.dismiss();
+    }
+
+
     private void init() {
+        etSearch = (AppCompatAutoCompleteTextView) rootView.findViewById(R.id.etSearch);
         btnUpload = (CardView) rootView.findViewById(R.id.btnUpload);
         btnVoiceInput = (ImageView) rootView.findViewById(R.id.btnVoiceInput);
-        etSearch = (EditText) rootView.findViewById(R.id.etSearch);
         btnUpload.setOnClickListener(this);
         btnVoiceInput.setOnClickListener(this);
         ((ScrollView) rootView.findViewById(R.id.container)).setOnTouchListener(new View.OnTouchListener() {

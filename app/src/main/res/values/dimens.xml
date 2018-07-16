@@ -9,6 +9,7 @@
     <dimen name="design_navigation_icon_padding" tools:override="true">7dp</dimen>
     <dimen name="navigation_icon_size">64dp</dimen>
     <dimen name="design_navigation_separator_vertical_padding">1dp</dimen>
+    <dimen name="fast_scroll_overlay_text_size">100dp</dimen>
 
 
 </resources>

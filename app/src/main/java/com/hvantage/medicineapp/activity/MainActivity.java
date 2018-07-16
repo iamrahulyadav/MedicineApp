@@ -26,13 +26,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.business.BusinessLoginActivity;
+import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.fragments.CartFragment;
 import com.hvantage.medicineapp.fragments.HomeFragment;
 import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.fragments.VaultFragment;
+import com.hvantage.medicineapp.model.DrugModel;
+import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
+import com.hvantage.medicineapp.util.Functions;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, FragmentIntraction {
 
@@ -68,6 +76,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.e(TAG, "onCreate: phone >> " + auth.getCurrentUser().getPhoneNumber());
             tvUsername.setText("Hello, " + auth.getCurrentUser().getDisplayName());
         }
+
+        if (new DBHelper(context).getMedicines() == null)
+            getData();
+
+
     }
 
     private boolean checkPermission() {
@@ -88,6 +101,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return false;
         } else {
             return true;
+        }
+    }
+
+    private void getData() {
+        if (Functions.isConnectingToInternet(context)) {
+            Log.e(TAG, "getDataFromServer: deleteMedicineData() >> " + new DBHelper(context).deleteMedicineData());
+            FirebaseDatabase.getInstance().getReference()
+                    .child(AppConstants.APP_NAME)
+                    .child(AppConstants.FIREBASE_KEY.MEDICINE)
+                    .orderByChild("name")
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                                DrugModel data = postSnapshot.getValue(DrugModel.class);
+                                new DBHelper(context).saveMedicine(data);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.w(TAG, "deleteMedicineData:onCancelled", databaseError.toException());
+
+                        }
+                    });
+        } else {
+            Toast.makeText(context, "No internet connection", Toast.LENGTH_LONG).show();
         }
     }
 

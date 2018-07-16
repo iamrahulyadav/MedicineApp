@@ -8,11 +8,14 @@
     tools:context=".activity.business.BusinessHomeActivity"
     tools:showIn="@layout/activity_business">
 
+
+    <include layout="@layout/empty_text" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recylcer_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        android:layout_height="match_parent"
+        android:scrollbars="vertical" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabAdd"

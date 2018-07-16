@@ -13,12 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.model.DrugModel;
@@ -34,6 +34,8 @@ public class AddProductActivity extends AppCompatActivity implements View.OnClic
     private boolean prescription_required = false;
     private ProgressBar progressBar;
     private Context context;
+    private TextView toolbar_title;
+    private DrugModel data = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +43,27 @@ public class AddProductActivity extends AppCompatActivity implements View.OnClic
         setContentView(R.layout.activity_add_product);
         context = this;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar_title = (TextView) toolbar.findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         init();
+
+        if (getIntent().hasExtra("data")) {
+            data = (DrugModel) getIntent().getSerializableExtra("data");
+        }
+        Log.e(TAG, "onCreate: data >> " + data);
+        if (data != null) {
+            toolbar_title.setText("Edit Drug");
+            etTitle.setText(data.getName());
+            etManufacturer.setText(data.getManufacturer());
+            etProductType.setText(data.getProduct_type());
+            etCategoryName.setText(data.getCategory_name());
+            etPower.setText(data.getPower());
+            etQty.setText(data.getQty());
+            etPrice.setText("" + data.getPrice());
+            etDescription.setText(data.getDesciption());
+            checkBox.setChecked(data.getPrescription_required());
+        }
     }
 
     @Override
@@ -103,8 +123,6 @@ public class AddProductActivity extends AppCompatActivity implements View.OnClic
         String key = FirebaseDatabase.getInstance()
                 .getReference(AppConstants.APP_NAME)
                 .child(AppConstants.FIREBASE_KEY.MEDICINE)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                .child(AppConstants.FIREBASE_KEY.MY_FAMILY)
                 .push().getKey();
         if (checkBox.isChecked())
             prescription_required = true;
@@ -116,7 +134,7 @@ public class AddProductActivity extends AppCompatActivity implements View.OnClic
                 etCategoryName.getText().toString(),
                 etPower.getText().toString(),
                 etQty.getText().toString(),
-                etPrice.getText().toString(),
+                Double.parseDouble(etPrice.getText().toString()),
                 etDescription.getText().toString(),
                 prescription_required
         );
