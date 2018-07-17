@@ -29,11 +29,13 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.activity.LoginActivity;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.adapter.CategoryAdapter;
 import com.hvantage.medicineapp.adapter.HomeProductAdapter;
@@ -187,15 +189,24 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                BrowseCategoryFragment fragment = new BrowseCategoryFragment();
-                Bundle args = new Bundle();
-                args.putString("data", catList.get(position).getName());
-                fragment.setArguments(args);
-                FragmentManager manager = getFragmentManager();
-                FragmentTransaction ft = manager.beginTransaction();
-                ft.replace(R.id.main_container, fragment);
-                ft.addToBackStack(null);
-                ft.commitAllowingStateLoss();
+                if (position == 0) {
+                    AllPrescriptionFragment fragment = new AllPrescriptionFragment();
+                    FragmentManager manager = getFragmentManager();
+                    FragmentTransaction ft = manager.beginTransaction();
+                    ft.replace(R.id.main_container, fragment);
+                    ft.addToBackStack(null);
+                    ft.commitAllowingStateLoss();
+                } else {
+                    BrowseCategoryFragment fragment = new BrowseCategoryFragment();
+                    Bundle args = new Bundle();
+                    args.putString("data", catList.get(position).getName());
+                    fragment.setArguments(args);
+                    FragmentManager manager = getFragmentManager();
+                    FragmentTransaction ft = manager.beginTransaction();
+                    ft.replace(R.id.main_container, fragment);
+                    ft.addToBackStack(null);
+                    ft.commitAllowingStateLoss();
+                }
             }
 
             @Override
@@ -276,11 +287,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnUpload:
-                FragmentManager manager = getFragmentManager();
-                FragmentTransaction ft = manager.beginTransaction();
-                ft.replace(R.id.main_container, new UploadPrecriptionFragment());
-                ft.addToBackStack(null);
-                ft.commitAllowingStateLoss();
+                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                    FragmentManager manager = getFragmentManager();
+                    FragmentTransaction ft = manager.beginTransaction();
+                    ft.replace(R.id.main_container, new UploadPrecriptionFragment());
+                    ft.addToBackStack(null);
+                    ft.commitAllowingStateLoss();
+                } else {
+                    startActivity(new Intent(getActivity(), LoginActivity.class));
+                }
+
                 break;
             case R.id.btnVoiceInput:
                 promptSpeechInput();

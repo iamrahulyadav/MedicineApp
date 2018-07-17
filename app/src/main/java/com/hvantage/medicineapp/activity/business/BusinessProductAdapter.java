@@ -18,11 +18,13 @@ public class BusinessProductAdapter extends RecyclerView.Adapter<BusinessProduct
     private static final String TAG = "BusinessProductAdapter";
     Context context;
     ArrayList<DrugModel> arrayList;
+    private ArrayList<DrugModel> contactListFiltered;
 
 
     public BusinessProductAdapter(Context context, ArrayList<DrugModel> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
+        this.contactListFiltered = arrayList;
     }
 
     @Override
@@ -34,10 +36,9 @@ public class BusinessProductAdapter extends RecyclerView.Adapter<BusinessProduct
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final DrugModel data = arrayList.get(position);
+        final DrugModel data = contactListFiltered.get(position);
         Log.e(TAG, position + " data : " + data);
-        holder.tvTitle.setText( data.getName());
-
+        holder.tvTitle.setText(data.getName());
     }
 
 
@@ -46,13 +47,20 @@ public class BusinessProductAdapter extends RecyclerView.Adapter<BusinessProduct
         return arrayList.size();
     }
 
+    public void updateList(ArrayList<DrugModel> list) {
+        arrayList = list;
+        notifyDataSetChanged();
+    }
+
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvTitle, tvBG;
+        TextView tvTitle;
 
         public ViewHolder(View itemView) {
             super(itemView);
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
         }
     }
+
 }

@@ -36,6 +36,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.activity.LoginActivity;
 import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
 import com.hvantage.medicineapp.model.PrescriptionModel;
 import com.hvantage.medicineapp.util.AppConstants;
@@ -75,11 +76,15 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
         context = container.getContext();
         rootView = inflater.inflate(R.layout.fragment_upload_prescription, container, false);
         if (intraction != null) {
-            intraction.actionbarsetTitle("Upload Presciption");
+            intraction.actionbarsetTitle("Upload Prescription");
         }
         init();
         setRecyclerView();
-        getData();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null)
+            getData();
+        else {
+            startActivity(new Intent(getActivity(), LoginActivity.class));
+        }
         return rootView;
     }
 

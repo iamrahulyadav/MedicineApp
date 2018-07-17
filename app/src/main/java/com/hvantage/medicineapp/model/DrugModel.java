@@ -3,15 +3,14 @@ package com.hvantage.medicineapp.model;
 import java.io.Serializable;
 
 public class DrugModel implements Serializable {
-    String key, name, manufacturer, product_type, category_name, power, qty, desciption;
+    String key, name, manufacturer, product_type, category_name, power, qty, desciption, image = "";
     double price;
     boolean prescription_required;
-
 
     public DrugModel() {
     }
 
-    public DrugModel(String key, String name, String manufacturer, String product_type, String category_name, String power, String qty, double price, String desciption, boolean prescription_required) {
+    public DrugModel(String key, String name, String manufacturer, String product_type, String category_name, String power, String qty, double price, String desciption, boolean prescription_required, String image) {
         this.key = key;
         this.name = name;
         this.manufacturer = manufacturer;
@@ -22,6 +21,15 @@ public class DrugModel implements Serializable {
         this.price = price;
         this.desciption = desciption;
         this.prescription_required = prescription_required;
+        this.image = image;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getName() {

@@ -30,6 +30,8 @@
                 android:singleLine="true"
                 android:text="Business"
                 android:textColor="@color/colorToolbarTitle" />
+
+
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>

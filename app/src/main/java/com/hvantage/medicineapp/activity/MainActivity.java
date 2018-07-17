@@ -77,10 +77,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             tvUsername.setText("Hello, " + auth.getCurrentUser().getDisplayName());
         }
 
-        if (new DBHelper(context).getMedicines() == null)
-            getData();
-
-
     }
 
     private boolean checkPermission() {
@@ -104,32 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void getData() {
-        if (Functions.isConnectingToInternet(context)) {
-            Log.e(TAG, "getDataFromServer: deleteMedicineData() >> " + new DBHelper(context).deleteMedicineData());
-            FirebaseDatabase.getInstance().getReference()
-                    .child(AppConstants.APP_NAME)
-                    .child(AppConstants.FIREBASE_KEY.MEDICINE)
-                    .orderByChild("name")
-                    .addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                                DrugModel data = postSnapshot.getValue(DrugModel.class);
-                                new DBHelper(context).saveMedicine(data);
-                            }
-                        }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            Log.w(TAG, "deleteMedicineData:onCancelled", databaseError.toException());
-
-                        }
-                    });
-        } else {
-            Toast.makeText(context, "No internet connection", Toast.LENGTH_LONG).show();
-        }
-    }
 
 
     @Override
@@ -230,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction ft = manager.beginTransaction();
-        Fragment fragment;
+        Fragment fragment = null;
         switch (id) {
             case R.id.nav_home:
                 fragment = new HomeFragment();
@@ -239,10 +210,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 clearBackStack();
                 break;
             case R.id.nav_upload_pre:
-                fragment = new UploadPrecriptionFragment();
-                ft.replace(R.id.main_container, fragment);
-                ft.addToBackStack(null);
-                ft.commitAllowingStateLoss();
+                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                    fragment = new UploadPrecriptionFragment();
+                    ft.replace(R.id.main_container, fragment);
+                    ft.addToBackStack(null);
+                    ft.commitAllowingStateLoss();
+                } else {
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                }
+
                 break;
             case R.id.nav_vault:
                 fragment = new VaultFragment();

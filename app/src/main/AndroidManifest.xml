@@ -37,10 +37,10 @@
             android:name=".activity.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden">
-               <intent-filter>
-                   <action android:name="android.intent.action.MAIN" />
-                   <category android:name="android.intent.category.LAUNCHER" />
-               </intent-filter>
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
         </activity>
         <activity
             android:name=".activity.OldLoginActivity"
@@ -67,11 +67,12 @@
         <activity
             android:name=".activity.business.BusinessHomeActivity"
             android:label=""
-            android:theme="@style/AppTheme.NoActionBar">
-            <!--<intent-filter>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden">
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+            </intent-filter>
         </activity>
         <activity
             android:name=".activity.business.BusinessLoginActivity"
@@ -82,6 +83,12 @@
             android:name=".activity.business.AddProductActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <service
+            android:name=".services.DBService"
+            android:enabled="true"
+            android:exported="true"
+            android:stopWithTask="true"></service>
     </application>
 
 </manifest>
