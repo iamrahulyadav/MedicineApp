@@ -37,6 +37,7 @@ import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.model.DrugModel;
 import com.hvantage.medicineapp.util.AppConstants;
+import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -88,6 +89,9 @@ public class AddProductActivity extends AppCompatActivity implements View.OnClic
             etPrice.setText("" + data.getPrice());
             etDescription.setText(data.getDesciption());
             checkBox.setChecked(data.getPrescription_required());
+            image_base64 = data.getImage();
+            if (!image_base64.equalsIgnoreCase(""))
+                imageDrug.setImageBitmap(Functions.base64ToBitmap(image_base64));
         }
     }
 

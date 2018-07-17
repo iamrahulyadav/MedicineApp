@@ -46,7 +46,7 @@
                 android:padding="6dp"
                 android:singleLine="true"
                 android:text="Personal Care"
-                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textColor="@color/colorTextHeading" />
         </android.support.v7.widget.CardView>
 

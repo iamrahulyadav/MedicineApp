@@ -2,6 +2,7 @@ package com.hvantage.medicineapp.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,12 +15,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.adapter.AllPrescriptionAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
+import com.hvantage.medicineapp.model.DrugModel;
+import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
+import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
+import com.hvantage.medicineapp.util.RecyclerItemClickListener;
 import com.hvantage.medicineapp.util.fastscrollbars.FastScrollRecyclerViewItemDecoration;
 
 import java.util.ArrayList;
@@ -59,7 +70,7 @@ public class AllPrescriptionFragment extends Fragment implements View.OnClickLis
         cardEmptyText = (CardView) rootView.findViewById(R.id.cardEmptyText);
     }
 
-    private void setRecyclerView(ArrayList<String> list) {
+    private void setRecyclerView(final ArrayList<String> list) {
         HashMap<String, Integer> mapIndex = calculateIndexesForName(list);
         Log.e(TAG, "setRecyclerView: mapIndex >> " + mapIndex);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
@@ -72,6 +83,48 @@ public class AllPrescriptionFragment extends Fragment implements View.OnClickLis
         mRecyclerView.addItemDecoration(decoration);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         adapter.notifyDataSetChanged();
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(context, mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                if (Functions.isConnectingToInternet(context)) {
+                    showProgressDialog();
+                    FirebaseDatabase.getInstance().getReference()
+                            .child(AppConstants.APP_NAME)
+                            .child(AppConstants.FIREBASE_KEY.MEDICINE)
+                            .orderByChild("name")
+                            .equalTo(list.get(position))
+                            .addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    hideProgressDialog();
+                                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                                        DrugModel data = postSnapshot.getValue(DrugModel.class);
+                                        Log.e(TAG, "onDataChange: data >> " + data);
+                                        startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", data));
+                                        break;
+                                    }
+
+
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    hideProgressDialog();
+                                    Log.w(TAG, "onCancelled >> ", databaseError.toException());
+                                }
+                            });
+                } else {
+                    Toast.makeText(context, "No internet connection", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        }));
+
+
     }
 
     private HashMap<String, Integer> calculateIndexesForName(ArrayList<String> items) {

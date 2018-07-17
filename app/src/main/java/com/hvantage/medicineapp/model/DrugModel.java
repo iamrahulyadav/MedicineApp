@@ -125,6 +125,7 @@ public class DrugModel implements Serializable {
                 ", price='" + price + '\'' +
                 ", desciption='" + desciption + '\'' +
                 ", prescription_required='" + prescription_required + '\'' +
+                ", image='" + image + '\'' +
                 '}';
     }
 }
