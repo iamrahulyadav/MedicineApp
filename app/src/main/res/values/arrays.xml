@@ -43,4 +43,19 @@
         <item>Community Medicine</item>
         <item>Darmotology</item>
     </string-array>
+
+    <string-array name="categories">
+        <item>Select Category</item>
+        <item>Baby &amp; Mother</item>
+        <item>OTC</item>
+        <item>Personal Care</item>
+        <item>Wellness</item>
+        <item>Diabetes</item>
+        <item>Health Aid</item>
+        <item>Ayurvedic</item>
+        <item>Homeopathy</item>
+    </string-array>
+    <string-array name="select_default">
+        <item>Select</item>
+    </string-array>
 </resources>

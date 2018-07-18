@@ -21,12 +21,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.model.DrugModel;
+import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.RecyclerItemClickListener;
@@ -38,16 +39,17 @@ public class BusinessHomeActivity extends AppCompatActivity {
 
     private static final String TAG = "BusinessHomeActivity";
     private static final int REQ_CODE_SPEECH_INPUT = 100;
-    ArrayList<DrugModel> filteredList = new ArrayList<DrugModel>();
+    ArrayList<ProductModel> filteredList = new ArrayList<ProductModel>();
     private FloatingActionButton fabAdd;
     private RecyclerView recylcer_view;
-    private ArrayList<DrugModel> list = new ArrayList<DrugModel>();
+    private ArrayList<ProductModel> list = new ArrayList<ProductModel>();
     private Context context;
     private BusinessProductAdapter adapter;
     private ProgressBar progressBar;
     private CardView cardEmptyText;
     private EditText etSearch;
     private ImageView btnVoiceInput;
+    private FloatingActionMenu floatingActionMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +64,7 @@ public class BusinessHomeActivity extends AppCompatActivity {
         setRecyclerView(filteredList);
     }
 
+
     private void getData() {
         showProgressDialog();
         FirebaseDatabase.getInstance().getReference()
@@ -72,8 +75,9 @@ public class BusinessHomeActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         list.clear();
+                        filteredList.clear();
                         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            DrugModel data = postSnapshot.getValue(DrugModel.class);
+                            ProductModel data = postSnapshot.getValue(ProductModel.class);
                             Log.e(TAG, "onDataChange: data >> " + data);
                             list.add(data);
                             filteredList.add(data);
@@ -113,16 +117,16 @@ public class BusinessHomeActivity extends AppCompatActivity {
             progressBar.dismiss();
     }
 
-    private void setRecyclerView(final ArrayList<DrugModel> list1) {
+    private void setRecyclerView(final ArrayList<ProductModel> list1) {
         adapter = new BusinessProductAdapter(context, list1);
         recylcer_view.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view.setAdapter(adapter);
         recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Intent intent = new Intent(context, AddProductActivity.class);
+                /*Intent intent = new Intent(context, AddProductCatActivity.class);
                 intent.putExtra("data", list1.get(position));
-                startActivity(intent);
+                startActivity(intent);*/
             }
 
             @Override
@@ -142,7 +146,7 @@ public class BusinessHomeActivity extends AppCompatActivity {
         fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(BusinessHomeActivity.this, AddProductActivity.class));
+                startActivity(new Intent(BusinessHomeActivity.this, AddProductCatActivity.class));
             }
         });
 
@@ -201,8 +205,8 @@ public class BusinessHomeActivity extends AppCompatActivity {
     }
 
     void filter(String text) {
-        ArrayList<DrugModel> temp = new ArrayList();
-        for (DrugModel d : list) {
+        ArrayList<ProductModel> temp = new ArrayList();
+        for (ProductModel d : list) {
             //or use .equal(text) with you want equal match
             //use .toLowerCase() for better matches
             if (d.getName().toLowerCase().contains(text.toLowerCase())) {
@@ -212,11 +216,11 @@ public class BusinessHomeActivity extends AppCompatActivity {
         adapter.updateList(temp);
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home)
             onBackPressed();
         return super.onOptionsItemSelected(item);
     }
+
 }

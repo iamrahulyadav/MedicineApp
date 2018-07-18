@@ -41,8 +41,8 @@ import com.hvantage.medicineapp.adapter.CategoryAdapter;
 import com.hvantage.medicineapp.adapter.HomeProductAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.CategoryModel;
-import com.hvantage.medicineapp.model.DrugModel;
 import com.hvantage.medicineapp.model.ProductModel;
+import com.hvantage.medicineapp.model.ItemModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
@@ -60,8 +60,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private static final int REQUEST_ALL_PERMISSIONS = 100;
     private final int REQ_CODE_SPEECH_INPUT = 100;
     ArrayList<CategoryModel> catList = new ArrayList<CategoryModel>();
-    ArrayList<ProductModel> productList = new ArrayList<ProductModel>();
-    ArrayList<ProductModel> productList2 = new ArrayList<ProductModel>();
+    ArrayList<ItemModel> productList = new ArrayList<ItemModel>();
+    ArrayList<ItemModel> productList2 = new ArrayList<ItemModel>();
     private RecyclerView recylcer_view;
     private CategoryAdapter adapter;
     private RecyclerView recylcer_view2;
@@ -117,7 +117,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         hideProgressDialog();
                                         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                                            DrugModel data = postSnapshot.getValue(DrugModel.class);
+                                            ProductModel data = postSnapshot.getValue(ProductModel.class);
                                             Log.e(TAG, "onDataChange: data >> " + data);
                                             startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", data));
                                             etSearch.setText("");
@@ -172,6 +172,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     private void setCategory() {
+        catList.clear();
         catList.add(new CategoryModel(1, "Prescriptions", R.drawable.cat_prescription));
         catList.add(new CategoryModel(1, AppConstants.CATEGORY.OTC, R.drawable.cat_otc));
         catList.add(new CategoryModel(1, AppConstants.CATEGORY.PERSONAL_CARE, R.drawable.cat_personal_care));
@@ -234,11 +235,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
             }
         }));
-        productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
+        productList.add(new ItemModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
+        productList.add(new ItemModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
+        productList.add(new ItemModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
+        productList.add(new ItemModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
+        productList.add(new ItemModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
         adapter2.notifyDataSetChanged();
 
     }
@@ -259,10 +260,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
             }
         }));
-        productList2.add(new ProductModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
-        productList2.add(new ProductModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
-        productList2.add(new ProductModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
-        productList2.add(new ProductModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
+        productList2.add(new ItemModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
+        productList2.add(new ItemModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
+        productList2.add(new ItemModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
+        productList2.add(new ItemModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
         adapter3.notifyDataSetChanged();
     }
 

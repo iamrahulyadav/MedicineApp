@@ -25,7 +25,7 @@ import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.adapter.AllPrescriptionAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
-import com.hvantage.medicineapp.model.DrugModel;
+import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
@@ -98,7 +98,7 @@ public class AllPrescriptionFragment extends Fragment implements View.OnClickLis
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     hideProgressDialog();
                                     for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                                        DrugModel data = postSnapshot.getValue(DrugModel.class);
+                                        ProductModel data = postSnapshot.getValue(ProductModel.class);
                                         Log.e(TAG, "onDataChange: data >> " + data);
                                         startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", data));
                                         break;

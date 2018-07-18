@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.business.BusinessHomeActivity">
+    tools:context=".activity.business.AddProductCatActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -28,17 +28,13 @@
                 android:gravity="center"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:text="Business"
+                android:text="Add Product"
                 android:textColor="@color/colorToolbarTitle" />
-
-
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_business" />
-
-
+    <include layout="@layout/content_add_product_cat" />
 
 
 </android.support.design.widget.CoordinatorLayout>

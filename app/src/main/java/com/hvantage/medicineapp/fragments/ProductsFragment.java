@@ -2,11 +2,10 @@ package com.hvantage.medicineapp.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,7 +20,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.adapter.BrowseCategoryAdapter;
+import com.hvantage.medicineapp.activity.ProductDetailActivity;
+import com.hvantage.medicineapp.adapter.CatProductAdapter;
+import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
@@ -31,15 +32,15 @@ import com.hvantage.medicineapp.util.RecyclerItemClickListener;
 import java.util.ArrayList;
 
 
-public class BrowseCategoryFragment extends Fragment implements View.OnClickListener {
+public class ProductsFragment extends Fragment implements View.OnClickListener {
 
-    private static final String TAG = "BrowseCategoryFragment";
+    private static final String TAG = "ProductsFragment";
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
     private RecyclerView recylcer_view;
-    private BrowseCategoryAdapter adapter;
-    private ArrayList<String> list = new ArrayList<String>();
+    private CatProductAdapter adapter;
+    private ArrayList<ProductModel> list = new ArrayList<ProductModel>();
     private ProgressBar progressBar;
     private String data;
     private CardView cardEmptyText;
@@ -53,7 +54,10 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
         data = getArguments().getString("data");
         Log.e(TAG, "onCreateView: data >> " + data);
         if (intraction != null) {
-            intraction.actionbarsetTitle(data);
+            if (data != null)
+                intraction.actionbarsetTitle(data);
+            else
+                intraction.actionbarsetTitle("Browse Products");
         }
         init();
         setRecyclerView();
@@ -68,15 +72,17 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
         showProgressDialog();
         FirebaseDatabase.getInstance().getReference()
                 .child(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.CATEGORY)
-                .child(data)
+                .child(AppConstants.FIREBASE_KEY.MEDICINE)
+                .orderByChild("sub_category_name")
+                .equalTo(data)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         list.clear();
                         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            Log.e(TAG, "onDataChange: postSnapshot >> " + postSnapshot);
-                            list.add(postSnapshot.getKey().toString());
+                            ProductModel model = postSnapshot.getValue(ProductModel.class);
+                            Log.e(TAG, "onDataChange: model >> " + model);
+                            list.add(model);
                         }
                         adapter.notifyDataSetChanged();
                         if (adapter.getItemCount() > 0)
@@ -106,21 +112,13 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
     }
 
     private void setRecyclerView() {
-        adapter = new BrowseCategoryAdapter(context, list);
+        adapter = new CatProductAdapter(context, list);
         recylcer_view.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view.setAdapter(adapter);
         recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                ProductsFragment fragment = new ProductsFragment();
-                Bundle args = new Bundle();
-                args.putString("data", list.get(position));
-                fragment.setArguments(args);
-                FragmentManager manager = getFragmentManager();
-                FragmentTransaction ft = manager.beginTransaction();
-                ft.replace(R.id.main_container, fragment);
-                ft.addToBackStack(null);
-                ft.commitAllowingStateLoss();
+                startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", list.get(position)));
             }
 
             @Override

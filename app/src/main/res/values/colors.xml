@@ -16,4 +16,5 @@
     <color name="colorWarning">#18a6ca</color>
     <color name="colorToolbarTitle">#ceffffff</color>
     <color name="semiTransparent">#d5111111</color>
+    <color name="colorFabRipple">#0a78b7</color>
 </resources>

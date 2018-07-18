@@ -49,4 +49,24 @@
         <item name="android:background">@android:color/transparent</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
+
+    <style name="MenuButtonsSmall">
+        <item name="fab_size">mini</item>
+        <item name="fab_colorNormal">@color/colorAccent</item>
+        <item name="fab_colorPressed">@color/colorFabRipple</item>
+        <item name="fab_colorRipple">@color/colorFabRipple</item>
+    </style>
+
+    <style name="MenuLabelsStyle">
+        <!--<item name="android:background">#fff</item>-->
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Small</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:paddingTop">2sp</item>
+        <item name="android:paddingBottom">2sp</item>
+        <item name="android:paddingLeft">5sp</item>
+        <item name="android:paddingRight">5sp</item>
+        <item name="android:background">@drawable/fab_rounded_corner_white</item>
+        <item name="android:ellipsize">end</item>
+    </style>
 </resources>

@@ -37,10 +37,10 @@
             android:name=".activity.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+               <intent-filter>
+                   <action android:name="android.intent.action.MAIN" />
+                   <category android:name="android.intent.category.LAUNCHER" />
+               </intent-filter>
         </activity>
         <activity
             android:name=".activity.OldLoginActivity"
@@ -69,10 +69,10 @@
             android:label=""
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden">
-          <!--  <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+              <!--<intent-filter>
+                  <action android:name="android.intent.action.MAIN" />
+                  <category android:name="android.intent.category.LAUNCHER" />
+              </intent-filter>-->
         </activity>
         <activity
             android:name=".activity.business.BusinessLoginActivity"
@@ -81,6 +81,10 @@
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activity.business.AddProductActivity"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".activity.business.AddProductCatActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar"></activity>
 

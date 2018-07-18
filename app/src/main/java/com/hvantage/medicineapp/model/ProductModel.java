@@ -1,65 +1,152 @@
 package com.hvantage.medicineapp.model;
 
-public class ProductModel {
+import java.io.Serializable;
 
-    String product_id, product_name, product_price, product_qty, product_img;
+public class ProductModel implements Serializable {
+    String key, name, manufacturer, product_type, category_name = "", sub_category_name = "", power, qty, description, image = "";
+    double price;
+    boolean prescription_required;
+    private int total_available = 0;
 
-    public ProductModel(String product_id, String product_name, String product_price, String product_qty, String product_img) {
-        this.product_id = product_id;
-        this.product_name = product_name;
-        this.product_price = product_price;
-        this.product_qty = product_qty;
-        this.product_img = product_img;
+    public ProductModel(String key, String name, String manufacturer, String product_type, String category_name, String sub_category_name, String power, String qty, String description, String image, double price, boolean prescription_required, int total_available) {
+        this.key = key;
+        this.name = name;
+        this.manufacturer = manufacturer;
+        this.product_type = product_type;
+        this.category_name = category_name;
+        this.sub_category_name = sub_category_name;
+        this.power = power;
+        this.qty = qty;
+        this.description = description;
+        this.image = image;
+        this.price = price;
+        this.prescription_required = prescription_required;
+        this.total_available = total_available;
     }
 
-    public String getProduct_id() {
-        return product_id;
+    public ProductModel() {
     }
 
-    public void setProduct_id(String product_id) {
-        this.product_id = product_id;
+    public int getTotal_available() {
+        return total_available;
     }
 
-    public String getProduct_name() {
-        return product_name;
+    public void setTotal_available(int total_available) {
+        this.total_available = total_available;
     }
 
-    public void setProduct_name(String product_name) {
-        this.product_name = product_name;
+    public String getKey() {
+        return key;
     }
 
-    public String getProduct_price() {
-        return product_price;
+    public void setKey(String key) {
+        this.key = key;
     }
 
-    public void setProduct_price(String product_price) {
-        this.product_price = product_price;
+    public String getName() {
+        return name;
     }
 
-    public String getProduct_qty() {
-        return product_qty;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setProduct_qty(String product_qty) {
-        this.product_qty = product_qty;
+    public String getManufacturer() {
+        return manufacturer;
     }
 
-    public String getProduct_img() {
-        return product_img;
+    public void setManufacturer(String manufacturer) {
+        this.manufacturer = manufacturer;
     }
 
-    public void setProduct_img(String product_img) {
-        this.product_img = product_img;
+    public String getProduct_type() {
+        return product_type;
+    }
+
+    public void setProduct_type(String product_type) {
+        this.product_type = product_type;
+    }
+
+    public String getCategory_name() {
+        return category_name;
+    }
+
+    public void setCategory_name(String category_name) {
+        this.category_name = category_name;
+    }
+
+    public String getSub_category_name() {
+        return sub_category_name;
+    }
+
+    public void setSub_category_name(String sub_category_name) {
+        this.sub_category_name = sub_category_name;
+    }
+
+    public String getPower() {
+        return power;
+    }
+
+    public void setPower(String power) {
+        this.power = power;
+    }
+
+    public String getQty() {
+        return qty;
+    }
+
+    public void setQty(String qty) {
+        this.qty = qty;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public boolean isPrescription_required() {
+        return prescription_required;
+    }
+
+    public void setPrescription_required(boolean prescription_required) {
+        this.prescription_required = prescription_required;
     }
 
     @Override
     public String toString() {
         return "ProductModel{" +
-                "product_id='" + product_id + '\'' +
-                ", product_name='" + product_name + '\'' +
-                ", product_price='" + product_price + '\'' +
-                ", product_qty='" + product_qty + '\'' +
-                ", product_img='" + product_img + '\'' +
+                "key='" + key + '\'' +
+                ", name='" + name + '\'' +
+                ", manufacturer='" + manufacturer + '\'' +
+                ", product_type='" + product_type + '\'' +
+                ", category_name='" + category_name + '\'' +
+                ", sub_category_name='" + sub_category_name + '\'' +
+                ", power='" + power + '\'' +
+                ", qty='" + qty + '\'' +
+                ", description='" + description + '\'' +
+                ", image='" + image + '\'' +
+                ", price=" + price +
+                ", prescription_required=" + prescription_required +
+                ", total_available=" + total_available +
                 '}';
     }
 }

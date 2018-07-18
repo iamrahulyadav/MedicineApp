@@ -28,7 +28,7 @@
                 android:gravity="center"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:text="Add Drug"
+                android:text="Add Product"
                 android:textColor="@color/colorToolbarTitle" />
         </android.support.v7.widget.Toolbar>
 

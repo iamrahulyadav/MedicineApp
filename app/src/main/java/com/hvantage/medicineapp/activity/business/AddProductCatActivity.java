@@ -23,19 +23,27 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.model.DrugModel;
+import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
@@ -45,13 +53,15 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
-public class AddProductActivity extends AppCompatActivity implements View.OnClickListener {
+public class AddProductCatActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "AddProductActivity";
     private static final int REQUEST_STORAGE = 0;
     private static final int REQUEST_IMAGE_CAPTURE = REQUEST_STORAGE + 1;
     private static final int REQUEST_LOAD_IMAGE = REQUEST_IMAGE_CAPTURE + 1;
+    ArrayList<String> subCatList = new ArrayList<String>();
     private CardView btnSubmit;
     private EditText etTitle, etManufacturer, etProductType, etCategoryName, etPower, etQty, etPrice, etDescription;
     private CheckBox checkBox;
@@ -59,23 +69,30 @@ public class AddProductActivity extends AppCompatActivity implements View.OnClic
     private ProgressBar progressBar;
     private Context context;
     private TextView toolbar_title;
-    private DrugModel data = null;
+    private ProductModel data = null;
     private ImageView imageDrug;
     private String image_base64 = "";
+    private Spinner spinnerCat;
+    private Spinner spinnerSubCat;
+    private ArrayAdapter<String> adapter;
+    private CheckBox checkBoxCat;
+    private LinearLayout llCategory;
+    private String category_name = "", sub_category_name = "";
+    private EditText etTotalAvailable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_product);
+        setContentView(R.layout.activity_add_product_cat);
         context = this;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar_title = (TextView) toolbar.findViewById(R.id.toolbar_title);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         init();
-
+        setSubCatAdapter();
         if (getIntent().hasExtra("data")) {
-            data = (DrugModel) getIntent().getSerializableExtra("data");
+            data = (ProductModel) getIntent().getSerializableExtra("data");
         }
         Log.e(TAG, "onCreate: data >> " + data);
         if (data != null) {
@@ -87,12 +104,61 @@ public class AddProductActivity extends AppCompatActivity implements View.OnClic
             etPower.setText(data.getPower());
             etQty.setText(data.getQty());
             etPrice.setText("" + data.getPrice());
-            etDescription.setText(data.getDesciption());
-            checkBox.setChecked(data.getPrescription_required());
+            etTotalAvailable.setText("" + data.getTotal_available());
+            etDescription.setText(data.getDescription());
+            checkBox.setChecked(data.isPrescription_required());
             image_base64 = data.getImage();
             if (!image_base64.equalsIgnoreCase(""))
                 imageDrug.setImageBitmap(Functions.base64ToBitmap(image_base64));
+
+            if (!data.getCategory_name().equalsIgnoreCase("") && !data.getCategory_name().equalsIgnoreCase("")) {
+                checkBoxCat.setChecked(true);
+                String[] arrayCat = getResources().getStringArray(R.array.categories);
+                for (int i = 0; i < arrayCat.length; i++) {
+                    if (arrayCat[i].equalsIgnoreCase(data.getCategory_name()))
+                        spinnerCat.setSelection(i);
+                }
+            }
         }
+    }
+
+    private void setSubCatAdapter() {
+        subCatList.add("Select Subcategory");
+        adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, subCatList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSubCat.setAdapter(adapter);
+    }
+
+    private void getCat() {
+        showProgressDialog();
+        FirebaseDatabase.getInstance().getReference()
+                .child(AppConstants.APP_NAME)
+                .child(AppConstants.FIREBASE_KEY.CATEGORY)
+                .child((String) spinnerCat.getSelectedItem())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        subCatList.clear();
+                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                            Log.e(TAG, "onDataChange: data >> " + postSnapshot.getKey());
+                            subCatList.add(postSnapshot.getKey());
+                        }
+                        adapter.notifyDataSetChanged();
+                        if (data != null && !data.getSub_category_name().equalsIgnoreCase("")) {
+                            for (int i = 0; i < subCatList.size(); i++) {
+                                if (subCatList.get(i).equalsIgnoreCase(data.getSub_category_name()))
+                                    spinnerSubCat.setSelection(i);
+                            }
+                        }
+                        hideProgressDialog();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d(TAG, "loadPost:onCancelled", databaseError.toException());
+                        hideProgressDialog();
+                    }
+                });
     }
 
     @Override
@@ -111,17 +177,56 @@ public class AddProductActivity extends AppCompatActivity implements View.OnClic
         etQty = (EditText) findViewById(R.id.etQty);
         etPrice = (EditText) findViewById(R.id.etPrice);
         etDescription = (EditText) findViewById(R.id.etDescription);
+        etTotalAvailable = (EditText) findViewById(R.id.etTotalAvailable);
         imageDrug = (ImageView) findViewById(R.id.imageDrug);
         checkBox = (CheckBox) findViewById(R.id.checkBox);
+        checkBoxCat = (CheckBox) findViewById(R.id.checkBoxCat);
+        llCategory = (LinearLayout) findViewById(R.id.llCategory);
         btnSubmit = (CardView) findViewById(R.id.btnSubmit);
+        spinnerCat = (Spinner) findViewById(R.id.spinnerCat);
+        spinnerSubCat = (Spinner) findViewById(R.id.spinnerSubCat);
         btnSubmit.setOnClickListener(this);
         imageDrug.setOnClickListener(this);
+        spinnerCat.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                if (position > 0) {
+                    getCat();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        checkBoxCat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    llCategory.setVisibility(View.VISIBLE);
+                } else {
+                    llCategory.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSubmit:
+                if (checkBoxCat.isChecked()) {
+                    if (spinnerCat.getSelectedItemPosition() == 0) {
+                        Toast.makeText(this, "Select Category", Toast.LENGTH_SHORT).show();
+                        return;
+
+                    } else if (spinnerSubCat.getSelectedItem().toString().equalsIgnoreCase("Select Subcategory")) {
+                        Toast.makeText(this, "Select Subcategory", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
                 if (TextUtils.isEmpty(etTitle.getText().toString()))
                     Toast.makeText(this, "Enter Title", Toast.LENGTH_SHORT).show();
                 else if (TextUtils.isEmpty(etManufacturer.getText().toString()))
@@ -130,8 +235,6 @@ public class AddProductActivity extends AppCompatActivity implements View.OnClic
                     Toast.makeText(this, "Enter Product Type", Toast.LENGTH_SHORT).show();
                 else if (TextUtils.isEmpty(etManufacturer.getText().toString()))
                     Toast.makeText(this, "Enter Manufacturer", Toast.LENGTH_SHORT).show();
-                else if (TextUtils.isEmpty(etCategoryName.getText().toString()))
-                    Toast.makeText(this, "Enter Category Name", Toast.LENGTH_SHORT).show();
                 else if (TextUtils.isEmpty(etPower.getText().toString()))
                     Toast.makeText(this, "Enter Power", Toast.LENGTH_SHORT).show();
                 else if (TextUtils.isEmpty(etQty.getText().toString()))
@@ -140,7 +243,16 @@ public class AddProductActivity extends AppCompatActivity implements View.OnClic
                     Toast.makeText(this, "Enter Price", Toast.LENGTH_SHORT).show();
                 else if (TextUtils.isEmpty(etDescription.getText().toString()))
                     Toast.makeText(this, "Enter Description", Toast.LENGTH_SHORT).show();
+                else if (TextUtils.isEmpty(etTotalAvailable.getText().toString()))
+                    Toast.makeText(this, "Enter Total Available", Toast.LENGTH_SHORT).show();
                 else {
+                    if (checkBoxCat.isChecked()) {
+                        category_name = spinnerCat.getSelectedItem().toString();
+                        sub_category_name = spinnerSubCat.getSelectedItem().toString();
+                    } else {
+                        category_name = "";
+                        sub_category_name = "";
+                    }
                     if (data == null)
                         saveData();
                     else
@@ -163,18 +275,21 @@ public class AddProductActivity extends AppCompatActivity implements View.OnClic
                 .push().getKey();
         if (checkBox.isChecked())
             prescription_required = true;
-        DrugModel model = new DrugModel(
+
+        ProductModel model = new ProductModel(
                 key,
                 etTitle.getText().toString(),
                 etManufacturer.getText().toString(),
                 etProductType.getText().toString(),
-                etCategoryName.getText().toString(),
+                category_name,
+                sub_category_name,
                 etPower.getText().toString(),
                 etQty.getText().toString(),
-                Double.parseDouble(etPrice.getText().toString()),
                 etDescription.getText().toString(),
+                image_base64,
+                Double.parseDouble(etPrice.getText().toString()),
                 prescription_required,
-                image_base64
+                Integer.parseInt(etTotalAvailable.getText().toString())
         );
 
         FirebaseDatabase.getInstance()
@@ -208,18 +323,20 @@ public class AddProductActivity extends AppCompatActivity implements View.OnClic
 
         if (checkBox.isChecked())
             prescription_required = true;
-        DrugModel model = new DrugModel(
+        ProductModel model = new ProductModel(
                 key,
                 etTitle.getText().toString(),
                 etManufacturer.getText().toString(),
                 etProductType.getText().toString(),
-                etCategoryName.getText().toString(),
+                category_name,
+                sub_category_name,
                 etPower.getText().toString(),
                 etQty.getText().toString(),
-                Double.parseDouble(etPrice.getText().toString()),
                 etDescription.getText().toString(),
+                image_base64,
+                Double.parseDouble(etPrice.getText().toString()),
                 prescription_required,
-                image_base64
+                Integer.parseInt(etTotalAvailable.getText().toString())
         );
 
         FirebaseDatabase.getInstance()
