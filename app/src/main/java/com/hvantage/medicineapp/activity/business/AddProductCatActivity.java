@@ -465,7 +465,8 @@ public class AddProductCatActivity extends AppCompatActivity implements View.OnC
                 .setGuidelines(CropImageView.Guidelines.ON)
                 .setMultiTouchEnabled(false)
                 .setAspectRatio(1, 1)
-                .setRequestedSize(100, 100)
+                .setOutputCompressQuality(100)
+//                .setRequestedSize(200, 200)
                 .setScaleType(CropImageView.ScaleType.CENTER_INSIDE)
                 .start(this);
     }
@@ -481,7 +482,7 @@ public class AddProductCatActivity extends AppCompatActivity implements View.OnC
         protected Void doInBackground(Bitmap... bitmaps) {
             Bitmap bitmapImage = bitmaps[0];
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            bitmapImage.compress(Bitmap.CompressFormat.PNG, 50, byteArrayOutputStream);
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 90, byteArrayOutputStream);
             byte[] byteArray = byteArrayOutputStream.toByteArray();
             image_base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
             Log.d(TAG, "Picture Image :-" + image_base64);

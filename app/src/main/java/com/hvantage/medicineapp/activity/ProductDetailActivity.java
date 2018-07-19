@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.HomeProductAdapter;
-import com.hvantage.medicineapp.model.ItemModel;
+import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.Functions;
 
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 public class ProductDetailActivity extends AppCompatActivity {
 
     private static final String TAG = "ProductDetailActivity";
-    ArrayList<ItemModel> productList = new ArrayList<ItemModel>();
+    ArrayList<ProductModel> productList = new ArrayList<ProductModel>();
     TextView tvName, tvManufacturer, tvPrice, tvAvailable, tvQty, tvPreRequired, tvProductType, tvPower, tvCategory, tvDesciption;
     private TextView toolbar_title;
     private Context context;
@@ -86,11 +86,11 @@ public class ProductDetailActivity extends AppCompatActivity {
         recylcer_view.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         recylcer_view.setAdapter(adapter);
 
-        productList.add(new ItemModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ItemModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ItemModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ItemModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ItemModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
+      /*  productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
+        productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
+        productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
+        productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
+        productList.add(new ProductModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));*/
         adapter.notifyDataSetChanged();
     }
 

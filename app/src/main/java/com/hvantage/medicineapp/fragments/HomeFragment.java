@@ -42,7 +42,6 @@ import com.hvantage.medicineapp.adapter.HomeProductAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.CategoryModel;
 import com.hvantage.medicineapp.model.ProductModel;
-import com.hvantage.medicineapp.model.ItemModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
@@ -58,16 +57,15 @@ import static android.app.Activity.RESULT_OK;
 public class HomeFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "HomeFragment";
     private static final int REQUEST_ALL_PERMISSIONS = 100;
-    private final int REQ_CODE_SPEECH_INPUT = 100;
+    private final int REQ_CODE_SPEECH_INPUT = 101;
     ArrayList<CategoryModel> catList = new ArrayList<CategoryModel>();
-    ArrayList<ItemModel> productList = new ArrayList<ItemModel>();
-    ArrayList<ItemModel> productList2 = new ArrayList<ItemModel>();
+    ArrayList<ProductModel> productList = new ArrayList<ProductModel>();
+    ArrayList<ProductModel> listDailyNeeds = new ArrayList<ProductModel>();
     private RecyclerView recylcer_view;
     private CategoryAdapter adapter;
-    private RecyclerView recylcer_view2;
-    private HomeProductAdapter adapter2;
-    private RecyclerView recylcer_view3;
-    private HomeProductAdapter adapter3;
+    private HomeProductAdapter adapterRecco;
+    private RecyclerView recylcer_view_daily;
+    private HomeProductAdapter adapterDaily;
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
@@ -76,6 +74,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private AppCompatAutoCompleteTextView etSearch;
     private ArrayList<String> list;
     private ProgressBar progressBar;
+    private RecyclerView recylcer_view_recco;
+
 
     @Nullable
     @Override
@@ -88,16 +88,52 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         init();
 
         list = new DBHelper(context).getMedicinesSearch();
-        Log.e(TAG, "onCreateView: list >> " + list);
+//        catArray = getResources().getStringArray(R.array.categories);
+//        Log.e(TAG, "onCreateView: catArray >> " + catArray);
+//        randomCat = catArray[new Random().nextInt(catArray.length)];
+//        Log.e(TAG, "onCreateView: randomCat >> " + randomCat);
+
         setCategory();
-        setProduct();
-        setProduct2();
+        //setProduct();
+        setRecylclerviewDaily();
         setSearchBar();
+        getRandomCatData();
         return rootView;
+    }
+
+    private void getRandomCatData() {
+        showProgressDialog();
+        FirebaseDatabase.getInstance().getReference()
+                .child(AppConstants.APP_NAME)
+                .child(AppConstants.FIREBASE_KEY.MEDICINE)
+                .orderByChild("category_name")
+                .equalTo("Personal Care")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        listDailyNeeds.clear();
+                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                            ProductModel model = postSnapshot.getValue(ProductModel.class);
+                            Log.d(TAG, "onDataChange: model >> " + model);
+                            listDailyNeeds.add(model);
+                            if (listDailyNeeds.size() == 10)
+                                break;
+                        }
+                        adapterDaily.notifyDataSetChanged();
+                        hideProgressDialog();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
+                        hideProgressDialog();
+                    }
+                });
     }
 
     private void setSearchBar() {
         if (list != null) {
+            Log.e(TAG, "setSearchBar: list >> " + list.size());
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, R.layout.auto_complete_text, list);
             etSearch.setThreshold(1);
             etSearch.setAdapter(adapter);
@@ -220,11 +256,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     private void setProduct() {
-        recylcer_view2 = (RecyclerView) rootView.findViewById(R.id.recylcer_view2);
-        adapter2 = new HomeProductAdapter(context, productList);
-        recylcer_view2.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        recylcer_view2.setAdapter(adapter2);
-        recylcer_view2.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view2, new RecyclerItemClickListener.OnItemClickListener() {
+        recylcer_view_recco = (RecyclerView) rootView.findViewById(R.id.recylcer_view_recco);
+        adapterRecco = new HomeProductAdapter(context, productList);
+        recylcer_view_recco.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+        recylcer_view_recco.setAdapter(adapterRecco);
+        recylcer_view_recco.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view_recco, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 startActivity(new Intent(context, ProductDetailActivity.class));
@@ -235,24 +271,19 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
             }
         }));
-        productList.add(new ItemModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ItemModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ItemModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ItemModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        productList.add(new ItemModel("1", "Horlicks Chocolate Delight", "199", "500gm", ""));
-        adapter2.notifyDataSetChanged();
-
+        adapterRecco.notifyDataSetChanged();
     }
 
-    private void setProduct2() {
-        recylcer_view3 = (RecyclerView) rootView.findViewById(R.id.recylcer_view3);
-        adapter3 = new HomeProductAdapter(context, productList2);
-        recylcer_view3.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        recylcer_view3.setAdapter(adapter3);
-        recylcer_view3.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view2, new RecyclerItemClickListener.OnItemClickListener() {
+    private void setRecylclerviewDaily() {
+        recylcer_view_daily = (RecyclerView) rootView.findViewById(R.id.recylcer_view_daily);
+        adapterDaily = new HomeProductAdapter(context, listDailyNeeds);
+        recylcer_view_daily.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+        recylcer_view_daily.setAdapter(adapterDaily);
+        recylcer_view_daily.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view_daily, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                startActivity(new Intent(context, ProductDetailActivity.class));
+                startActivity(new Intent(context, ProductDetailActivity.class)
+                        .putExtra("medicine_data", listDailyNeeds.get(position)));
             }
 
             @Override
@@ -260,11 +291,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
             }
         }));
-        productList2.add(new ItemModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
-        productList2.add(new ItemModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
-        productList2.add(new ItemModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
-        productList2.add(new ItemModel("2", "Colgate Total Advanced Health Tooth Paste", "80.75", "120 gm", ""));
-        adapter3.notifyDataSetChanged();
+        adapterDaily.notifyDataSetChanged();
     }
 
     @Override

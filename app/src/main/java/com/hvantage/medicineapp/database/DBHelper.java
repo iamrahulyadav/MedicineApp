@@ -79,12 +79,12 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(KEY_PRICE, modal.getPrice());
         values.put(KEY_DESCIPTION, modal.getDesciption());
         values.put(KEY_PRESCRIPTION_REQUIRED, String.valueOf(modal.getPrescription_required()));
-        Log.e(TAG, "saveMedicine: values >> " + values.toString());
+        Log.d(TAG, "saveMedicine: values >> " + values.toString());
         boolean bb = db.insert(TABLE_MEDICINE, null, values) > 0;
         if (bb) {
-            Log.e("saveMedicine : ", "Inserted");
+            Log.d("saveMedicine : ", "Inserted");
         } else {
-            Log.e("saveMedicine : ", "Not inserted");
+            Log.d("saveMedicine : ", "Not inserted");
         }
         db.close();
     }

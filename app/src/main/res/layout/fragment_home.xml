@@ -168,7 +168,7 @@
                     android:layout_height="wrap_content">
 
                     <android.support.v7.widget.RecyclerView
-                        android:id="@+id/recylcer_view2"
+                        android:id="@+id/recylcer_view_recco"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="3dp"
@@ -194,7 +194,7 @@
                     android:layout_height="wrap_content">
 
                     <android.support.v7.widget.RecyclerView
-                        android:id="@+id/recylcer_view3"
+                        android:id="@+id/recylcer_view_daily"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="3dp"
