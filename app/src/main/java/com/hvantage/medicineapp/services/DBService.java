@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -13,7 +12,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.database.DBHelper;
-import com.hvantage.medicineapp.model.DrugModel;
+import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.Functions;
 
@@ -66,7 +65,7 @@ public class DBService extends Service {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                                    DrugModel data = postSnapshot.getValue(DrugModel.class);
+                                    ProductModel data = postSnapshot.getValue(ProductModel.class);
                                     mydb.saveMedicine(data);
                                 }
                             }

@@ -149,19 +149,20 @@
                 </RelativeLayout>
             </android.support.v4.widget.NestedScrollView>
 
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:text="Recommended Products"
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone" />
 
             <android.support.v4.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:overScrollMode="never">
+                android:overScrollMode="never"
+                android:visibility="gone">
 
                 <RelativeLayout
                     android:layout_width="match_parent"

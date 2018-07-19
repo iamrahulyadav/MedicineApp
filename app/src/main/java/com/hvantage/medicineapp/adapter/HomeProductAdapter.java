@@ -46,13 +46,20 @@ public class HomeProductAdapter extends RecyclerView.Adapter<HomeProductAdapter.
 
         if (!data.getImage().equalsIgnoreCase("")) {
             Bitmap bitmap = Functions.base64ToBitmap(data.getImage());
-            if (bitmap != null)
+            if (bitmap != null) {
                 holder.img.setImageBitmap(bitmap);
                /* Glide.with(context)
                         .load(data.getImage())
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .skipMemoryCache(true)
                         .into(holder.img);*/
+                /*holder.img.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                    }
+                });*/
+            }
+
         }
 
 

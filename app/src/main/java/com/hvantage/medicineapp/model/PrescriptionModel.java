@@ -1,6 +1,8 @@
 package com.hvantage.medicineapp.model;
 
-public class PrescriptionModel {
+import java.io.Serializable;
+
+public class PrescriptionModel implements Serializable {
     String key, image_base64;
 
     public PrescriptionModel(String key, String image_base64) {

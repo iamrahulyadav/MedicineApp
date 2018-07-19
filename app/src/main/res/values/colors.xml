@@ -17,4 +17,6 @@
     <color name="colorToolbarTitle">#ceffffff</color>
     <color name="semiTransparent">#d5111111</color>
     <color name="colorFabRipple">#0a78b7</color>
+
+    <color name="black_overlay">#66000000</color>
 </resources>

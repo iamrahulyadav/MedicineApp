@@ -96,50 +96,6 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
                 .child(AppConstants.FIREBASE_KEY.PRESCRIPTION)
                 .orderByKey()
-                /*.addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                        PrescriptionModel data = dataSnapshot.getValue(PrescriptionModel.class);
-                        if (data != null) {
-                            if (catList.size() > 3) {
-                                btnUpload.setVisibility(View.GONE);
-                            } else {
-                                btnUpload.setVisibility(View.GONE);
-                                catList.add(data);
-                                adapter.notifyDataSetChanged();
-                            }
-                        }
-
-                        if (adapter.getItemCount() >= 3) {
-                            btnUpload.setVisibility(View.GONE);
-                        } else {
-                            btnUpload.setVisibility(View.VISIBLE);
-
-                        }
-                        hideProgressDialog();
-                    }
-
-                    @Override
-                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                        hideProgressDialog();
-                    }
-
-                    @Override
-                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                        hideProgressDialog();
-                    }
-
-                    @Override
-                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                        hideProgressDialog();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        hideProgressDialog();
-                    }
-                });*/
-
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -150,12 +106,10 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                                 catList.add(data);
                                 adapter.notifyDataSetChanged();
                             }
-
                             if (adapter.getItemCount() >= 3) {
                                 btnUpload.setVisibility(View.GONE);
                             } else {
                                 btnUpload.setVisibility(View.VISIBLE);
-
                             }
                         }
                         hideProgressDialog();
@@ -177,6 +131,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     }
 
     private void setRecyclerView() {
+        catList.clear();
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
         adapter = new UploadedPreAdapter(context, catList);
         recylcer_view.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
@@ -229,7 +184,6 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private void selectImage() {
         final CharSequence[] items = {"Camera", "Gallery"};
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Add Photo");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
@@ -331,7 +285,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
         protected Void doInBackground(Bitmap... bitmaps) {
             Bitmap bitmapImage = bitmaps[0];
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            bitmapImage.compress(Bitmap.CompressFormat.PNG, 30, byteArrayOutputStream);
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 80, byteArrayOutputStream);
             byte[] byteArray = byteArrayOutputStream.toByteArray();
             String Encoded_userimage = Base64.encodeToString(byteArray, Base64.DEFAULT);
             publishProgress(Encoded_userimage);
@@ -357,22 +311,14 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            // Write was successful!
-                            // ...
                             hideProgressDialog();
-
-                            //catList.add(data);
-                            //adapter.notifyDataSetChanged();
                             Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
-
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            // Write failed
                             hideProgressDialog();
-                            // ...
                             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
                         }
                     });

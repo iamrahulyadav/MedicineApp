@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
@@ -22,8 +24,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.activity.ImagePreviewActivity;
 import com.hvantage.medicineapp.model.PrescriptionModel;
 import com.hvantage.medicineapp.util.AppConstants;
+import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.TouchImageView;
 
@@ -67,7 +71,9 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
             @Override
             public void onClick(View view) {
                 Log.e(TAG, "onBindViewHolder: data >> " + data);
-                showPreviewDialog(Base64.decode(data.getImage_base64(), Base64.DEFAULT));
+               // context.startActivity(new Intent(context, ImagePreviewActivity.class).putExtra("prescription_data", data));
+                showPreviewDialog(Functions.base64ToBitmap(data.getImage_base64()));
+
             }
         });
         holder.imgRemove.setOnClickListener(new View.OnClickListener() {
@@ -91,7 +97,7 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 hideProgressDialog();
-                                                removeAt(position);
+                                                // removeAt(position);
                                                 Toast.makeText(context, "Removed", Toast.LENGTH_SHORT).show();
                                                 // Write was successful!
                                                 // ...
@@ -135,23 +141,16 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
     }
 
 
-    private void showPreviewDialog(byte[] imageByteArray) {
+    private void showPreviewDialog(Bitmap bitmap) {
         Dialog dialog1 = new Dialog(context, R.style.image_preview_dialog);
         dialog1.setContentView(R.layout.image_preview_layout);
         Window window = dialog1.getWindow();
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         dialog1.setCancelable(true);
         dialog1.setCanceledOnTouchOutside(true);
-
         TouchImageView imgPreview = (TouchImageView) dialog1.findViewById(R.id.imgPreview);
         imgPreview.setScaleType(ImageView.ScaleType.FIT_CENTER);
-
-        Glide.with(context)
-                .load(imageByteArray)
-                .crossFade()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(imgPreview);
-
+        imgPreview.setImageBitmap(bitmap);
         dialog1.show();
     }
 

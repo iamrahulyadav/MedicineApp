@@ -60,7 +60,7 @@ public class AllPrescriptionFragment extends Fragment implements View.OnClickLis
             intraction.actionbarsetTitle("All Prescriptions");
         }
         init();
-        ArrayList<String> list = new DBHelper(context).getMedicinesSearch();
+        ArrayList<String> list = new DBHelper(context).getMedicinesAll();
         Log.e(TAG, "onCreateView: list >> " + list);
         setRecyclerView(list);
         return rootView;

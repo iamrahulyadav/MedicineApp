@@ -16,7 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.database.DBHelper;
-import com.hvantage.medicineapp.model.DrugModel;
+import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.services.DBService;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.Functions;
@@ -74,7 +74,7 @@ public class SplashActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                                DrugModel data = postSnapshot.getValue(DrugModel.class);
+                                ProductModel data = postSnapshot.getValue(ProductModel.class);
                                 new DBHelper(context).saveMedicine(data);
                             }
                             if (FirebaseAuth.getInstance().getCurrentUser() == null) {

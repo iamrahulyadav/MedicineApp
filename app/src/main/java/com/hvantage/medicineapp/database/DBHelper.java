@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.hvantage.medicineapp.model.DrugModel;
+import com.hvantage.medicineapp.model.ProductModel;
 
 import java.util.ArrayList;
 
@@ -28,10 +28,13 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String KEY_PRODUCT_TYPE = "product_type";
     private static final String KEY_POWER = "power";
     private static final String KEY_CATEGORY = "category";
+    private static final String KEY_SUB_CATEGORY = "sub_category";
     private static final String KEY_QTY = "qty";
     private static final String KEY_PRICE = "price";
     private static final String KEY_DESCIPTION = "desciption";
+    private static final String KEY_IMAGE = "image";
     private static final String KEY_PRESCRIPTION_REQUIRED = "prescription_required";
+    private static final String KEY_TOTAL_AVAILABLE = "total_available";
 
     //tables
     private static final String TABLE_MEDICINE = "medicine";
@@ -49,10 +52,13 @@ public class DBHelper extends SQLiteOpenHelper {
             + KEY_PRODUCT_TYPE + " TEXT, "
             + KEY_POWER + " TEXT, "
             + KEY_CATEGORY + " TEXT, "
+            + KEY_SUB_CATEGORY + " TEXT, "
             + KEY_QTY + " TEXT, "
             + KEY_PRICE + " REAL, "
             + KEY_DESCIPTION + " TEXT, "
-            + KEY_PRESCRIPTION_REQUIRED + " TEXT"
+            + KEY_IMAGE + " TEXT, "
+            + KEY_PRESCRIPTION_REQUIRED + " TEXT,"
+            + KEY_TOTAL_AVAILABLE + " INTEGER "
             + ")";
 
 
@@ -66,7 +72,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
-    public void saveMedicine(DrugModel modal) {
+    public void saveMedicine(ProductModel modal) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_FB, modal.getKey());
@@ -77,8 +83,11 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(KEY_CATEGORY, modal.getCategory_name());
         values.put(KEY_QTY, modal.getQty());
         values.put(KEY_PRICE, modal.getPrice());
-        values.put(KEY_DESCIPTION, modal.getDesciption());
-        values.put(KEY_PRESCRIPTION_REQUIRED, String.valueOf(modal.getPrescription_required()));
+        values.put(KEY_DESCIPTION, modal.getDescription());
+        values.put(KEY_PRESCRIPTION_REQUIRED, String.valueOf(modal.isPrescription_required()));
+        values.put(KEY_TOTAL_AVAILABLE, String.valueOf(modal.getTotal_available()));
+        values.put(KEY_SUB_CATEGORY, modal.getSub_category_name());
+        values.put(KEY_IMAGE, modal.getImage());
         Log.d(TAG, "saveMedicine: values >> " + values.toString());
         boolean bb = db.insert(TABLE_MEDICINE, null, values) > 0;
         if (bb) {
@@ -99,9 +108,9 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
-    public ArrayList<DrugModel> getMedicines() {
+    public ArrayList<ProductModel> getMedicines() {
         SQLiteDatabase db = this.getReadableDatabase();
-        ArrayList<DrugModel> list = null;
+        ArrayList<ProductModel> list = null;
         String query = "SELECT * FROM " + TABLE_MEDICINE;
 //        String query = "SELECT * FROM " + TABLE_PROJECTS + " WHERE " + KEY_PROJECT_TYPE + "=" + type_id + " ORDER BY ID DESC";
         Cursor cursor = db.rawQuery(query, null);
@@ -109,9 +118,9 @@ public class DBHelper extends SQLiteOpenHelper {
             return list;
         }
         if (cursor.moveToFirst()) {
-            list = new ArrayList<DrugModel>();
+            list = new ArrayList<ProductModel>();
             do {
-                DrugModel d = new DrugModel();
+                ProductModel d = new ProductModel();
                 d.setKey(cursor.getString(cursor.getColumnIndex(KEY_FB)));
                 d.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
                 d.setManufacturer(cursor.getString(cursor.getColumnIndex(KEY_MANUFACTURER)));
@@ -119,8 +128,11 @@ public class DBHelper extends SQLiteOpenHelper {
                 d.setPower(cursor.getString(cursor.getColumnIndex(KEY_POWER)));
                 d.setCategory_name(cursor.getString(cursor.getColumnIndex(KEY_CATEGORY)));
                 d.setQty(cursor.getString(cursor.getColumnIndex(KEY_QTY)));
+                d.setSub_category_name(cursor.getString(cursor.getColumnIndex(KEY_SUB_CATEGORY)));
+                d.setImage(cursor.getString(cursor.getColumnIndex(KEY_IMAGE)));
                 d.setPrice(cursor.getDouble(cursor.getColumnIndex(KEY_PRICE)));
-                d.setDesciption(cursor.getString(cursor.getColumnIndex(KEY_DESCIPTION)));
+                d.setTotal_available(cursor.getInt(cursor.getColumnIndex(KEY_TOTAL_AVAILABLE)));
+                d.setDescription(cursor.getString(cursor.getColumnIndex(KEY_DESCIPTION)));
                 d.setPrescription_required(Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(KEY_PRESCRIPTION_REQUIRED))));
                 list.add(d);
             } while (cursor.moveToNext());
@@ -133,6 +145,25 @@ public class DBHelper extends SQLiteOpenHelper {
         ArrayList<String> list = null;
         String query = "SELECT * FROM " + TABLE_MEDICINE;
 //        String query = "SELECT * FROM " + TABLE_PROJECTS + " WHERE " + KEY_PROJECT_TYPE + "=" + type_id + " ORDER BY ID DESC";
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor == null) {
+            return list;
+        }
+        if (cursor.moveToFirst()) {
+            list = new ArrayList<String>();
+            do {
+                list.add(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+            } while (cursor.moveToNext());
+        }
+        return list;
+    }
+
+    public ArrayList<String> getMedicinesAll() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<String> list = null;
+//        String query = "SELECT * FROM " + TABLE_MEDICINE;
+//        String query = "SELECT * FROM " + TABLE_MEDICINE + " WHERE " + KEY_CATEGORY + "=" + param;
+        String query = "SELECT * FROM medicine where category='Prescription'";
         Cursor cursor = db.rawQuery(query, null);
         if (cursor == null) {
             return list;

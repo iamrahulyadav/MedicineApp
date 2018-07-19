@@ -189,7 +189,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
         switch (id) {
             case R.id.action_cart:
-                openCartFragment();
+                //openCartFragment();
+                startActivity(new Intent(context, CartActivity.class));
+
                 break;
         }
         return super.onOptionsItemSelected(item);
