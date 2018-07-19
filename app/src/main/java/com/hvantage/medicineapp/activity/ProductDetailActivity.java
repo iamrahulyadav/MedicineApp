@@ -219,7 +219,7 @@ public class ProductDetailActivity extends AppCompatActivity implements View.OnC
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         hideProgressDialog();
-                        Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "DocumentSnapshot successfully written!");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
