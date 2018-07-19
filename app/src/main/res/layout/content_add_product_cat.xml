@@ -41,49 +41,35 @@
                     android:src="@drawable/placeholder_drugs_generic" />
             </android.support.v7.widget.CardView>
 
-            <CheckBox
-                android:id="@+id/checkBoxCat"
+
+            <Spinner
+                android:id="@+id/spinnerCat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:fontFamily="@font/quicksand"
-                android:hint="Add Category"
-                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                android:textColor="@color/colorTextHeading" />
+                android:entries="@array/categories" />
 
-            <LinearLayout
-                android:id="@+id/llCategory"
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.7dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/colorTextHeading" />
+
+            <Spinner
+                android:id="@+id/spinnerSubCat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
+                android:layout_marginTop="15dp"
+                android:entries="@array/select_default"
+                android:visibility="gone" />
 
-                <Spinner
-                    android:id="@+id/spinnerCat"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:entries="@array/categories" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.7dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/colorTextHeading" />
-
-                <Spinner
-                    android:id="@+id/spinnerSubCat"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:entries="@array/select_default" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.7dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@color/colorTextHeading" />
-            </LinearLayout>
+            <View
+                android:id="@+id/viewLine"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="0.7dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/colorTextHeading" />
 
 
             <EditText

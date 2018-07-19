@@ -26,10 +26,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -75,10 +73,9 @@ public class AddProductCatActivity extends AppCompatActivity implements View.OnC
     private Spinner spinnerCat;
     private Spinner spinnerSubCat;
     private ArrayAdapter<String> adapter;
-    private CheckBox checkBoxCat;
-    private LinearLayout llCategory;
     private String category_name = "", sub_category_name = "";
     private EditText etTotalAvailable;
+    private View viewLine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,14 +108,20 @@ public class AddProductCatActivity extends AppCompatActivity implements View.OnC
             if (!image_base64.equalsIgnoreCase(""))
                 imageDrug.setImageBitmap(Functions.base64ToBitmap(image_base64));
 
-            if (!data.getCategory_name().equalsIgnoreCase("") && !data.getCategory_name().equalsIgnoreCase("")) {
-                checkBoxCat.setChecked(true);
+            if (data.getCategory_name().equalsIgnoreCase("Prescription")) {
+                spinnerCat.setSelection(0);
+                spinnerSubCat.setVisibility(View.GONE);
+                viewLine.setVisibility(View.GONE);
+
+            } else if (!data.getCategory_name().equalsIgnoreCase("") && !data.getCategory_name().equalsIgnoreCase("")) {
                 String[] arrayCat = getResources().getStringArray(R.array.categories);
                 for (int i = 0; i < arrayCat.length; i++) {
                     if (arrayCat[i].equalsIgnoreCase(data.getCategory_name()))
                         spinnerCat.setSelection(i);
                 }
             }
+
+
         }
     }
 
@@ -180,11 +183,10 @@ public class AddProductCatActivity extends AppCompatActivity implements View.OnC
         etTotalAvailable = (EditText) findViewById(R.id.etTotalAvailable);
         imageDrug = (ImageView) findViewById(R.id.imageDrug);
         checkBox = (CheckBox) findViewById(R.id.checkBox);
-        checkBoxCat = (CheckBox) findViewById(R.id.checkBoxCat);
-        llCategory = (LinearLayout) findViewById(R.id.llCategory);
         btnSubmit = (CardView) findViewById(R.id.btnSubmit);
         spinnerCat = (Spinner) findViewById(R.id.spinnerCat);
         spinnerSubCat = (Spinner) findViewById(R.id.spinnerSubCat);
+        viewLine = (View) findViewById(R.id.viewLine);
         btnSubmit.setOnClickListener(this);
         imageDrug.setOnClickListener(this);
         spinnerCat.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -192,6 +194,11 @@ public class AddProductCatActivity extends AppCompatActivity implements View.OnC
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
                 if (position > 0) {
                     getCat();
+                    spinnerSubCat.setVisibility(View.VISIBLE);
+                    viewLine.setVisibility(View.VISIBLE);
+                } else {
+                    spinnerSubCat.setVisibility(View.GONE);
+                    viewLine.setVisibility(View.GONE);
                 }
             }
 
@@ -201,28 +208,14 @@ public class AddProductCatActivity extends AppCompatActivity implements View.OnC
             }
         });
 
-        checkBoxCat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    llCategory.setVisibility(View.VISIBLE);
-                } else {
-                    llCategory.setVisibility(View.GONE);
-                }
-            }
-        });
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSubmit:
-                if (checkBoxCat.isChecked()) {
-                    if (spinnerCat.getSelectedItemPosition() == 0) {
-                        Toast.makeText(this, "Select Category", Toast.LENGTH_SHORT).show();
-                        return;
-
-                    } else if (spinnerSubCat.getSelectedItem().toString().equalsIgnoreCase("Select Subcategory")) {
+                if (spinnerCat.getSelectedItemPosition() > 0) {
+                    if (spinnerSubCat.getSelectedItem().toString().equalsIgnoreCase("Select Subcategory")) {
                         Toast.makeText(this, "Select Subcategory", Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -246,12 +239,12 @@ public class AddProductCatActivity extends AppCompatActivity implements View.OnC
                 else if (TextUtils.isEmpty(etTotalAvailable.getText().toString()))
                     Toast.makeText(this, "Enter Total Available", Toast.LENGTH_SHORT).show();
                 else {
-                    if (checkBoxCat.isChecked()) {
+                    if (spinnerCat.getSelectedItemPosition() == 0) {
+                        category_name = spinnerCat.getSelectedItem().toString();
+                        sub_category_name = "";
+                    } else {
                         category_name = spinnerCat.getSelectedItem().toString();
                         sub_category_name = spinnerSubCat.getSelectedItem().toString();
-                    } else {
-                        category_name = "";
-                        sub_category_name = "";
                     }
                     if (data == null)
                         saveData();

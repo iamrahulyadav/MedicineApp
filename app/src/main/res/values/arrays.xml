@@ -45,7 +45,7 @@
     </string-array>
 
     <string-array name="categories">
-        <item>Select Category</item>
+        <item>Prescription</item>
         <item>Baby &amp; Mother</item>
         <item>OTC</item>
         <item>Personal Care</item>
@@ -55,6 +55,7 @@
         <item>Ayurvedic</item>
         <item>Homeopathy</item>
     </string-array>
+
     <string-array name="select_default">
         <item>Select</item>
     </string-array>
