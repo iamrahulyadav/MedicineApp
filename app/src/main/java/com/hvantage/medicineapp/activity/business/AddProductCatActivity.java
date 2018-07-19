@@ -55,7 +55,7 @@ import java.util.ArrayList;
 
 public class AddProductCatActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String TAG = "AddProductActivity";
+    private static final String TAG = "AddProductCatActivity";
     private static final int REQUEST_STORAGE = 0;
     private static final int REQUEST_IMAGE_CAPTURE = REQUEST_STORAGE + 1;
     private static final int REQUEST_LOAD_IMAGE = REQUEST_IMAGE_CAPTURE + 1;

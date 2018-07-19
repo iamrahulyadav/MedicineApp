@@ -101,8 +101,13 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                         PrescriptionModel data = dataSnapshot.getValue(PrescriptionModel.class);
                         if (data != null) {
-                            catList.add(data);
-                            adapter.notifyDataSetChanged();
+                            if (catList.size() > 3) {
+                                btnUpload.setVisibility(View.GONE);
+                            } else {
+                                btnUpload.setVisibility(View.GONE);
+                                catList.add(data);
+                                adapter.notifyDataSetChanged();
+                            }
                         }
 
                         if (adapter.getItemCount() >= 3) {

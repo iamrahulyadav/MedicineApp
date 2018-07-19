@@ -53,7 +53,7 @@ public class BusinessProductAdapter extends RecyclerView.Adapter<BusinessProduct
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final ProductModel data = contactListFiltered.get(position);
-        Log.e(TAG, position + " data : " + data);
+        Log.d(TAG, position + " data : " + data);
         holder.tvTitle.setText(data.getName());
         holder.tvQty.setText("(Qty. " + data.getTotal_available() + ")");
         if (data.getTotal_available() == 0)
