@@ -85,6 +85,7 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
                 });
             }
         });
+
         holder.tvPlus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

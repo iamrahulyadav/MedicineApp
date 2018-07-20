@@ -19,6 +19,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
@@ -37,8 +38,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.LoginActivity;
+import com.hvantage.medicineapp.adapter.CartItemAdapter;
 import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
+import com.hvantage.medicineapp.model.CartModel;
 import com.hvantage.medicineapp.model.PrescriptionModel;
+import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.GridSpacingItemDecoration;
@@ -69,6 +73,10 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private int spacing = 30, spanCount = 3;
     private boolean boolean_folder = false, includeEdge = true;
     private CardView btnPlaceOrder;
+    private ArrayList<CartModel> list = new ArrayList<CartModel>();
+    private CartItemAdapter adapterCart;
+    private double total = 0;
+    private RecyclerView recylcer_view_items;
 
     @Nullable
     @Override
@@ -80,13 +88,78 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
         }
         init();
         setRecyclerView();
-        if (FirebaseAuth.getInstance().getCurrentUser() != null)
+        setRecyclerViewCart();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             getData();
-        else {
+            getCartData();
+        } else {
             startActivity(new Intent(getActivity(), LoginActivity.class));
         }
         return rootView;
     }
+
+    private void setRecyclerViewCart() {
+        recylcer_view_items = (RecyclerView) rootView.findViewById(R.id.recylcer_view_items);
+        adapterCart = new CartItemAdapter(context, list);
+        recylcer_view_items.setLayoutManager(new LinearLayoutManager(context));
+        recylcer_view_items.setAdapter(adapterCart);
+        adapterCart.notifyDataSetChanged();
+    }
+
+    private void getCartData() {
+        showProgressDialog();
+        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+                .child(AppConstants.FIREBASE_KEY.CART)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                .child(AppConstants.FIREBASE_KEY.CART_ITEMS)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        list.clear();
+                        total = 0;
+                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                            final CartModel model1 = postSnapshot.getValue(CartModel.class);
+                            Log.e(TAG, "onDataChange: model1 >> " + model1);
+                            FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+                                    .child(AppConstants.FIREBASE_KEY.MEDICINE)
+                                    .child(model1.getKey())
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot1) {
+                                            ProductModel model2 = dataSnapshot1.getValue(ProductModel.class);
+                                            Log.e(TAG, "onDataChange: model2 >> " + model2);
+                                            CartModel final_model = new CartModel();
+                                            final_model.setKey(model1.getKey());
+                                            final_model.setQty_no(model1.getQty_no());
+                                            final_model.setItem(model2.getName());
+                                            final_model.setImage(model2.getImage());
+                                            final_model.setItem_price(model2.getPrice());
+                                            final_model.setItem_total_price(model1.getQty_no() * model2.getPrice());
+                                            list.add(final_model);
+                                            total = total + final_model.getItem_total_price();
+                                            adapterCart.notifyDataSetChanged();
+                                            //tvTotalPrice.setText("Rs. " + total);
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+                                            Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                                        }
+                                    });
+
+                        }
+                        hideProgressDialog();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // Getting Post failed, log a message
+                        Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                        hideProgressDialog();
+                    }
+                });
+    }
+
 
     private void getData() {
         showProgressDialog();
