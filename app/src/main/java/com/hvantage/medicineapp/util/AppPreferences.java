@@ -13,6 +13,7 @@ public class AppPreferences {
     public static final String PREFERENCES = "my_home_check";
 
     public static final String MOBILE_NO = "mobile_no";
+    public static final String ORDER_TYPE = "order_type";
 
     private static AppPreferences instance;
     private final SharedPreferences sharedPreferences;
@@ -37,5 +38,19 @@ public class AppPreferences {
         SharedPreferences pereference = context.getSharedPreferences(
                 PREFERENCES, 0);
         return pereference.getString(MOBILE_NO, "");
+    }
+
+    public static void setOrderType(Context context, int value) {
+        SharedPreferences preferences = context.getSharedPreferences(
+                PREFERENCES, 0);
+        Editor editor = preferences.edit();
+        editor.putInt(MOBILE_NO, value);
+        editor.commit();
+    }
+
+    public static int getOrderType(Context context) {
+        SharedPreferences pereference = context.getSharedPreferences(
+                PREFERENCES, 0);
+        return pereference.getInt(MOBILE_NO, 0);
     }
 }

@@ -56,6 +56,7 @@
                 android:id="@+id/llQty"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:layout_gravity="center_vertical"
                 android:background="@drawable/border_round"
                 android:orientation="horizontal"
@@ -114,6 +115,18 @@
                     android:textColor="@color/colorPrimary"
                     android:textStyle="bold" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="5dp"
+                android:layout_toRightOf="@id/llQty"
+                android:drawableLeft="@drawable/ic_delete_black_24dp"
+                android:padding="5dp"
+                android:text=""
+                android:textColor="@color/colorTextHeading" />
 
             <TextView
                 android:id="@+id/tvTotalPrice"

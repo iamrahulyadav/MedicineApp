@@ -1,7 +1,40 @@
 package com.hvantage.medicineapp.model;
 
-public class AddressModel {
-    public AddressModel(String key, String pincode, String address, String landmark, String city, String state, String is_default) {
+import java.io.Serializable;
+
+public class AddressModel implements Serializable {
+
+    String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getContact_no() {
+        return contact_no;
+    }
+
+    public void setContact_no(String contact_no) {
+        this.contact_no = contact_no;
+    }
+
+
+    String contact_no;
+    String key;
+    String pincode;
+    String address;
+    String landmark;
+    String city;
+    String state;
+    boolean is_default;
+
+    public AddressModel(String name, String contact_no, String key, String pincode, String address, String landmark, String city, String state, boolean is_default) {
+        this.name = name;
+        this.contact_no = contact_no;
         this.key = key;
         this.pincode = pincode;
         this.address = address;
@@ -10,8 +43,6 @@ public class AddressModel {
         this.state = state;
         this.is_default = is_default;
     }
-
-    String key, pincode, address, landmark, city, state, is_default;
 
     public AddressModel() {
     }
@@ -64,11 +95,11 @@ public class AddressModel {
         this.state = state;
     }
 
-    public String getIs_default() {
+    public boolean getIs_default() {
         return is_default;
     }
 
-    public void setIs_default(String is_default) {
+    public void setIs_default(boolean is_default) {
         this.is_default = is_default;
     }
 

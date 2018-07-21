@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -37,6 +38,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.activity.DeliveryAddressActivity;
 import com.hvantage.medicineapp.activity.LoginActivity;
 import com.hvantage.medicineapp.adapter.CartItemAdapter;
 import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
@@ -44,6 +46,7 @@ import com.hvantage.medicineapp.model.CartModel;
 import com.hvantage.medicineapp.model.PrescriptionModel;
 import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
+import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.GridSpacingItemDecoration;
 import com.hvantage.medicineapp.util.ProgressBar;
@@ -64,19 +67,22 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private View rootView;
     private FragmentIntraction intraction;
     private RecyclerView recylcer_view;
-    private UploadedPreAdapter adapter;
-    private ArrayList<PrescriptionModel> catList = new ArrayList<PrescriptionModel>();
+    private UploadedPreAdapter adapterPres;
+    private ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
     private CardView btnUpload;
     private ProgressBar progressBar;
     private String userChoosenTask;
     private Dialog dialog;
     private int spacing = 30, spanCount = 3;
-    private boolean boolean_folder = false, includeEdge = true;
+    private boolean includeEdge = true;
     private CardView btnPlaceOrder;
-    private ArrayList<CartModel> list = new ArrayList<CartModel>();
+    private ArrayList<CartModel> cartList = new ArrayList<CartModel>();
     private CartItemAdapter adapterCart;
     private double total = 0;
     private RecyclerView recylcer_view_items;
+    private TextView tvInstructions;
+    private TextView tvCartItemEmpty;
+    private CardView btnContinue;
 
     @Nullable
     @Override
@@ -100,14 +106,13 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
 
     private void setRecyclerViewCart() {
         recylcer_view_items = (RecyclerView) rootView.findViewById(R.id.recylcer_view_items);
-        adapterCart = new CartItemAdapter(context, list);
+        adapterCart = new CartItemAdapter(context, cartList);
         recylcer_view_items.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view_items.setAdapter(adapterCart);
         adapterCart.notifyDataSetChanged();
     }
 
     private void getCartData() {
-        showProgressDialog();
         FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
                 .child(AppConstants.FIREBASE_KEY.CART)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
@@ -115,7 +120,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        list.clear();
+                        cartList.clear();
                         total = 0;
                         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                             final CartModel model1 = postSnapshot.getValue(CartModel.class);
@@ -135,9 +140,11 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                                             final_model.setImage(model2.getImage());
                                             final_model.setItem_price(model2.getPrice());
                                             final_model.setItem_total_price(model1.getQty_no() * model2.getPrice());
-                                            list.add(final_model);
-                                            total = total + final_model.getItem_total_price();
+                                            cartList.add(final_model);
                                             adapterCart.notifyDataSetChanged();
+                                            total = total + final_model.getItem_total_price();
+                                            if (adapterCart.getItemCount() > 0)
+                                                tvCartItemEmpty.setVisibility(View.GONE);
                                             //tvTotalPrice.setText("Rs. " + total);
                                         }
 
@@ -146,16 +153,13 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                                             Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
                                         }
                                     });
-
                         }
-                        hideProgressDialog();
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         // Getting Post failed, log a message
                         Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                        hideProgressDialog();
                     }
                 });
     }
@@ -172,14 +176,19 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        catList.clear();
+                        presList.clear();
                         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                             PrescriptionModel data = postSnapshot.getValue(PrescriptionModel.class);
                             if (data != null) {
-                                catList.add(data);
-                                adapter.notifyDataSetChanged();
+                                presList.add(data);
+                                adapterPres.notifyDataSetChanged();
                             }
-                            if (adapter.getItemCount() >= 3) {
+
+                            if (adapterPres.getItemCount() > 1) {
+                                tvInstructions.setVisibility(View.GONE);
+                            } else
+                                tvInstructions.setVisibility(View.GONE);
+                            if (adapterPres.getItemCount() >= 3) {
                                 btnUpload.setVisibility(View.GONE);
                             } else {
                                 btnUpload.setVisibility(View.VISIBLE);
@@ -190,6 +199,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
+                        presList.clear();
                         // Getting Post failed, log a message
                         Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
                         hideProgressDialog();
@@ -200,17 +210,21 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private void init() {
         btnUpload = (CardView) rootView.findViewById(R.id.btnUpload);
         btnPlaceOrder = (CardView) rootView.findViewById(R.id.btnPlaceOrder);
+        tvInstructions = (TextView) rootView.findViewById(R.id.tvInstructions);
+        tvCartItemEmpty = (TextView) rootView.findViewById(R.id.tvCartItemEmpty);
+        btnContinue = (CardView) rootView.findViewById(R.id.btnContinue);
         btnUpload.setOnClickListener(this);
+        btnContinue.setOnClickListener(this);
     }
 
     private void setRecyclerView() {
-        catList.clear();
+        presList.clear();
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
-        adapter = new UploadedPreAdapter(context, catList);
+        adapterPres = new UploadedPreAdapter(context, presList);
         recylcer_view.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
         recylcer_view.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
-        recylcer_view.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+        recylcer_view.setAdapter(adapterPres);
+        adapterPres.notifyDataSetChanged();
     }
 
     @Override
@@ -236,8 +250,34 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
             case R.id.btnUpload:
                 selectImage();
                 break;
+            case R.id.btnContinue:
+                if (presList.isEmpty())
+                    showNoPresAlert();
+                else {
+                    AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
+                    startActivity(new Intent(context, DeliveryAddressActivity.class));
+                }
+                break;
         }
 
+    }
+
+    private void showNoPresAlert() {
+        new AlertDialog.Builder(context)
+                .setMessage("Please upload atleast one presciptions to order with prescription.")
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        selectImage();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .show();
     }
 
     private void showProgressDialog() {

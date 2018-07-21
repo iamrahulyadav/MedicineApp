@@ -2,6 +2,7 @@ package com.hvantage.medicineapp.activity;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,6 +10,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,12 +25,12 @@ import com.hvantage.medicineapp.adapter.CartItemAdapter;
 import com.hvantage.medicineapp.model.CartModel;
 import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
+import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.ProgressBar;
 
 import java.util.ArrayList;
 
 public class CartActivity extends AppCompatActivity {
-
     private static final String TAG = "CartActivity";
     private Context context;
     private ArrayList<CartModel> list = new ArrayList<CartModel>();
@@ -34,7 +38,9 @@ public class CartActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private CartItemAdapter adapter;
     private double total = 0;
-    private TextView tvTotalPrice;
+    private TextView tvTotalPrice, tvPayableAmt;
+    private RelativeLayout btnSubmit;
+    private LinearLayout llAmount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +57,16 @@ public class CartActivity extends AppCompatActivity {
 
     private void init() {
         tvTotalPrice = (TextView) findViewById(R.id.tvTotalPrice);
+        tvPayableAmt = (TextView) findViewById(R.id.tvPayableAmt);
+        llAmount = (LinearLayout) findViewById(R.id.llAmount);
+        btnSubmit = (RelativeLayout) findViewById(R.id.btnSubmit);
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITHOUT_PRESCRIPTION);
+                startActivity(new Intent(context, DeliveryAddressActivity.class));
+            }
+        });
     }
 
     private void setRecyclerView() {
@@ -109,22 +125,45 @@ public class CartActivity extends AppCompatActivity {
                                             total = total + final_model.getItem_total_price();
                                             adapter.notifyDataSetChanged();
                                             tvTotalPrice.setText("Rs. " + total);
+                                            tvPayableAmt.setText("Rs. " + total);
+                                            if (adapter.getItemCount() == 0) {
+                                                llAmount.setVisibility(View.GONE);
+                                                btnSubmit.setVisibility(View.GONE);
+                                            }else {
+                                                llAmount.setVisibility(View.VISIBLE);
+                                                btnSubmit.setVisibility(View.VISIBLE);
+                                            }
                                         }
 
                                         @Override
                                         public void onCancelled(DatabaseError databaseError) {
-                                            Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                                            adapter.notifyDataSetChanged();
+                                            if (adapter.getItemCount() == 0) {
+                                                llAmount.setVisibility(View.GONE);
+                                                btnSubmit.setVisibility(View.GONE);
+                                            } else {
+                                                llAmount.setVisibility(View.VISIBLE);
+                                                btnSubmit.setVisibility(View.VISIBLE);
+                                            }
+                                            Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
                                         }
                                     });
 
                         }
                         hideProgressDialog();
+
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        // Getting Post failed, log a message
-                        Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                        if (adapter.getItemCount() == 0) {
+                            llAmount.setVisibility(View.GONE);
+                            btnSubmit.setVisibility(View.GONE);
+                        } else {
+                            llAmount.setVisibility(View.VISIBLE);
+                            btnSubmit.setVisibility(View.VISIBLE);
+                        }
+                        Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
                         hideProgressDialog();
                     }
                 });
