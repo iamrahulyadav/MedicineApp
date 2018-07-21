@@ -70,7 +70,7 @@ public class DeliveryAddressActivity extends AppCompatActivity {
         recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Intent intent = new Intent(context, ConfirmItemActivity.class);
+                Intent intent = new Intent(context, ConfirmOrderActivity.class);
                 intent.putExtra("data", list.get(position));
                 startActivity(intent);
                 finish();

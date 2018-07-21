@@ -35,17 +35,18 @@ import com.hvantage.medicineapp.util.ProgressBar;
 
 import java.util.ArrayList;
 
-public class ConfirmItemActivity extends AppCompatActivity implements View.OnClickListener {
+public class ConfirmOrderActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String TAG = "ConfirmItemActivity";
+    private static final String TAG = "ConfirmOrderActivity";
     private Context context;
     private ProgressBar progressBar;
-    private TextView tvTotalPrice;
+    private TextView tvTotalPrice,tvPayableAmt;
     private TextView tvCheckout;
     private LinearLayout llPrescription, llMedicine, llAmount;
     private LinearLayout llPayMode;
     private AddressModel addressData;
     private TextView tvAddress1, tvAddress2, tvAddress3, tvAddress4;
+    private TextView tvChangeAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,12 +83,11 @@ public class ConfirmItemActivity extends AppCompatActivity implements View.OnCli
             }
 
 
-
             if (addressData != null) {
                 tvAddress1.setText(addressData.getName() + ", +91" + addressData.getContact_no());
                 tvAddress2.setText(addressData.getAddress() + ", " + addressData.getLandmark());
                 tvAddress3.setText(addressData.getCity() + ", " + addressData.getPincode());
-                tvAddress3.setText(addressData.getState() + ", India");
+                tvAddress4.setText(addressData.getState() + ", India");
             } else {
                 startActivity(new Intent(context, DeliveryAddressActivity.class));
                 finish();
@@ -100,16 +100,19 @@ public class ConfirmItemActivity extends AppCompatActivity implements View.OnCli
 
     private void init() {
         tvTotalPrice = (TextView) findViewById(R.id.tvTotalPrice);
+        tvPayableAmt = (TextView) findViewById(R.id.tvPayableAmt);
         tvCheckout = (TextView) findViewById(R.id.tvCheckout);
         tvAddress1 = (TextView) findViewById(R.id.tvAddress1);
         tvAddress2 = (TextView) findViewById(R.id.tvAddress2);
         tvAddress3 = (TextView) findViewById(R.id.tvAddress3);
         tvAddress4 = (TextView) findViewById(R.id.tvAddress4);
+        tvChangeAddress = (TextView) findViewById(R.id.tvChangeAddress);
         llPrescription = (LinearLayout) findViewById(R.id.llPrescription);
         llMedicine = (LinearLayout) findViewById(R.id.llMedicine);
         llAmount = (LinearLayout) findViewById(R.id.llAmount);
         llPayMode = (LinearLayout) findViewById(R.id.llPayMode);
         tvCheckout.setOnClickListener(this);
+        tvChangeAddress.setOnClickListener(this);
     }
 
 
@@ -175,12 +178,24 @@ public class ConfirmItemActivity extends AppCompatActivity implements View.OnCli
                                             cartList.add(final_model);
                                             adapterCart.notifyDataSetChanged();
                                             total = total + final_model.getItem_total_price();
-//                                            tvTotalPrice.setText("Rs. " + total);
+                                            tvTotalPrice.setText("Rs. " + total);
+                                            tvPayableAmt.setText("Rs. " + total);
+                                            if (adapterCart.getItemCount() == 0) {
+                                                llMedicine.setVisibility(View.GONE);
+                                            } else {
+                                                llMedicine.setVisibility(View.VISIBLE);
+                                            }
                                         }
 
                                         @Override
                                         public void onCancelled(DatabaseError databaseError) {
-                                            Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                                            adapterCart.notifyDataSetChanged();
+                                            if (adapterCart.getItemCount() == 0) {
+                                                llMedicine.setVisibility(View.GONE);
+                                            } else {
+                                                llMedicine.setVisibility(View.VISIBLE);
+                                            }
+                                            Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
                                         }
                                     });
                         }
@@ -188,8 +203,13 @@ public class ConfirmItemActivity extends AppCompatActivity implements View.OnCli
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        // Getting Post failed, log a message
-                        Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                        adapterCart.notifyDataSetChanged();
+                        if (adapterCart.getItemCount() == 0) {
+                            llMedicine.setVisibility(View.GONE);
+                        } else {
+                            llMedicine.setVisibility(View.VISIBLE);
+                        }
+                        Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
                     }
                 });
     }
@@ -212,14 +232,25 @@ public class ConfirmItemActivity extends AppCompatActivity implements View.OnCli
                                 presList.add(data);
                                 adapterPres.notifyDataSetChanged();
                             }
+                            adapterPres.notifyDataSetChanged();
+                            if (adapterPres.getItemCount() == 0) {
+                                llPrescription.setVisibility(View.GONE);
+                            } else {
+                                llPrescription.setVisibility(View.VISIBLE);
+                            }
                         }
                         hideProgressDialog();
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        // Getting Post failed, log a message
-                        Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                        adapterPres.notifyDataSetChanged();
+                        if (adapterPres.getItemCount() == 0) {
+                            llPrescription.setVisibility(View.GONE);
+                        } else {
+                            llPrescription.setVisibility(View.VISIBLE);
+                        }
+                        Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
                         hideProgressDialog();
                     }
                 });
@@ -258,6 +289,9 @@ public class ConfirmItemActivity extends AppCompatActivity implements View.OnCli
                     showNoItemsAlert();
                 }
                 showVaryAlert();
+                break;
+            case R.id.tvChangeAddress:
+                startActivity(new Intent(context, DeliveryAddressActivity.class));
                 break;
 
         }

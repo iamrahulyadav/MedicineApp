@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -24,7 +23,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.activity.ImagePreviewActivity;
 import com.hvantage.medicineapp.model.PrescriptionModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.Functions;
@@ -71,7 +69,7 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
             @Override
             public void onClick(View view) {
                 Log.e(TAG, "onBindViewHolder: data >> " + data);
-               // context.startActivity(new Intent(context, ImagePreviewActivity.class).putExtra("prescription_data", data));
+                // context.startActivity(new Intent(context, ImagePreviewActivity.class).putExtra("prescription_data", data));
                 showPreviewDialog(Functions.base64ToBitmap(data.getImage_base64()));
 
             }
@@ -97,6 +95,7 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 hideProgressDialog();
+                                                notifyDataSetChanged();
                                                 // removeAt(position);
                                                 Toast.makeText(context, "Removed", Toast.LENGTH_SHORT).show();
                                                 // Write was successful!
@@ -107,6 +106,7 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
+                                                notifyDataSetChanged();
                                                 hideProgressDialog();
                                                 // Write failed
                                                 // ...

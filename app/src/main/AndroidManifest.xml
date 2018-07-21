@@ -98,7 +98,7 @@
             android:label=""
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.ConfirmItemActivity"
+            android:name=".activity.ConfirmOrderActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

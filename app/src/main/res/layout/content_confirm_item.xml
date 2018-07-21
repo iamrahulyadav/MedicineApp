@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorWhite"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activity.ConfirmItemActivity"
+    tools:context=".activity.ConfirmOrderActivity"
     tools:showIn="@layout/activity_confirm_item">
 
     <RelativeLayout
@@ -45,6 +45,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tvChangeAddress"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -167,7 +168,8 @@
                     android:id="@+id/llPrescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -220,7 +222,8 @@
                     android:id="@+id/llMedicine"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -303,11 +306,12 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tvTotalPrice"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="0.4"
                             android:gravity="right"
-                            android:text="Rs. 1200"
+                            android:text="Rs. 0.0"
                             android:textAppearance="@style/TextAppearance.AppCompat.Small"
                             android:textColor="@color/colorTextHeading"
                             android:textStyle="bold" />
@@ -342,7 +346,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="0.4"
                             android:gravity="right"
-                            android:text="Rs. 40"
+                            android:text="Rs. 0.0"
                             android:textAppearance="@style/TextAppearance.AppCompat.Small"
                             android:textColor="@color/colorTextHeading"
                             android:textStyle="bold" />
@@ -377,7 +381,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="0.4"
                             android:gravity="right"
-                            android:text="Rs. 8"
+                            android:text="Rs. 0.0"
                             android:textAppearance="@style/TextAppearance.AppCompat.Small"
                             android:textColor="@color/colorTextHeading"
                             android:textStyle="bold" />
@@ -408,11 +412,12 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tvPayableAmt"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="0.4"
                             android:gravity="right"
-                            android:text="Rs. 1248"
+                            android:text="Rs. 0.0"
                             android:textAppearance="@style/TextAppearance.AppCompat.Small"
                             android:textColor="@color/colorTextHeading"
                             android:textStyle="bold" />
