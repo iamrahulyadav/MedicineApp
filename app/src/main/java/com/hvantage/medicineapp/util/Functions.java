@@ -18,6 +18,7 @@ import android.widget.EditText;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.regex.Matcher;
@@ -124,6 +125,7 @@ public class Functions {
         Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         return bitmap;
     }
+
     public static void showSettingsAlert(final Activity mContext) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
         alertDialog.setTitle("GPS is disabled");
@@ -144,6 +146,11 @@ public class Functions {
 
         // Showing Alert Message
         alertDialog.show();
+    }
+
+    public static double roundTwoDecimals(double d) {
+        DecimalFormat twoDForm = new DecimalFormat("#.##");
+        return Double.valueOf(twoDForm.format(d));
     }
 
 

@@ -17,6 +17,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,6 +27,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,14 +43,17 @@ import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.DeliveryAddressActivity;
 import com.hvantage.medicineapp.activity.LoginActivity;
+import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.adapter.CartItemAdapter;
 import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
+import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.CartModel;
 import com.hvantage.medicineapp.model.PrescriptionModel;
 import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.FragmentIntraction;
+import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.GridSpacingItemDecoration;
 import com.hvantage.medicineapp.util.ProgressBar;
 
@@ -75,7 +81,6 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private Dialog dialog;
     private int spacing = 30, spanCount = 3;
     private boolean includeEdge = true;
-    private CardView btnPlaceOrder;
     private ArrayList<CartModel> cartList = new ArrayList<CartModel>();
     private CartItemAdapter adapterCart;
     private double total = 0;
@@ -83,6 +88,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private TextView tvInstructions;
     private TextView tvCartItemEmpty;
     private CardView btnContinue;
+    private AppCompatAutoCompleteTextView etSearch;
 
     @Nullable
     @Override
@@ -93,16 +99,70 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
             intraction.actionbarsetTitle("Upload Prescription");
         }
         init();
+        list = new DBHelper(context).getMedicinesSearch();
+
         setRecyclerView();
         setRecyclerViewCart();
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             getData();
             getCartData();
+            setSearchBar();
+
         } else {
             startActivity(new Intent(getActivity(), LoginActivity.class));
         }
         return rootView;
     }
+
+    private ArrayList<String> list = new ArrayList<String>();
+
+
+    private void setSearchBar() {
+        if (list != null) {
+            Log.e(TAG, "setSearchBar: list >> " + list.size());
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, R.layout.auto_complete_text, list);
+            etSearch.setThreshold(1);
+            etSearch.setAdapter(adapter);
+            etSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Log.e(TAG, "onItemClick: text >> " + etSearch.getText().toString());
+                    if (Functions.isConnectingToInternet(context)) {
+                        showProgressDialog();
+                        FirebaseDatabase.getInstance().getReference()
+                                .child(AppConstants.APP_NAME)
+                                .child(AppConstants.FIREBASE_KEY.MEDICINE)
+                                .orderByChild("name")
+                                .equalTo(etSearch.getText().toString())
+                                .addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        hideProgressDialog();
+                                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                                            ProductModel data = postSnapshot.getValue(ProductModel.class);
+                                            Log.e(TAG, "onDataChange: data >> " + data);
+                                            startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", data));
+                                            etSearch.setText("");
+                                            break;
+                                        }
+
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        hideProgressDialog();
+                                        Log.w(TAG, "onCancelled >> ", databaseError.toException());
+                                    }
+                                });
+                    } else {
+                        Toast.makeText(context, "No internet connection", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+    }
+
 
     private void setRecyclerViewCart() {
         recylcer_view_items = (RecyclerView) rootView.findViewById(R.id.recylcer_view_items);
@@ -209,9 +269,9 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
 
     private void init() {
         btnUpload = (CardView) rootView.findViewById(R.id.btnUpload);
-        btnPlaceOrder = (CardView) rootView.findViewById(R.id.btnPlaceOrder);
         tvInstructions = (TextView) rootView.findViewById(R.id.tvInstructions);
         tvCartItemEmpty = (TextView) rootView.findViewById(R.id.tvCartItemEmpty);
+        etSearch = (AppCompatAutoCompleteTextView) rootView.findViewById(R.id.etSearch);
         btnContinue = (CardView) rootView.findViewById(R.id.btnContinue);
         btnUpload.setOnClickListener(this);
         btnContinue.setOnClickListener(this);

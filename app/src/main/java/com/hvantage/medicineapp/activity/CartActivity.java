@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -26,6 +27,7 @@ import com.hvantage.medicineapp.model.CartModel;
 import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
+import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 
 import java.util.ArrayList;
@@ -52,7 +54,13 @@ public class CartActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         init();
         setRecyclerView();
-        getData();
+        if (FirebaseAuth.getInstance().getCurrentUser() != null)
+            getData();
+        else {
+            Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(context, LoginActivity.class));
+            finish();
+        }
     }
 
     private void init() {
@@ -124,12 +132,12 @@ public class CartActivity extends AppCompatActivity {
                                             list.add(final_model);
                                             total = total + final_model.getItem_total_price();
                                             adapter.notifyDataSetChanged();
-                                            tvTotalPrice.setText("Rs. " + total);
-                                            tvPayableAmt.setText("Rs. " + total);
+                                            tvTotalPrice.setText("Rs. " + Functions.roundTwoDecimals(total));
+                                            tvPayableAmt.setText("Rs. " + Functions.roundTwoDecimals(total));
                                             if (adapter.getItemCount() == 0) {
                                                 llAmount.setVisibility(View.GONE);
                                                 btnSubmit.setVisibility(View.GONE);
-                                            }else {
+                                            } else {
                                                 llAmount.setVisibility(View.VISIBLE);
                                                 btnSubmit.setVisibility(View.VISIBLE);
                                             }

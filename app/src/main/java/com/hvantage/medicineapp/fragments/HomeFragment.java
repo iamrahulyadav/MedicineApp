@@ -282,8 +282,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         recylcer_view_daily.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view_daily, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                startActivity(new Intent(context, ProductDetailActivity.class)
-                        .putExtra("medicine_data", listDailyNeeds.get(position)));
+               /* startActivity(new Intent(context, ProductDetailActivity.class)
+                        .putExtra("medicine_data", listDailyNeeds.get(position)));*/
             }
 
             @Override
