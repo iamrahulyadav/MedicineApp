@@ -36,5 +36,4 @@
 
     <include layout="@layout/content_add_product_cat" />
 
-
 </android.support.design.widget.CoordinatorLayout>
