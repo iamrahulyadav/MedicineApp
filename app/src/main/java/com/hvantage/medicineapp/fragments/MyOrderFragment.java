@@ -70,7 +70,7 @@ public class MyOrderFragment extends Fragment implements View.OnClickListener {
             public void onItemClick(View view, int position) {
                 FragmentManager manager = getFragmentManager();
                 FragmentTransaction ft = manager.beginTransaction();
-                Fragment fragment = new AddDoctorFragment();
+                Fragment fragment = new OrderDetailFragment();
                 Bundle args = new Bundle();
                 args.putSerializable("data", list.get(position));
                 fragment.setArguments(args);

@@ -339,6 +339,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         orderData.setKey(key);
         orderData.setPayment_mode(payment_mode);
         orderData.setStatus("In-Progress");
+        orderData.setOrder_type(String.valueOf(AppPreferences.getOrderType(context)));
         orderData.setBy(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber());
 
         Log.e(TAG, "sendData: orderData >> " + orderData);

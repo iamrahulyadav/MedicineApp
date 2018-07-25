@@ -16,6 +16,16 @@ public class OrderData implements Serializable {
     private String date;
     private String time;
 
+    public String getOrder_type() {
+        return order_type;
+    }
+
+    public void setOrder_type(String order_type) {
+        this.order_type = order_type;
+    }
+
+    private String order_type;
+
     public String getPayment_mode() {
         return payment_mode;
     }
