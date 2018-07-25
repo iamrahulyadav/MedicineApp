@@ -16,6 +16,7 @@ public class AppConstants {
         public static final String MEDICINE = "medicine";
         public static final String CART_ITEMS = "cart_items";
         public static final String ADDRESS = "address";
+        public static final String ORDERS = "orders";
     }
 
     public class CATEGORY {

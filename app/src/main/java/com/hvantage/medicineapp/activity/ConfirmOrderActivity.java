@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,38 +15,51 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.CartItemAdapter;
 import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
 import com.hvantage.medicineapp.model.AddressModel;
 import com.hvantage.medicineapp.model.CartModel;
+import com.hvantage.medicineapp.model.OrderData;
 import com.hvantage.medicineapp.model.PrescriptionModel;
 import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
+import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.GridSpacingItemDecoration;
 import com.hvantage.medicineapp.util.ProgressBar;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class ConfirmOrderActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "ConfirmOrderActivity";
     private Context context;
     private ProgressBar progressBar;
-    private TextView tvTotalPrice,tvPayableAmt;
+    private TextView tvTotalPrice, tvPayableAmt;
     private TextView tvCheckout;
     private LinearLayout llPrescription, llMedicine, llAmount;
     private LinearLayout llPayMode;
     private AddressModel addressData;
     private TextView tvAddress1, tvAddress2, tvAddress3, tvAddress4;
     private TextView tvChangeAddress;
+    private Map<String, String> timestamp;
+    private Double taxes = 0.0;
+    private Double delivery_fee = 0.0;
+    private String payment_mode = "Cash On Delivery";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +69,8 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        timestamp = ServerValue.TIMESTAMP;
+        Log.e(TAG, "onCreate: ServerValue.TIMESTAMP >> " + ServerValue.TIMESTAMP);
         if (getIntent().hasExtra("data"))
             addressData = (AddressModel) getIntent().getSerializableExtra("data");
         else {
@@ -173,11 +188,11 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                                             final_model.setQty_no(model1.getQty_no());
                                             final_model.setItem(model2.getName());
                                             final_model.setImage(model2.getImage());
-                                            final_model.setItem_price(model2.getPrice());
-                                            final_model.setItem_total_price(model1.getQty_no() * model2.getPrice());
+                                            final_model.setItem_price(String.valueOf(model2.getPrice()));
+                                            final_model.setItem_total_price(String.valueOf(model1.getQty_no() * model2.getPrice()));
                                             cartList.add(final_model);
                                             adapterCart.notifyDataSetChanged();
-                                            total = total + final_model.getItem_total_price();
+                                            total = total + Double.parseDouble(final_model.getItem_total_price());
                                             tvTotalPrice.setText("Rs. " + total);
                                             tvPayableAmt.setText("Rs. " + total);
                                             if (adapterCart.getItemCount() == 0) {
@@ -283,12 +298,11 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tvCheckout:
-                if (presList.isEmpty()) {
-                    showNoPresAlert();
-                } else if (cartList.isEmpty() && !presList.isEmpty()) {
-                    showNoItemsAlert();
+                if (Functions.isConnectingToInternet(context))
+                    sendData();
+                else {
+                    Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
                 }
-                showVaryAlert();
                 break;
             case R.id.tvChangeAddress:
                 startActivity(new Intent(context, DeliveryAddressActivity.class));
@@ -297,42 +311,78 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    private void showNoItemsAlert() {
-        new AlertDialog.Builder(context)
-                .setMessage("No items added, place order with uploaded prescriptions only.")
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+    private void sendData() {
+        showProgressDialog();
+
+
+        String key = FirebaseDatabase.getInstance()
+                .getReference(AppConstants.APP_NAME)
+                .child(AppConstants.FIREBASE_KEY.ORDERS)
+                .push().getKey();
+
+        OrderData orderData = new OrderData();
+//        orderData.setDate_time_server(ServerValue.TIMESTAMP);
+        orderData.setDate(Functions.getCurrentDate());
+        orderData.setTime(Functions.getCurrentTime());
+        orderData.setTaxes(String.valueOf(taxes));
+        orderData.setDelivery_fee(String.valueOf(delivery_fee));
+        orderData.setTotal_amount(String.valueOf(total));
+        orderData.setPayable_amount(String.valueOf(total));
+
+        //delivery details
+        orderData.setDelivery_details(addressData);
+        //cart items
+        orderData.setItems(cartList);
+        //presriptions
+        orderData.setPrescriptions(presList);
+
+        orderData.setKey(key);
+        orderData.setPayment_mode(payment_mode);
+        orderData.setStatus("In-Progress");
+        orderData.setBy(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber());
+
+        Log.e(TAG, "sendData: orderData >> " + orderData);
+
+        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+                .child(AppConstants.FIREBASE_KEY.ORDERS)
+                .child(key)
+                .setValue(orderData)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onComplete(@NonNull Task<Void> task) {
+                        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+                                .child(AppConstants.FIREBASE_KEY.CART)
+                                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                                .removeValue()
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        hideProgressDialog();
+                                        Toast.makeText(context, "Order Placed", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(ConfirmOrderActivity.this, MainActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        startActivity(intent);
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        hideProgressDialog();
+                                        Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
 
                     }
-                }).show();
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                hideProgressDialog();
+                Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Error writing document", e);
+            }
+        });
+
     }
 
-    private void showNoPresAlert() {
-        new AlertDialog.Builder(context)
-                .setMessage("No presciption uploaded, continue shopping without prescription.")
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                }).show();
-    }
-
-    private void showVaryAlert() {
-        new AlertDialog.Builder(context)
-                .setMessage("Total amount can be vary after reviewing your uploaded prescriptions by our pharmacist if any uploads.")
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                }).show();
-    }
 }

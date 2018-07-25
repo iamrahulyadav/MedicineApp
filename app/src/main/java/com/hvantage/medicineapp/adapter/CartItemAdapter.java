@@ -55,8 +55,8 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
         Log.e(TAG, position + " data : " + data);
         holder.tvTitle.setText(data.getItem());
         holder.tvQty.setText("" + data.getQty_no());
-        holder.tvPrice.setText("Rs. " + Functions.roundTwoDecimals(data.getItem_price()));
-        holder.tvTotalPrice.setText("Rs. " + Functions.roundTwoDecimals(data.getItem_total_price()));
+        holder.tvPrice.setText("Rs. " + Functions.roundTwoDecimals(Double.parseDouble(data.getItem_price())));
+        holder.tvTotalPrice.setText("Rs. " + Functions.roundTwoDecimals(Double.parseDouble(data.getItem_total_price())));
         if (!data.getImage().equalsIgnoreCase(""))
             holder.imageThumb.setImageBitmap(Functions.base64ToBitmap(data.getImage()));
         else

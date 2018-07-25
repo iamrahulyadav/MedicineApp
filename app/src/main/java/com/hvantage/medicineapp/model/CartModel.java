@@ -1,10 +1,12 @@
 package com.hvantage.medicineapp.model;
 
-public class CartModel {
+import java.io.Serializable;
+
+public class CartModel implements Serializable {
     String key;
     int qty_no = 1;
     String item;
-    String image="";
+    String image = "";
 
     public String getImage() {
         return image;
@@ -15,7 +17,7 @@ public class CartModel {
     }
 
     String qty;
-    double item_price = 0, item_total_price = 0;
+    String item_price = "0", item_total_price = "0";
 
     public String getItem() {
         return item;
@@ -33,19 +35,19 @@ public class CartModel {
         this.qty = qty;
     }
 
-    public double getItem_price() {
+    public String getItem_price() {
         return item_price;
     }
 
-    public void setItem_price(double item_price) {
+    public void setItem_price(String item_price) {
         this.item_price = item_price;
     }
 
-    public double getItem_total_price() {
+    public String getItem_total_price() {
         return item_total_price;
     }
 
-    public void setItem_total_price(double item_total_price) {
+    public void setItem_total_price(String item_total_price) {
         this.item_total_price = item_total_price;
     }
 

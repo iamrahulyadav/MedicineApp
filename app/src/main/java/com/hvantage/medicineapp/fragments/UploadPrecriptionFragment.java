@@ -198,11 +198,11 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                                             final_model.setQty_no(model1.getQty_no());
                                             final_model.setItem(model2.getName());
                                             final_model.setImage(model2.getImage());
-                                            final_model.setItem_price(model2.getPrice());
-                                            final_model.setItem_total_price(model1.getQty_no() * model2.getPrice());
+                                            final_model.setItem_price(String.valueOf(model2.getPrice()));
+                                            final_model.setItem_total_price(String.valueOf(model1.getQty_no() * model2.getPrice()));
                                             cartList.add(final_model);
                                             adapterCart.notifyDataSetChanged();
-                                            total = total + final_model.getItem_total_price();
+                                            total = total + Double.parseDouble(final_model.getItem_total_price());
                                             if (adapterCart.getItemCount() > 0)
                                                 tvCartItemEmpty.setVisibility(View.GONE);
                                             //tvTotalPrice.setText("Rs. " + total);

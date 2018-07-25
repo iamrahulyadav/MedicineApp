@@ -26,21 +26,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.business.BusinessLoginActivity;
-import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.fragments.CartFragment;
 import com.hvantage.medicineapp.fragments.HomeFragment;
+import com.hvantage.medicineapp.fragments.MyOrderFragment;
 import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.fragments.VaultFragment;
-import com.hvantage.medicineapp.model.DrugModel;
-import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
-import com.hvantage.medicineapp.util.Functions;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, FragmentIntraction {
 
@@ -99,8 +92,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         }
     }
-
-
 
 
     @Override
@@ -224,6 +215,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_vault:
                 fragment = new VaultFragment();
+                ft.replace(R.id.main_container, fragment);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+                break;
+            case R.id.nav_orders:
+                fragment = new MyOrderFragment();
                 ft.replace(R.id.main_container, fragment);
                 ft.addToBackStack(null);
                 ft.commitAllowingStateLoss();

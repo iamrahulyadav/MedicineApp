@@ -9,35 +9,35 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.model.DoctorModel;
+import com.hvantage.medicineapp.model.OrderData;
 
 import java.util.ArrayList;
 
-public class MyDoctorAdapter extends RecyclerView.Adapter<MyDoctorAdapter.ViewHolder> {
+public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHolder> {
 
     private static final String TAG = "CategoryAdapter";
     Context context;
-    ArrayList<DoctorModel> arrayList;
+    ArrayList<OrderData> arrayList;
 
-
-    public MyDoctorAdapter(Context context, ArrayList<DoctorModel> arrayList) {
+    public MyOrdersAdapter(Context context, ArrayList<OrderData> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.doctor_item_layout, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_item_layout, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final DoctorModel data = arrayList.get(position);
+        final OrderData data = arrayList.get(position);
         Log.e(TAG, position + " data : " + data);
-        holder.tvTitle.setText("Dr. " + data.getName());
-        holder.tvBG.setText(data.getSpecialization());
+        holder.tvDate.setText(data.getDate());
+        holder.tvStatus.setText(data.getStatus());
+        holder.tvID.setText("ORD" + data.getKey().replace("-", ""));
     }
 
 
@@ -48,12 +48,13 @@ public class MyDoctorAdapter extends RecyclerView.Adapter<MyDoctorAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvTitle, tvBG;
+        TextView tvDate, tvID, tvStatus;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
-            tvBG = (TextView) itemView.findViewById(R.id.tvBG);
+            tvDate = (TextView) itemView.findViewById(R.id.tvDate);
+            tvStatus = (TextView) itemView.findViewById(R.id.tvStatus);
+            tvID = (TextView) itemView.findViewById(R.id.tvID);
         }
     }
 }

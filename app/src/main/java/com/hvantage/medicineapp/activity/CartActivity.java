@@ -127,10 +127,10 @@ public class CartActivity extends AppCompatActivity {
                                             final_model.setQty_no(model1.getQty_no());
                                             final_model.setItem(model2.getName());
                                             final_model.setImage(model2.getImage());
-                                            final_model.setItem_price(model2.getPrice());
-                                            final_model.setItem_total_price(model1.getQty_no() * model2.getPrice());
+                                            final_model.setItem_price(String.valueOf(model2.getPrice()));
+                                            final_model.setItem_total_price(String.valueOf(model1.getQty_no() * model2.getPrice()));
                                             list.add(final_model);
-                                            total = total + final_model.getItem_total_price();
+                                            total = total + Double.parseDouble(final_model.getItem_total_price());
                                             adapter.notifyDataSetChanged();
                                             tvTotalPrice.setText("Rs. " + Functions.roundTwoDecimals(total));
                                             tvPayableAmt.setText("Rs. " + Functions.roundTwoDecimals(total));
