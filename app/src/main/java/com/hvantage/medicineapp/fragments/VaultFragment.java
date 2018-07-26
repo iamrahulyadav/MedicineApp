@@ -88,6 +88,11 @@ public class VaultFragment extends Fragment implements View.OnClickListener {
                 ft.addToBackStack(null);
                 ft.commitAllowingStateLoss();
                 break;
+            case R.id.cardUploads:
+                ft.replace(R.id.main_container, new MyPrescriptionFragment());
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+                break;
         }
     }
 

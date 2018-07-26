@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
@@ -13,32 +14,39 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.model.PrescriptionModel;
+import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.TouchImageView;
 
 import java.util.ArrayList;
 
-public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.ViewHolder> {
+public class AllUploadedPreAdapter extends RecyclerView.Adapter<AllUploadedPreAdapter.ViewHolder> {
 
     private static final String TAG = "UploadedPreAdapter";
     Context context;
     ArrayList<PrescriptionModel> arrayList;
     private ProgressBar progressBar;
 
-    public UploadedPreAdapter(Context context, ArrayList<PrescriptionModel> arrayList) {
+    public AllUploadedPreAdapter(Context context, ArrayList<PrescriptionModel> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.uploaded_pres_item_layout, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.all_uploaded_pres_item_layout, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }
@@ -47,6 +55,8 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final PrescriptionModel data = arrayList.get(position);
         Log.d(TAG, "onBindViewHolder: data >> " + data);
+        holder.tvTitle.setText(data.getTitle());
+        holder.tvDate.setText(data.getDate_time());
         byte[] imageByteArray = Base64.decode(data.getImage_base64(), Base64.DEFAULT);
         Glide.with(context)
                 .load(imageByteArray)
@@ -76,13 +86,12 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                removeAt(position);
-                                /*showProgressDialog();
+                                showProgressDialog();
                                 FirebaseDatabase.getInstance().getReference()
                                         .child(AppConstants.APP_NAME)
-                                        .child(AppConstants.FIREBASE_KEY.CART)
+                                        .child(AppConstants.FIREBASE_KEY.VAULT)
                                         .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                                        .child(AppConstants.FIREBASE_KEY.PRESCRIPTION)
+                                        .child(AppConstants.FIREBASE_KEY.MY_PRESCRIPTIONS)
                                         .child(data.getKey())
                                         .removeValue()
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -92,9 +101,6 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
                                                 notifyDataSetChanged();
                                                 // removeAt(position);
                                                 Toast.makeText(context, "Removed", Toast.LENGTH_SHORT).show();
-                                                // Write was successful!
-                                                // ...
-
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
@@ -102,11 +108,9 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
                                             public void onFailure(@NonNull Exception e) {
                                                 notifyDataSetChanged();
                                                 hideProgressDialog();
-                                                // Write failed
-                                                // ...
                                                 Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
                                             }
-                                        });*/
+                                        });
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -162,11 +166,14 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView image, imgRemove;
+        TextView  tvTitle, tvDate;
 
         public ViewHolder(View itemView) {
             super(itemView);
             image = (ImageView) itemView.findViewById(R.id.image);
             imgRemove = (ImageView) itemView.findViewById(R.id.imgRemove);
+            tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
+            tvDate = (TextView) itemView.findViewById(R.id.tvDate);
         }
     }
 }

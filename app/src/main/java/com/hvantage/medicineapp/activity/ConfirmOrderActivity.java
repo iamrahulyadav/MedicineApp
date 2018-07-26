@@ -74,7 +74,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         if (getIntent().hasExtra("data"))
             addressData = (AddressModel) getIntent().getSerializableExtra("data");
         else {
-            startActivity(new Intent(context, DeliveryAddressActivity.class));
+            startActivity(new Intent(context, SelectAddressActivity.class));
             finish();
         }
         Log.e(TAG, "onCreate: addressData >> " + addressData);
@@ -104,7 +104,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 tvAddress3.setText(addressData.getCity() + ", " + addressData.getPincode());
                 tvAddress4.setText(addressData.getState() + ", India");
             } else {
-                startActivity(new Intent(context, DeliveryAddressActivity.class));
+                startActivity(new Intent(context, SelectAddressActivity.class));
                 finish();
             }
 
@@ -182,7 +182,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                                         @Override
                                         public void onDataChange(DataSnapshot dataSnapshot1) {
                                             ProductModel model2 = dataSnapshot1.getValue(ProductModel.class);
-                                            Log.e(TAG, "onDataChange: model2 >> " + model2);
+                                            Log.d(TAG, "onDataChange: model2 >> " + model2);
                                             CartModel final_model = new CartModel();
                                             final_model.setKey(model1.getKey());
                                             final_model.setQty_no(model1.getQty_no());
@@ -305,7 +305,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 }
                 break;
             case R.id.tvChangeAddress:
-                startActivity(new Intent(context, DeliveryAddressActivity.class));
+                startActivity(new Intent(context, SelectAddressActivity.class));
                 break;
 
         }

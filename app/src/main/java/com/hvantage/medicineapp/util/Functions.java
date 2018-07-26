@@ -78,7 +78,7 @@ public class Functions {
     public static String getCurrentDate() {
         Calendar c = Calendar.getInstance();
 //        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        SimpleDateFormat sdf = new SimpleDateFormat("MMM d");
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM d,yyyy");
         String strDate = sdf.format(c.getTime());
         return strDate;
     }

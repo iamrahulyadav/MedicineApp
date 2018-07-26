@@ -39,6 +39,7 @@ import com.hvantage.medicineapp.activity.LoginActivity;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.adapter.CategoryAdapter;
 import com.hvantage.medicineapp.adapter.HomeProductAdapter;
+import com.hvantage.medicineapp.adapter.HomeProductAdapter2;
 import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.CategoryModel;
 import com.hvantage.medicineapp.model.ProductModel;
@@ -75,6 +76,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private ArrayList<String> list;
     private ProgressBar progressBar;
     private RecyclerView recylcer_view_recco;
+    private RecyclerView recylcer_view_daily2;
+    private HomeProductAdapter2 adapterDaily2;
 
 
     @Nullable
@@ -96,6 +99,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         setCategory();
         //setProduct();
         setRecylclerviewDaily();
+        setRecylclerviewDaily2();
         setSearchBar();
         getRandomCatData();
         return rootView;
@@ -116,10 +120,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                             ProductModel model = postSnapshot.getValue(ProductModel.class);
                             Log.d(TAG, "onDataChange: model >> " + model);
                             listDailyNeeds.add(model);
-                            if (listDailyNeeds.size() == 10)
-                                break;
+                            /*if (listDailyNeeds.size() == 10)
+                                break;*/
                         }
                         adapterDaily.notifyDataSetChanged();
+                        adapterDaily2.notifyDataSetChanged();
                         hideProgressDialog();
                     }
 
@@ -292,6 +297,26 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             }
         }));
         adapterDaily.notifyDataSetChanged();
+    }
+
+    private void setRecylclerviewDaily2() {
+        recylcer_view_daily2 = (RecyclerView) rootView.findViewById(R.id.recylcer_view_daily2);
+        recylcer_view_daily2.setLayoutManager(new LinearLayoutManager(context));
+        adapterDaily2 = new HomeProductAdapter2(context, listDailyNeeds);
+        recylcer_view_daily2.setAdapter(adapterDaily2);
+        recylcer_view_daily2.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view_daily, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+               /* startActivity(new Intent(context, ProductDetailActivity.class)
+                        .putExtra("medicine_data", listDailyNeeds.get(position)));*/
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        }));
+        adapterDaily2.notifyDataSetChanged();
     }
 
     @Override

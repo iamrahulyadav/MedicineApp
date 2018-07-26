@@ -396,7 +396,7 @@ public class AddProductCatActivity extends AppCompatActivity implements View.OnC
     }
 
     private void cameraIntent() {
-        final String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/M4D/";
+        final String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/medicineapp/";
         File newdir = new File(dir);
         newdir.mkdirs();
         String file = dir + "report_img.jpg";
@@ -433,7 +433,7 @@ public class AddProductCatActivity extends AppCompatActivity implements View.OnC
                 startCropImageActivity(data.getData());
             } else if (requestCode == REQUEST_IMAGE_CAPTURE) {
                 File croppedImageFile1 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                        + "/M4D/" + "report_img.jpg");
+                        + "/medicineapp/" + "report_img.jpg");
                 final Uri outputFileUri;
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
                     outputFileUri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", croppedImageFile1);

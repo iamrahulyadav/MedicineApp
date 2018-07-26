@@ -27,9 +27,9 @@ import com.hvantage.medicineapp.util.RecyclerItemClickListener;
 
 import java.util.ArrayList;
 
-public class DeliveryAddressActivity extends AppCompatActivity {
+public class SelectAddressActivity extends AppCompatActivity {
 
-    private static final String TAG = "DeliveryAddressActivity";
+    private static final String TAG = "SelectAddressActivity";
     private Context context;
     private ArrayList<AddressModel> list = new ArrayList<AddressModel>();
     private AddressAdapter adapter;

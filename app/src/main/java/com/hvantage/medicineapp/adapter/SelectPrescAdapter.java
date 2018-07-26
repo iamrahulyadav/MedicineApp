@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -23,21 +24,21 @@ import com.hvantage.medicineapp.util.TouchImageView;
 
 import java.util.ArrayList;
 
-public class OrderDetailPresAdapter extends RecyclerView.Adapter<OrderDetailPresAdapter.ViewHolder> {
+public class SelectPrescAdapter extends RecyclerView.Adapter<SelectPrescAdapter.ViewHolder> {
 
-    private static final String TAG = "OrderDetailPresAdapter";
+    private static final String TAG = "SelectPrescAdapter";
     Context context;
     ArrayList<PrescriptionModel> arrayList;
     private ProgressBar progressBar;
 
-    public OrderDetailPresAdapter(Context context, ArrayList<PrescriptionModel> arrayList) {
+    public SelectPrescAdapter(Context context, ArrayList<PrescriptionModel> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_detail_pres_item_layout, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.select_pres_item_layout, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }
@@ -46,6 +47,9 @@ public class OrderDetailPresAdapter extends RecyclerView.Adapter<OrderDetailPres
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final PrescriptionModel data = arrayList.get(position);
         Log.d(TAG, "onBindViewHolder: data >> " + data);
+        holder.tvTitle.setText(data.getTitle());
+        holder.tvDesciption.setText(data.getDescription());
+        holder.tvDate.setText(data.getDate_time());
         byte[] imageByteArray = Base64.decode(data.getImage_base64(), Base64.DEFAULT);
         Glide.with(context)
                 .load(imageByteArray)
@@ -55,7 +59,6 @@ public class OrderDetailPresAdapter extends RecyclerView.Adapter<OrderDetailPres
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.image);
 //        holder.image.setImageBitmap(data);
-
 
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,19 +104,16 @@ public class OrderDetailPresAdapter extends RecyclerView.Adapter<OrderDetailPres
         return arrayList.size();
     }
 
-    public void removeAt(int position) {
-        arrayList.remove(position);
-        notifyItemRemoved(position);
-        notifyItemRangeChanged(position, arrayList.size());
-    }
-
     public class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView image, imgRemove;
+        ImageView image;
+        TextView tvDesciption, tvTitle, tvDate;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            tvDesciption = (TextView) itemView.findViewById(R.id.tvDesciption);
+            tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
+            tvDate = (TextView) itemView.findViewById(R.id.tvDate);
             image = (ImageView) itemView.findViewById(R.id.image);
-            imgRemove = (ImageView) itemView.findViewById(R.id.imgRemove);
         }
     }
 }

@@ -72,7 +72,7 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITHOUT_PRESCRIPTION);
-                startActivity(new Intent(context, DeliveryAddressActivity.class));
+                startActivity(new Intent(context, SelectAddressActivity.class));
             }
         });
     }
@@ -121,7 +121,7 @@ public class CartActivity extends AppCompatActivity {
                                         @Override
                                         public void onDataChange(DataSnapshot dataSnapshot1) {
                                             ProductModel model2 = dataSnapshot1.getValue(ProductModel.class);
-                                            Log.e(TAG, "onDataChange: model2 >> " + model2);
+                                            Log.d(TAG, "onDataChange: model2 >> " + model2);
                                             CartModel final_model = new CartModel();
                                             final_model.setKey(model1.getKey());
                                             final_model.setQty_no(model1.getQty_no());

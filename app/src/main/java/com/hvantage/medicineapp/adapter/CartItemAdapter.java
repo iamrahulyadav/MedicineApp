@@ -52,7 +52,7 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
     public void onBindViewHolder(final ViewHolder holder, final int position) {
 
         final CartModel data = arrayList.get(position);
-        Log.e(TAG, position + " data : " + data);
+        Log.d(TAG, position + " data : " + data);
         holder.tvTitle.setText(data.getItem());
         holder.tvQty.setText("" + data.getQty_no());
         holder.tvPrice.setText("Rs. " + Functions.roundTwoDecimals(Double.parseDouble(data.getItem_price())));

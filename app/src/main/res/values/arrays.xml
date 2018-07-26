@@ -59,4 +59,12 @@
     <string-array name="select_default">
         <item>Select</item>
     </string-array>
+    <string-array name="filter_no_items">
+        <item>All</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+
+    </string-array>
 </resources>

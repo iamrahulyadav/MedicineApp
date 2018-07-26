@@ -1,6 +1,6 @@
 package com.hvantage.medicineapp.fragments;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,9 +12,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
@@ -32,8 +33,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,9 +40,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.activity.DeliveryAddressActivity;
 import com.hvantage.medicineapp.activity.LoginActivity;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
+import com.hvantage.medicineapp.activity.SelectAddressActivity;
 import com.hvantage.medicineapp.adapter.CartItemAdapter;
 import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
@@ -56,11 +55,15 @@ import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.GridSpacingItemDecoration;
 import com.hvantage.medicineapp.util.ProgressBar;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import static android.app.Activity.RESULT_OK;
 
 
 public class UploadPrecriptionFragment extends Fragment implements View.OnClickListener {
@@ -68,13 +71,15 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private static final int REQUEST_STORAGE = 0;
     private static final int REQUEST_IMAGE_CAPTURE = REQUEST_STORAGE + 1;
     private static final int REQUEST_LOAD_IMAGE = REQUEST_IMAGE_CAPTURE + 1;
-    private static final String TAG = "UploadPhotosActivity";
+    private static final String TAG = "UploadPrecrFragment";
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
     private RecyclerView recylcer_view;
     private UploadedPreAdapter adapterPres;
     private ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
+    private ArrayList<String> list = new ArrayList<String>();
+
     private CardView btnUpload;
     private ProgressBar progressBar;
     private String userChoosenTask;
@@ -89,7 +94,9 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private TextView tvCartItemEmpty;
     private CardView btnContinue;
     private AppCompatAutoCompleteTextView etSearch;
+    private PrescriptionModel data;
 
+    @SuppressLint("LongLogTag")
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -99,24 +106,68 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
             intraction.actionbarsetTitle("Upload Prescription");
         }
         init();
-        list = new DBHelper(context).getMedicinesSearch();
-
         setRecyclerView();
         setRecyclerViewCart();
+        list = new DBHelper(context).getMedicinesSearch();
+        if (getArguments() != null) {
+            data = (PrescriptionModel) getArguments().getSerializable("data");
+            Log.e(TAG, "onCreateView: data >> " + data);
+            presList.add(data);
+        } else {
+            askAlert();
+        }
+        setSearchBar();
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            getData();
+            //getData();
             getCartData();
-            setSearchBar();
-
         } else {
             startActivity(new Intent(getActivity(), LoginActivity.class));
         }
         return rootView;
     }
 
-    private ArrayList<String> list = new ArrayList<String>();
+    private void askAlert() {
+        final CharSequence[] items = {"Choose Existing", "Camera", "Gallery"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals("Choose Existing")) {
+                    FragmentManager manager = getFragmentManager();
+                    FragmentTransaction ft = manager.beginTransaction();
+                    ft.replace(R.id.main_container, new SelectPrescFragment());
+                    ft.addToBackStack(null);
+                    ft.commitAllowingStateLoss();
+                } else if (items[item].equals("Camera")) {
+                    userChoosenTask = "Camera";
+                    cameraIntent();
+                } else if (items[item].equals("Gallery")) {
+                    userChoosenTask = "Gallery";
+                    galleryIntent();
+                }
+            }
+        });
+        builder.setCancelable(false);
+        builder.show();
+
+        /*final CharSequence[] items = {"Camera", "Gallery"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals("Camera")) {
+                    userChoosenTask = "Camera";
+                    cameraIntent();
+                } else if (items[item].equals("Gallery")) {
+                    userChoosenTask = "Gallery";
+                    galleryIntent();
+                }
+            }
+        });*/
+    }
 
 
+    @SuppressLint("LongLogTag")
     private void setSearchBar() {
         if (list != null) {
             Log.e(TAG, "setSearchBar: list >> " + list.size());
@@ -192,7 +243,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                                         @Override
                                         public void onDataChange(DataSnapshot dataSnapshot1) {
                                             ProductModel model2 = dataSnapshot1.getValue(ProductModel.class);
-                                            Log.e(TAG, "onDataChange: model2 >> " + model2);
+                                            Log.d(TAG, "onDataChange: model2 >> " + model2);
                                             CartModel final_model = new CartModel();
                                             final_model.setKey(model1.getKey());
                                             final_model.setQty_no(model1.getQty_no());
@@ -315,7 +366,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                     showNoPresAlert();
                 else {
                     AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
-                    startActivity(new Intent(context, DeliveryAddressActivity.class));
+                    startActivity(new Intent(context, SelectAddressActivity.class));
                 }
                 break;
         }
@@ -412,23 +463,15 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
         startActivityForResult(createPickIntent(), REQUEST_LOAD_IMAGE);
     }
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
+        if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_LOAD_IMAGE && data != null) {
-                Bitmap bitmap = null;
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), data.getData());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                new ImageTask().execute(bitmap);
-
+                startCropImageActivity(data.getData());
             } else if (requestCode == REQUEST_IMAGE_CAPTURE) {
                 File croppedImageFile1 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                        + "/M4D/" + "report_img.jpg");
+                        + "/medicineapp/" + "report_img.jpg");
                 final Uri outputFileUri;
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
                     outputFileUri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", croppedImageFile1);
@@ -436,15 +479,33 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                     outputFileUri = Uri.fromFile(croppedImageFile1);
                 }
                 Log.e(TAG, " Inside REQUEST_IMAGE_CAPTURE uri :- " + outputFileUri);
-                Bitmap bitmap = null;
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), outputFileUri);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                startCropImageActivity(outputFileUri);
+            } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+                CropImage.ActivityResult result = CropImage.getActivityResult(data);
+                if (resultCode == RESULT_OK) {
+                    Bitmap bitmap = null;
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), result.getUri());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    new ImageTask().execute(bitmap);
+                } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                    Toast.makeText(getActivity(), "Cropping failed: " + result.getError(), Toast.LENGTH_LONG).show();
                 }
-                new ImageTask().execute(bitmap);
             }
         }
+    }
+
+    private void startCropImageActivity(Uri imageUri) {
+        CropImage.activity(imageUri)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setMultiTouchEnabled(false)
+                .setAspectRatio(3, 4)
+                .setOutputCompressQuality(50)
+//                .setRequestedSize(200, 200)
+                .setScaleType(CropImageView.ScaleType.CENTER_INSIDE)
+                .start(getContext(), this);
     }
 
     class ImageTask extends AsyncTask<Bitmap, String, Void> {
@@ -469,8 +530,13 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
             String image_base64 = values[0];
+            final PrescriptionModel data = new PrescriptionModel("", image_base64);
             Log.d(TAG, "onProgressUpdate: image_base64 >> " + image_base64);
-            String key = FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+            presList.add(data);
+            adapterPres.notifyDataSetChanged();
+            hideProgressDialog();
+
+            /*String key = FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
                     .child(AppConstants.FIREBASE_KEY.CART)
                     .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
                     .push().getKey();
@@ -494,7 +560,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                             hideProgressDialog();
                             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
                         }
-                    });
+                    });*/
 
         }
     }

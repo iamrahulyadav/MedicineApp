@@ -109,12 +109,53 @@
             android:weightSum="2">
 
             <android.support.v7.widget.CardView
-                android:id="@+id/cardReports"
+                android:id="@+id/cardUploads"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="5dp"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                app:cardCornerRadius="3dp"
+                app:cardElevation="1dp"
+                app:contentPadding="10dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/img4"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="10dp"
+                        android:src="@drawable/vault_rx"
+                        android:tint="@color/colorPrimary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/img4"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="10dp"
+                        android:text="My Prescriptions"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                        android:textStyle="bold" />
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cardReports"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="2dp"
                 android:layout_marginTop="2dp"
                 android:layout_weight="1"
                 android:clickable="true"
@@ -146,46 +187,7 @@
                         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                         android:textStyle="bold" />
                 </RelativeLayout>
-            </android.support.v7.widget.CardView>
 
-            <android.support.v7.widget.CardView
-                android:id="@+id/cardUploads"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:foreground="?attr/selectableItemBackgroundBorderless"
-                app:cardCornerRadius="3dp"
-                app:cardElevation="1dp"
-                app:contentPadding="10dp">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <ImageView
-                        android:id="@+id/img4"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="10dp"
-                        android:src="@drawable/vault_uploads"
-                        android:tint="@color/colorPrimary" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/img4"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="10dp"
-                        android:text="My Uploads"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                        android:textStyle="bold" />
-                </RelativeLayout>
             </android.support.v7.widget.CardView>
 
 

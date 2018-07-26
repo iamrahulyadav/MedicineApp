@@ -102,13 +102,13 @@
             android:label=""
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.DeliveryAddressActivity"
+            android:name=".activity.SelectAddressActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.AddAddressActivity"
             android:label=""
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

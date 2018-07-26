@@ -3,11 +3,48 @@ package com.hvantage.medicineapp.model;
 import java.io.Serializable;
 
 public class PrescriptionModel implements Serializable {
-    String key, image_base64;
+    String key;
+    String image_base64;
+    String title = "";
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDate_time() {
+        return date_time;
+    }
+
+    public void setDate_time(String date_time) {
+        this.date_time = date_time;
+    }
+
+    String description = "";
+    String date_time = "";
 
     public PrescriptionModel(String key, String image_base64) {
         this.key = key;
         this.image_base64 = image_base64;
+    }
+
+    public PrescriptionModel(String key, String image_base64, String title, String description, String date_time) {
+        this.key = key;
+        this.image_base64 = image_base64;
+        this.title = title;
+        this.description = description;
+        this.date_time = date_time;
     }
 
     public PrescriptionModel() {
