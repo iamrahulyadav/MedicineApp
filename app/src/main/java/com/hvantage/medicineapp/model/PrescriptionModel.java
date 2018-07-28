@@ -1,11 +1,14 @@
 package com.hvantage.medicineapp.model;
 
-import java.io.Serializable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class PrescriptionModel implements Serializable {
+public class PrescriptionModel implements Parcelable {
     String key;
     String image_base64;
     String title = "";
+    String description = "";
+    String date_time = "";
 
     public String getTitle() {
         return title;
@@ -31,8 +34,6 @@ public class PrescriptionModel implements Serializable {
         this.date_time = date_time;
     }
 
-    String description = "";
-    String date_time = "";
 
     public PrescriptionModel(String key, String image_base64) {
         this.key = key;
@@ -73,4 +74,39 @@ public class PrescriptionModel implements Serializable {
                 ", image_base64='" + image_base64 + '\'' +
                 '}';
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.key);
+        dest.writeString(this.image_base64);
+        dest.writeString(this.title);
+        dest.writeString(this.description);
+        dest.writeString(this.date_time);
+    }
+
+    protected PrescriptionModel(Parcel in) {
+        this.key = in.readString();
+        this.image_base64 = in.readString();
+        this.title = in.readString();
+        this.description = in.readString();
+        this.date_time = in.readString();
+    }
+
+    public static final Parcelable.Creator<PrescriptionModel> CREATOR = new Parcelable.Creator<PrescriptionModel>() {
+        @Override
+        public PrescriptionModel createFromParcel(Parcel source) {
+            return new PrescriptionModel(source);
+        }
+
+        @Override
+        public PrescriptionModel[] newArray(int size) {
+            return new PrescriptionModel[size];
+        }
+    };
 }

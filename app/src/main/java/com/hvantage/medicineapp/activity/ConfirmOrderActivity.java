@@ -60,6 +60,18 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private Double taxes = 0.0;
     private Double delivery_fee = 0.0;
     private String payment_mode = "Cash On Delivery";
+    ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
+    private RecyclerView recylcer_view;
+    private UploadedPreAdapter adapterPres;
+
+    private ArrayList<CartModel> cartList = new ArrayList<CartModel>();
+    private CartItemAdapter adapterCart;
+
+    private double total = 0;
+    private RecyclerView recylcer_view_items;
+
+    private int spacing = 30, spanCount = 3;
+    private boolean includeEdge = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +89,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             startActivity(new Intent(context, SelectAddressActivity.class));
             finish();
         }
+
         Log.e(TAG, "onCreate: addressData >> " + addressData);
         init();
         setRecyclerView();
@@ -131,21 +144,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     }
 
 
-    private RecyclerView recylcer_view;
-    private UploadedPreAdapter adapterPres;
-    private ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
-
-    private ArrayList<CartModel> cartList = new ArrayList<CartModel>();
-    private CartItemAdapter adapterCart;
-
-    private double total = 0;
-    private RecyclerView recylcer_view_items;
-
-    private int spacing = 30, spanCount = 3;
-    private boolean includeEdge = true;
-
     private void setRecyclerView() {
-        presList.clear();
         recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
         adapterPres = new UploadedPreAdapter(context, presList);
         recylcer_view.setLayoutManager(new GridLayoutManager(context, spanCount));
@@ -231,11 +230,9 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
 
     private void getData() {
         showProgressDialog();
-        FirebaseDatabase.getInstance().getReference()
-                .child(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.CART)
+        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+                .child(AppConstants.FIREBASE_KEY.TEMP_PRESCRIPTION)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                .child(AppConstants.FIREBASE_KEY.PRESCRIPTION)
                 .orderByKey()
                 .addValueEventListener(new ValueEventListener() {
                     @Override

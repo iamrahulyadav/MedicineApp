@@ -1,7 +1,6 @@
 package com.hvantage.medicineapp.fragments;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -33,6 +33,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -83,7 +85,6 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private CardView btnUpload;
     private ProgressBar progressBar;
     private String userChoosenTask;
-    private Dialog dialog;
     private int spacing = 30, spanCount = 3;
     private boolean includeEdge = true;
     private ArrayList<CartModel> cartList = new ArrayList<CartModel>();
@@ -110,15 +111,18 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
         setRecyclerViewCart();
         list = new DBHelper(context).getMedicinesSearch();
         if (getArguments() != null) {
-            data = (PrescriptionModel) getArguments().getSerializable("data");
-            Log.e(TAG, "onCreateView: data >> " + data);
-            presList.add(data);
-        } else {
+            presList = getArguments().getParcelableArrayList("data");
+            setRecyclerView();
+
+        }
+        Log.e(TAG, "onCreateView: data >> " + presList.size());
+        if (adapterPres.getItemCount() == 0)
             askAlert();
+        else {
+            btnContinue.setOnClickListener(this);
         }
         setSearchBar();
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            //getData();
             getCartData();
         } else {
             startActivity(new Intent(getActivity(), LoginActivity.class));
@@ -135,7 +139,11 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 if (items[item].equals("Choose Existing")) {
                     FragmentManager manager = getFragmentManager();
                     FragmentTransaction ft = manager.beginTransaction();
-                    ft.replace(R.id.main_container, new SelectPrescFragment());
+                    Fragment fragment = new SelectPrescFragment();
+                    Bundle args = new Bundle();
+                    args.putParcelableArrayList("data", presList);
+                    fragment.setArguments(args);
+                    ft.replace(R.id.main_container, fragment);
                     ft.addToBackStack(null);
                     ft.commitAllowingStateLoss();
                 } else if (items[item].equals("Camera")) {
@@ -147,23 +155,8 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 }
             }
         });
-        builder.setCancelable(false);
+//        builder.setCancelable(false);
         builder.show();
-
-        /*final CharSequence[] items = {"Camera", "Gallery"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Camera")) {
-                    userChoosenTask = "Camera";
-                    cameraIntent();
-                } else if (items[item].equals("Gallery")) {
-                    userChoosenTask = "Gallery";
-                    galleryIntent();
-                }
-            }
-        });*/
     }
 
 
@@ -329,7 +322,6 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     }
 
     private void setRecyclerView() {
-        presList.clear();
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
         adapterPres = new UploadedPreAdapter(context, presList);
         recylcer_view.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
@@ -359,14 +351,44 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnUpload:
-                selectImage();
+//                selectImage();
+                askAlert();
                 break;
             case R.id.btnContinue:
                 if (presList.isEmpty())
                     showNoPresAlert();
                 else {
-                    AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
-                    startActivity(new Intent(context, SelectAddressActivity.class));
+                    showProgressDialog();
+                    Log.e(TAG, "onClick: presList >> " + presList.size());
+                  /*  String key = FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+                            .child(AppConstants.FIREBASE_KEY.CART)
+                            .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                            .push().getKey();*/
+                    FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+                            .child(AppConstants.FIREBASE_KEY.TEMP_PRESCRIPTION)
+                            .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                            .setValue(presList)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.e(TAG, "onSuccess: saved");
+                                    hideProgressDialog();
+                                    AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
+                                    Intent intent = new Intent(getActivity(), SelectAddressActivity.class);
+                                    Bundle bundle = new Bundle();
+                                    bundle.putParcelableArrayList("listPresc", presList);
+                                    // intent.putExtra("data", bundle);
+                                    startActivity(intent);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e(TAG, "onSuccess: failed");
+                                }
+                            });
+
+
                 }
                 break;
         }
@@ -379,7 +401,8 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        selectImage();
+                        //selectImage();
+                        askAlert();
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

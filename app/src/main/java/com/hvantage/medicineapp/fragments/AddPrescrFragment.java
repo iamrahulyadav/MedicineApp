@@ -71,7 +71,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         rootView = inflater.inflate(R.layout.fragment_add_prescr, container, false);
 
         if (getArguments() != null) {
-            data = (PrescriptionModel) getArguments().getSerializable("data");
+            data = (PrescriptionModel) getArguments().getParcelable("data");
             Log.e(TAG, "onCreateView: data >> " + data);
         }
 
@@ -81,7 +81,6 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
             else
                 intraction.actionbarsetTitle("Prescription Details");
         }
-
 
         init();
         if (!Functions.isConnectingToInternet(context))

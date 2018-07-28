@@ -125,7 +125,7 @@ public class MyPrescriptionFragment extends Fragment implements View.OnClickList
                 FragmentTransaction ft = manager.beginTransaction();
                 Fragment fragment = new AddPrescrFragment();
                 Bundle args = new Bundle();
-                args.putSerializable("data", list.get(position));
+                args.putParcelable("data", list.get(position));
                 fragment.setArguments(args);
                 ft.replace(R.id.main_container, fragment);
                 ft.addToBackStack(null);

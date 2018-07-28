@@ -21,6 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.AddressAdapter;
 import com.hvantage.medicineapp.model.AddressModel;
+import com.hvantage.medicineapp.model.PrescriptionModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.RecyclerItemClickListener;
@@ -36,6 +37,7 @@ public class SelectAddressActivity extends AppCompatActivity {
     private RecyclerView recylcer_view;
     private ProgressBar progressBar;
     private CardView btnSubmit;
+    ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +47,16 @@ public class SelectAddressActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+       /* if (getIntent().hasExtra("data"))
+            presList = getIntent().getParcelableArrayListExtra("data");*/
+
+       /* Bundle bundle = getIntent().getBundleExtra("data");   //<< get Bundle from Intent
+        presList = bundle.getParcelableArrayList("listPresc");
+        Log.e(TAG, "onCreate: presList >> " + presList);*/
         init();
         setRecyclerView();
         getData();
+
 //        Toast.makeText(context, "Select Delivery Address", Toast.LENGTH_SHORT).show();
     }
 

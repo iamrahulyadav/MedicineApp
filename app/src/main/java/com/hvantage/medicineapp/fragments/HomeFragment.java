@@ -1,6 +1,10 @@
 package com.hvantage.medicineapp.fragments;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -23,12 +27,16 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -78,6 +86,102 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private RecyclerView recylcer_view_recco;
     private RecyclerView recylcer_view_daily2;
     private HomeProductAdapter2 adapterDaily2;
+    private FloatingActionMenu floatingActionMenu;
+
+    private void setFloatingButton() {
+        new FloatingButton().showFloatingButton(rootView, context);
+        new FloatingButton().setFloatingButtonControls(rootView);
+    }
+
+    public class FloatingButton {
+        FrameLayout bckgroundDimmer;
+        FloatingActionButton button1, button2;
+
+        public void showFloatingButton(final View activity, final Context mContext) {
+
+            floatingActionMenu = (FloatingActionMenu) activity.findViewById(R.id.material_design_android_floating_action_menu);
+            button1 = (FloatingActionButton) activity.findViewById(R.id.material_design_floating_action_menu_item1);
+            button2 = (FloatingActionButton) activity.findViewById(R.id.material_design_floating_action_menu_item2);
+            createCustomAnimation();
+
+            button1.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    Fragment fragment = new MyPrescriptionFragment();
+                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+                    fragmentTransaction.replace(R.id.main_container, fragment, fragment.getTag());
+                    fragmentTransaction.commitAllowingStateLoss();
+                    fragmentTransaction.addToBackStack(null);
+                    floatingActionMenu.close(true);
+                }
+            });
+            button2.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    Fragment fragment = new UploadPrecriptionFragment();
+                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+                    fragmentTransaction.replace(R.id.main_container, fragment, fragment.getTag());
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commitAllowingStateLoss();
+                    floatingActionMenu.close(true);
+                }
+            });
+        }
+
+        public void setFloatingButtonControls(View activity) {
+            bckgroundDimmer = (FrameLayout) activity.findViewById(R.id.background_dimmer);
+            floatingActionMenu = (FloatingActionMenu) activity.findViewById(R.id.material_design_android_floating_action_menu);
+            floatingActionMenu.setOnMenuToggleListener(new FloatingActionMenu.OnMenuToggleListener() {
+                @Override
+                public void onMenuToggle(boolean opened) {
+                    if (opened) {
+                        bckgroundDimmer.setVisibility(View.VISIBLE);
+                    } else {
+                        bckgroundDimmer.setVisibility(View.GONE);
+                    }
+                }
+            });
+            bckgroundDimmer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (floatingActionMenu.isOpened()) {
+                        floatingActionMenu.close(true);
+                        bckgroundDimmer.setVisibility(View.GONE);
+                        //menu opened
+                    }
+                }
+            });
+        }
+    }
+
+    private void createCustomAnimation() {
+        AnimatorSet set = new AnimatorSet();
+        ObjectAnimator scaleOutX = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleX", 1.0f, 0.2f);
+        ObjectAnimator scaleOutY = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleY", 1.0f, 0.2f);
+        ObjectAnimator scaleInX = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleX", 0.2f, 1.0f);
+        ObjectAnimator scaleInY = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleY", 0.2f, 1.0f);
+
+        scaleOutX.setDuration(50);
+        scaleOutY.setDuration(50);
+
+        scaleInX.setDuration(150);
+        scaleInY.setDuration(150);
+
+        scaleInX.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                floatingActionMenu.getMenuIconView().setImageResource(floatingActionMenu.isOpened()
+                        ? R.drawable.fab_back : R.drawable.fab_plus);
+            }
+        });
+
+        set.play(scaleOutX).with(scaleOutY);
+        set.play(scaleInX).with(scaleInY).after(scaleOutX);
+        set.setInterpolator(new OvershootInterpolator(2));
+
+        floatingActionMenu.setIconToggleAnimatorSet(set);
+
+    }
 
 
     @Nullable
@@ -89,6 +193,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             intraction.actionbarsetTitle(getResources().getString(R.string.app_name));
         }
         init();
+        setFloatingButton();
 
         list = new DBHelper(context).getMedicinesSearch();
 //        catArray = getResources().getStringArray(R.array.categories);

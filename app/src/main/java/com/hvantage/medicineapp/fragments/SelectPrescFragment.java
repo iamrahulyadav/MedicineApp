@@ -1,5 +1,6 @@
 package com.hvantage.medicineapp.fragments;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -14,6 +15,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,6 +33,7 @@ import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.RecyclerItemClickListener;
+import com.hvantage.medicineapp.util.TouchImageView;
 
 import java.util.ArrayList;
 
@@ -42,6 +47,7 @@ public class SelectPrescFragment extends Fragment implements View.OnClickListene
     private RecyclerView recylcer_view;
     private SelectPrescAdapter adapter;
     private ArrayList<PrescriptionModel> list = new ArrayList<PrescriptionModel>();
+    private ArrayList<PrescriptionModel> selectedlist = new ArrayList<PrescriptionModel>();
     private ProgressBar progressBar;
     private String data;
     private CardView cardEmptyText;
@@ -54,8 +60,16 @@ public class SelectPrescFragment extends Fragment implements View.OnClickListene
         if (intraction != null) {
             intraction.actionbarsetTitle("Select Prescriptions");
         }
+
+
         init();
         setRecyclerView();
+        if (getArguments() != null) {
+            selectedlist = getArguments().getParcelableArrayList("data");
+            if (selectedlist != null)
+                Log.e(TAG, "onCreateView: data >> " + selectedlist.size());
+            /*presList.add(data);*/
+        }
         if (Functions.isConnectingToInternet(context))
             getData();
         else
@@ -76,7 +90,7 @@ public class SelectPrescFragment extends Fragment implements View.OnClickListene
                         list.clear();
                         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                             PrescriptionModel data = postSnapshot.getValue(PrescriptionModel.class);
-                            Log.e(TAG, "onDataChange: data >> " + data);
+                            Log.d(TAG, "onDataChange: data >> " + data);
                             list.add(data);
                         }
                         adapter.notifyDataSetChanged();
@@ -111,16 +125,35 @@ public class SelectPrescFragment extends Fragment implements View.OnClickListene
         recylcer_view.setAdapter(adapter);
         recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, int position) {
-                FragmentManager manager = getFragmentManager();
-                FragmentTransaction ft = manager.beginTransaction();
-                Fragment fragment = new UploadPrecriptionFragment();
-                Bundle args = new Bundle();
-                args.putSerializable("data", list.get(position));
-                fragment.setArguments(args);
-                ft.replace(R.id.main_container, fragment);
+            public void onItemClick(View view, final int position) {
+                showPreviewDialog(list.get(position));
+
+               /* final CharSequence[] items = {"Select Prescription", "View Prescription"};
+                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
+                        if (items[item].equals("View Prescription")) {
+                            showPreviewDialog(list.get(position));
+                        } else if (items[item].equals("Select Prescription")) {
+                            selectedlist.add(list.get(position));
+                            FragmentManager manager = getFragmentManager();
+                            FragmentTransaction ft = manager.beginTransaction();
+                            Fragment fragment = new UploadPrecriptionFragment();
+                            Bundle args = new Bundle();
+                            args.putParcelableArrayList("data", selectedlist);
+                            fragment.setArguments(args);
+                            ft.replace(R.id.main_container, fragment);
 //                ft.addToBackStack(null);
-                ft.commitAllowingStateLoss();
+                            getActivity().onBackPressed();
+
+                            ft.commitAllowingStateLoss();
+                        }
+                    }
+                });
+//        builder.setCancelable(false);
+                builder.show();*/
+
             }
 
             @Override
@@ -129,6 +162,64 @@ public class SelectPrescFragment extends Fragment implements View.OnClickListene
             }
         }));
         adapter.notifyDataSetChanged();
+    }
+
+    private void showPreviewDialog(final PrescriptionModel model) {
+        final Dialog dialog1 = new Dialog(context, R.style.image_preview_dialog);
+        dialog1.setContentView(R.layout.presr_preview_layout);
+        Window window = dialog1.getWindow();
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        dialog1.setCancelable(false);
+        dialog1.setCanceledOnTouchOutside(false);
+        TouchImageView imgPreview = (TouchImageView) dialog1.findViewById(R.id.imgPreview);
+        ImageView imgBack = (ImageView) dialog1.findViewById(R.id.imgBack);
+        TextView tvTitle = (TextView) dialog1.findViewById(R.id.tvTitle);
+        TextView tvDesciption = (TextView) dialog1.findViewById(R.id.tvDesciption);
+        TextView tvDate = (TextView) dialog1.findViewById(R.id.tvDate);
+        CardView btnSubmit = (CardView) dialog1.findViewById(R.id.btnSubmit);
+        CardView btnCancel = (CardView) dialog1.findViewById(R.id.btnCancel);
+
+//        imgPreview.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        imgPreview.setImageBitmap(Functions.base64ToBitmap(model.getImage_base64()));
+        tvTitle.setText(model.getTitle());
+
+        tvDesciption.setText(model.getDescription());
+        tvDate.setText("Uploaded on : " + model.getDate_time());
+        if (model.getDescription().equalsIgnoreCase(""))
+            tvDesciption.setVisibility(View.GONE);
+        dialog1.show();
+
+        imgBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog1.dismiss();
+            }
+        });
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog1.dismiss();
+            }
+        });
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog1.dismiss();
+                selectedlist.add(model);
+                FragmentManager manager = getFragmentManager();
+                FragmentTransaction ft = manager.beginTransaction();
+                Fragment fragment = new UploadPrecriptionFragment();
+                Bundle args = new Bundle();
+                args.putParcelableArrayList("data", selectedlist);
+                fragment.setArguments(args);
+                ft.replace(R.id.main_container, fragment);
+//                ft.addToBackStack(null);
+                getActivity().onBackPressed();
+
+                ft.commitAllowingStateLoss();
+            }
+        });
+
     }
 
     @Override

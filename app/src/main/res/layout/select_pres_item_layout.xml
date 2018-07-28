@@ -7,12 +7,13 @@
     android:layout_marginLeft="8dp"
     android:layout_marginRight="8dp"
     android:layout_marginTop="8dp"
-    app:cardElevation="1dp"
     app:cardBackgroundColor="@color/colorWhite"
     app:cardCornerRadius="3dp"
-    app:contentPadding="10dp">
+    app:cardElevation="1dp"
+    app:contentPadding="5dp">
 
     <RelativeLayout
+        android:id="@+id/llSingle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -65,4 +66,78 @@
 
 
     </RelativeLayout>
+
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/llFullView"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:background="@color/colorActivityBackground"-->
+    <!--android:orientation="vertical">-->
+
+
+    <!--<com.hvantage.medicineapp.util.TouchImageView-->
+    <!--android:id="@+id/image1"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:background="#e9e9e9"-->
+    <!--android:backgroundTint="@color/colorActivityBackground"-->
+    <!--android:scaleType="centerCrop" />-->
+
+
+    <!--<RelativeLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentBottom="true"-->
+    <!--android:background="#c7ffffff"-->
+    <!--android:padding="8dp">-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/tvTitle1"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:textAppearance="@style/TextAppearance.AppCompat.Subhead"-->
+    <!--android:textColor="@color/colorTextHeading"-->
+    <!--android:textStyle="bold" />-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/tvDesciption1"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@id/tvTitle1"-->
+    <!--android:text=""-->
+    <!--android:textAppearance="@style/TextAppearance.AppCompat.Small"-->
+    <!--android:textColor="@color/colorTextHeading" />-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/tvDate1"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@id/tvDesciption1"-->
+    <!--android:text=""-->
+    <!--android:textAppearance="@style/TextAppearance.Compat.Notification.Time"-->
+    <!--android:textColor="@color/colorTextHeading" />-->
+
+    <!--<android.support.v7.widget.CardView-->
+    <!--android:id="@+id/next"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@id/tvDate1"-->
+    <!--android:layout_margin="5dp"-->
+    <!--app:cardBackgroundColor="@color/colorPrimary"-->
+    <!--app:cardUseCompatPadding="true"-->
+    <!--app:contentPadding="5dp">-->
+
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:paddingLeft="5dp"-->
+    <!--android:paddingRight="5dp"-->
+    <!--android:text="Select this prescription"-->
+    <!--android:textColor="@color/colorToolbarTitle"-->
+    <!--android:textStyle="bold" />-->
+    <!--</android.support.v7.widget.CardView>-->
+    <!--</RelativeLayout>-->
+
+
+    <!--</RelativeLayout>-->
 </android.support.v7.widget.CardView>

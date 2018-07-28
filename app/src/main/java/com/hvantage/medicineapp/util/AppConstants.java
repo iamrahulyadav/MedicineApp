@@ -18,6 +18,7 @@ public class AppConstants {
         public static final String ADDRESS = "address";
         public static final String ORDERS = "orders";
         public static final String MY_PRESCRIPTIONS = "my_prescriptions";
+        public static final String TEMP_PRESCRIPTION = "temp_prescription";
     }
 
     public class CATEGORY {

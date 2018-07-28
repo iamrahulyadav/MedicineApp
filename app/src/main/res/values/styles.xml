@@ -52,14 +52,14 @@
 
     <style name="MenuButtonsSmall">
         <item name="fab_size">mini</item>
-        <item name="fab_colorNormal">@color/colorAccent</item>
-        <item name="fab_colorPressed">@color/colorFabRipple</item>
-        <item name="fab_colorRipple">@color/colorFabRipple</item>
+        <item name="fab_colorNormal">@color/colorPrimary</item>
+        <item name="fab_colorPressed">@color/colorPrimary</item>
+        <item name="fab_colorRipple">@color/colorPrimary</item>
     </style>
 
     <style name="MenuLabelsStyle">
         <!--<item name="android:background">#fff</item>-->
-        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorTextHeading</item>
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Small</item>
         <item name="android:maxLines">1</item>
         <item name="android:paddingTop">2sp</item>

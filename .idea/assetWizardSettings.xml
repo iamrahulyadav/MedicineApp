@@ -23,7 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="paddingPercent" value="20" />
+                                                <entry key="paddingPercent" value="10" />
                                                 <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
@@ -35,8 +35,8 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="C:\Users\RK\Downloads\add_cart_small.png" />
-                                      <entry key="outputName" value="add_cart_small" />
+                                      <entry key="imageAsset" value="C:\Users\RK\Downloads\medicine\upload.png" />
+                                      <entry key="outputName" value="fab_upload" />
                                       <entry key="theme" value="CUSTOM" />
                                       <entry key="themeColor" value="ffffff" />
                                     </map>
@@ -65,7 +65,6 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="backgroundColor" value="ffffff" />
                                       <entry key="foregroundImage" value="C:\Users\Hvantage\Downloads\medicineapp\pills_themed.png" />
                                     </map>
                                   </option>

@@ -1,16 +1,13 @@
 package com.hvantage.medicineapp.adapter;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,9 +15,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.model.PrescriptionModel;
-import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
-import com.hvantage.medicineapp.util.TouchImageView;
 
 import java.util.ArrayList;
 
@@ -65,10 +60,12 @@ public class SelectPrescAdapter extends RecyclerView.Adapter<SelectPrescAdapter.
             public void onClick(View view) {
                 Log.e(TAG, "onBindViewHolder: data >> " + data);
                 // context.startActivity(new Intent(context, ImagePreviewActivity.class).putExtra("prescription_data", data));
-                showPreviewDialog(Functions.base64ToBitmap(data.getImage_base64()));
+                //showPreviewDialog(Functions.base64ToBitmap(data.getImage_base64()));
             }
         });
     }
+
+
 
     private void showProgressDialog() {
         progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
@@ -84,19 +81,6 @@ public class SelectPrescAdapter extends RecyclerView.Adapter<SelectPrescAdapter.
             progressBar.dismiss();
     }
 
-
-    private void showPreviewDialog(Bitmap bitmap) {
-        Dialog dialog1 = new Dialog(context, R.style.image_preview_dialog);
-        dialog1.setContentView(R.layout.image_preview_layout);
-        Window window = dialog1.getWindow();
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        dialog1.setCancelable(true);
-        dialog1.setCanceledOnTouchOutside(true);
-        TouchImageView imgPreview = (TouchImageView) dialog1.findViewById(R.id.imgPreview);
-        imgPreview.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        imgPreview.setImageBitmap(bitmap);
-        dialog1.show();
-    }
 
 
     @Override

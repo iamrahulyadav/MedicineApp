@@ -253,5 +253,6 @@
 
         </LinearLayout>
     </ScrollView>
+    <include layout="@layout/layout_floating_button" />
 
 </android.support.constraint.ConstraintLayout>
