@@ -30,6 +30,7 @@ public class AddAddressActivity extends AppCompatActivity implements View.OnClic
     private CardView btnSubmit;
     private ProgressBar progressBar;
     private Context context;
+    private EditText etAddress, etLandmark, etState, etCity, etPostalCode, etName, etPhoneNo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +42,6 @@ public class AddAddressActivity extends AppCompatActivity implements View.OnClic
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         init();
     }
-
-    private EditText etAddress, etLandmark, etState, etCity, etPostalCode, etName, etPhoneNo;
 
     private void init() {
         etName = (EditText) findViewById(R.id.etName);

@@ -31,13 +31,13 @@ import java.util.ArrayList;
 public class SelectAddressActivity extends AppCompatActivity {
 
     private static final String TAG = "SelectAddressActivity";
+    ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
     private Context context;
     private ArrayList<AddressModel> list = new ArrayList<AddressModel>();
     private AddressAdapter adapter;
     private RecyclerView recylcer_view;
     private ProgressBar progressBar;
     private CardView btnSubmit;
-    ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

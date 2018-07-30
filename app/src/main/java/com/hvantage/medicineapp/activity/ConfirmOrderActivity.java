@@ -47,6 +47,7 @@ import java.util.Map;
 public class ConfirmOrderActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "ConfirmOrderActivity";
+    ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
     private Context context;
     private ProgressBar progressBar;
     private TextView tvTotalPrice, tvPayableAmt;
@@ -60,7 +61,6 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private Double taxes = 0.0;
     private Double delivery_fee = 0.0;
     private String payment_mode = "Cash On Delivery";
-    ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
     private RecyclerView recylcer_view;
     private UploadedPreAdapter adapterPres;
 

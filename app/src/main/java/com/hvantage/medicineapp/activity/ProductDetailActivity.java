@@ -53,6 +53,7 @@ public class ProductDetailActivity extends AppCompatActivity implements View.OnC
     private TextView tvMinus, tvQty, tvPlus;
     private CardView btnAddToCart;
     private ProgressBar progressBar;
+    private int qty = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,8 +169,6 @@ public class ProductDetailActivity extends AppCompatActivity implements View.OnC
             qty++;
         tvQty.setText(String.valueOf(qty));
     }
-
-    private int qty = 1;
 
     @Override
     public void onClick(View v) {
