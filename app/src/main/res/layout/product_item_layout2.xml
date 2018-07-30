@@ -45,11 +45,24 @@
             android:text="Rs. 00"
             android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
+        <TextView
+            android:id="@+id/tvOffers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvPrice"
+            android:layout_toRightOf="@id/img"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:singleLine="true"
+            android:text="Get 10% off on purchase of 200ml"
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Time"
+            android:textColor="@color/colorSuccess" />
+
         <LinearLayout
-            android:layout_marginTop="3dp"
             android:layout_width="100dp"
             android:layout_height="30dp"
-            android:layout_below="@id/tvPrice"
+            android:layout_below="@id/tvOffers"
+            android:layout_marginTop="3dp"
             android:layout_toRightOf="@id/img"
             android:orientation="horizontal"
             android:weightSum="3.2">
@@ -113,7 +126,7 @@
             android:layout_width="wrap_content"
             android:layout_height="35dp"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/tvPrice"
+            android:layout_below="@id/tvOffers"
             android:layout_margin="3dp"
             app:cardBackgroundColor="@color/colorPrimary"
             app:cardCornerRadius="2dp"
