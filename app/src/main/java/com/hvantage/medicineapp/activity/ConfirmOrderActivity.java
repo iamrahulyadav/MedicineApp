@@ -30,10 +30,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.CartItemAdapter;
 import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
+import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.model.AddressModel;
 import com.hvantage.medicineapp.model.CartModel;
 import com.hvantage.medicineapp.model.OrderData;
-import com.hvantage.medicineapp.model.PrescriptionModel;
 import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
@@ -47,7 +47,7 @@ import java.util.Map;
 public class ConfirmOrderActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "ConfirmOrderActivity";
-    ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
+    //    ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
     private Context context;
     private ProgressBar progressBar;
     private TextView tvTotalPrice, tvPayableAmt;
@@ -100,7 +100,8 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 llMedicine.setVisibility(View.VISIBLE);
                 llPayMode.setVisibility(View.GONE);
                 llAmount.setVisibility(View.GONE);
-                getData();
+                //getData();
+//                presList = UploadPrecriptionFragment.presList;
                 getCartData();
             } else {
                 llPrescription.setVisibility(View.GONE);
@@ -146,7 +147,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
 
     private void setRecyclerView() {
         recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
-        adapterPres = new UploadedPreAdapter(context, presList);
+        adapterPres = new UploadedPreAdapter(context, UploadPrecriptionFragment.presList);
         recylcer_view.setLayoutManager(new GridLayoutManager(context, spanCount));
         recylcer_view.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
         recylcer_view.setAdapter(adapterPres);
@@ -228,45 +229,45 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 });
     }
 
-    private void getData() {
-        showProgressDialog();
-        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.TEMP_PRESCRIPTION)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                .orderByKey()
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        presList.clear();
-                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            PrescriptionModel data = postSnapshot.getValue(PrescriptionModel.class);
-                            if (data != null) {
-                                presList.add(data);
-                                adapterPres.notifyDataSetChanged();
-                            }
-                            adapterPres.notifyDataSetChanged();
-                            if (adapterPres.getItemCount() == 0) {
-                                llPrescription.setVisibility(View.GONE);
-                            } else {
-                                llPrescription.setVisibility(View.VISIBLE);
-                            }
-                        }
-                        hideProgressDialog();
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        adapterPres.notifyDataSetChanged();
-                        if (adapterPres.getItemCount() == 0) {
-                            llPrescription.setVisibility(View.GONE);
-                        } else {
-                            llPrescription.setVisibility(View.VISIBLE);
-                        }
-                        Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
-                        hideProgressDialog();
-                    }
-                });
-    }
+//    private void getData() {
+//        showProgressDialog();
+//        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+//                .child(AppConstants.FIREBASE_KEY.TEMP_PRESCRIPTION)
+//                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+//                .orderByKey()
+//                .addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        presList.clear();
+//                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+//                            PrescriptionModel data = postSnapshot.getValue(PrescriptionModel.class);
+//                            if (data != null) {
+//                                presList.add(data);
+//                                adapterPres.notifyDataSetChanged();
+//                            }
+//                            adapterPres.notifyDataSetChanged();
+//                            if (adapterPres.getItemCount() == 0) {
+//                                llPrescription.setVisibility(View.GONE);
+//                            } else {
+//                                llPrescription.setVisibility(View.VISIBLE);
+//                            }
+//                        }
+//                        hideProgressDialog();
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//                        adapterPres.notifyDataSetChanged();
+//                        if (adapterPres.getItemCount() == 0) {
+//                            llPrescription.setVisibility(View.GONE);
+//                        } else {
+//                            llPrescription.setVisibility(View.VISIBLE);
+//                        }
+//                        Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
+//                        hideProgressDialog();
+//                    }
+//                });
+//    }
 
     private void showProgressDialog() {
         progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
@@ -331,7 +332,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         //cart items
         orderData.setItems(cartList);
         //presriptions
-        orderData.setPrescriptions(presList);
+        orderData.setPrescriptions(UploadPrecriptionFragment.presList);
 
         orderData.setKey(key);
         orderData.setPayment_mode(payment_mode);

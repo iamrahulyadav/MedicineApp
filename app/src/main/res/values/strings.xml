@@ -16,5 +16,6 @@
     <string name="speech_not_supported">speech not supported</string>
     <string name="Rs">\u20B9  </string>
     <string name="title_activity_select_presc">SelectPrescActivity</string>
+    <string name="title_activity_presc_preview">PrescPreviewActivity</string>
 
 </resources>

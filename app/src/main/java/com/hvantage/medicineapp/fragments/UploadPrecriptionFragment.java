@@ -43,6 +43,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.LoginActivity;
+import com.hvantage.medicineapp.activity.PrescPreviewActivity;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.activity.SelectAddressActivity;
 import com.hvantage.medicineapp.adapter.CartItemAdapter;
@@ -74,12 +75,12 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private static final int REQUEST_IMAGE_CAPTURE = REQUEST_STORAGE + 1;
     private static final int REQUEST_LOAD_IMAGE = REQUEST_IMAGE_CAPTURE + 1;
     private static final String TAG = "UploadPrecrFragment";
+    public static ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
     private RecyclerView recylcer_view;
     private UploadedPreAdapter adapterPres;
-    private ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
     private ArrayList<String> list = new ArrayList<String>();
 
     private CardView btnUpload;
@@ -90,7 +91,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private ArrayList<CartModel> cartList = new ArrayList<CartModel>();
     private CartItemAdapter adapterCart;
     private double total = 0;
-    private RecyclerView recylcer_view_items;
+    private RecyclerView recylcer_view_cart;
     private TextView tvInstructions;
     private TextView tvCartItemEmpty;
     private CardView btnContinue;
@@ -106,6 +107,10 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
         if (intraction != null) {
             intraction.actionbarsetTitle("Upload Prescription");
         }
+        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+                .child(AppConstants.FIREBASE_KEY.TEMP_PRESCRIPTION)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                .removeValue();
         init();
         setRecyclerView();
         setRecyclerViewCart();
@@ -113,7 +118,6 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
         if (getArguments() != null) {
             presList = getArguments().getParcelableArrayList("data");
             setRecyclerView();
-
         }
         Log.e(TAG, "onCreateView: data >> " + presList.size());
         if (adapterPres.getItemCount() == 0)
@@ -185,7 +189,9 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                                         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                                             ProductModel data = postSnapshot.getValue(ProductModel.class);
                                             Log.e(TAG, "onDataChange: data >> " + data);
-                                            startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", data));
+                                            Intent intent = new Intent(context, ProductDetailActivity.class);
+                                            intent.putExtra("medicine_data", data);
+                                            startActivity(intent);
                                             etSearch.setText("");
                                             break;
                                         }
@@ -209,10 +215,10 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
 
 
     private void setRecyclerViewCart() {
-        recylcer_view_items = (RecyclerView) rootView.findViewById(R.id.recylcer_view_items);
+        recylcer_view_cart = (RecyclerView) rootView.findViewById(R.id.recylcer_view_items);
         adapterCart = new CartItemAdapter(context, cartList);
-        recylcer_view_items.setLayoutManager(new LinearLayoutManager(context));
-        recylcer_view_items.setAdapter(adapterCart);
+        recylcer_view_cart.setLayoutManager(new LinearLayoutManager(context));
+        recylcer_view_cart.setAdapter(adapterCart);
         adapterCart.notifyDataSetChanged();
     }
 
@@ -358,12 +364,8 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 if (presList.isEmpty())
                     showNoPresAlert();
                 else {
-                    showProgressDialog();
+                    /*showProgressDialog();
                     Log.e(TAG, "onClick: presList >> " + presList.size());
-                  /*  String key = FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-                            .child(AppConstants.FIREBASE_KEY.CART)
-                            .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                            .push().getKey();*/
                     FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
                             .child(AppConstants.FIREBASE_KEY.TEMP_PRESCRIPTION)
                             .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
@@ -375,9 +377,6 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                                     hideProgressDialog();
                                     AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
                                     Intent intent = new Intent(getActivity(), SelectAddressActivity.class);
-                                    Bundle bundle = new Bundle();
-                                    bundle.putParcelableArrayList("listPresc", presList);
-                                    // intent.putExtra("data", bundle);
                                     startActivity(intent);
                                 }
                             })
@@ -386,7 +385,11 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                                 public void onFailure(@NonNull Exception e) {
                                     Log.e(TAG, "onSuccess: failed");
                                 }
-                            });
+                            });*/
+
+                    AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
+                    Intent intent = new Intent(getActivity(), SelectAddressActivity.class);
+                    startActivity(intent);
 
 
                 }
@@ -558,33 +561,56 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
             presList.add(data);
             adapterPres.notifyDataSetChanged();
             hideProgressDialog();
-
-            /*String key = FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-                    .child(AppConstants.FIREBASE_KEY.CART)
+           /* String key = FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+                    .child(AppConstants.FIREBASE_KEY.TEMP_PRESCRIPTION)
                     .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                    .push().getKey();
-            final PrescriptionModel data = new PrescriptionModel(key, image_base64);
-            FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-                    .child(AppConstants.FIREBASE_KEY.CART)
-                    .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                    .child(AppConstants.FIREBASE_KEY.PRESCRIPTION)
-                    .child(key)
-                    .setValue(data)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    .push().getKey();*/
+            //saveList();
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setMessage("Do you want to add prescription medicines")
+                    .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onSuccess(Void aVoid) {
-                            hideProgressDialog();
-                            Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
+                        public void onClick(DialogInterface dialog, int which) {
+                            startActivity(
+                                    new Intent(context, PrescPreviewActivity.class)
+                                            .putExtra("position", presList.size() - 1));
                         }
                     })
-                    .addOnFailureListener(new OnFailureListener() {
+                    .setNegativeButton("Submit Anyway", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onFailure(@NonNull Exception e) {
-                            hideProgressDialog();
-                            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+                        public void onClick(DialogInterface dialog, int which) {
+
                         }
-                    });*/
+                    });
+
+
+//        builder.setCancelable(false);
+            builder.show();
+
 
         }
+    }
+
+    private void saveList() {
+        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+                .child(AppConstants.FIREBASE_KEY.TEMP_PRESCRIPTION)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                .setValue(presList)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        hideProgressDialog();
+                        Log.e(TAG, "onSuccess: added");
+                        Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "onFailure: failed");
+                        hideProgressDialog();
+                        Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }

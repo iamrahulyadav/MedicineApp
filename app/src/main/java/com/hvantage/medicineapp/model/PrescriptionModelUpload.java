@@ -3,25 +3,12 @@ package com.hvantage.medicineapp.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
-
-public class PrescriptionModel implements Parcelable {
+public class PrescriptionModelUpload implements Parcelable {
     String key;
     String image_base64;
     String title = "";
     String description = "";
     String date_time = "";
-
-    public ArrayList<CartModel> getItem_list() {
-        return item_list;
-    }
-
-    public void setItem_list(ArrayList<CartModel> item_list) {
-        this.item_list = item_list;
-    }
-
-    ArrayList<CartModel> item_list = new ArrayList<CartModel>();
-
 
     public String getTitle() {
         return title;
@@ -48,12 +35,12 @@ public class PrescriptionModel implements Parcelable {
     }
 
 
-    public PrescriptionModel(String key, String image_base64) {
+    public PrescriptionModelUpload(String key, String image_base64) {
         this.key = key;
         this.image_base64 = image_base64;
     }
 
-    public PrescriptionModel(String key, String image_base64, String title, String description, String date_time) {
+    public PrescriptionModelUpload(String key, String image_base64, String title, String description, String date_time) {
         this.key = key;
         this.image_base64 = image_base64;
         this.title = title;
@@ -61,7 +48,7 @@ public class PrescriptionModel implements Parcelable {
         this.date_time = date_time;
     }
 
-    public PrescriptionModel() {
+    public PrescriptionModelUpload() {
     }
 
     public String getKey() {
@@ -103,7 +90,7 @@ public class PrescriptionModel implements Parcelable {
         dest.writeString(this.date_time);
     }
 
-    protected PrescriptionModel(Parcel in) {
+    protected PrescriptionModelUpload(Parcel in) {
         this.key = in.readString();
         this.image_base64 = in.readString();
         this.title = in.readString();
@@ -111,15 +98,15 @@ public class PrescriptionModel implements Parcelable {
         this.date_time = in.readString();
     }
 
-    public static final Parcelable.Creator<PrescriptionModel> CREATOR = new Parcelable.Creator<PrescriptionModel>() {
+    public static final Parcelable.Creator<com.hvantage.medicineapp.model.PrescriptionModel> CREATOR = new Parcelable.Creator<com.hvantage.medicineapp.model.PrescriptionModel>() {
         @Override
-        public PrescriptionModel createFromParcel(Parcel source) {
-            return new PrescriptionModel(source);
+        public com.hvantage.medicineapp.model.PrescriptionModel createFromParcel(Parcel source) {
+            return new com.hvantage.medicineapp.model.PrescriptionModel(source);
         }
 
         @Override
-        public PrescriptionModel[] newArray(int size) {
-            return new PrescriptionModel[size];
+        public com.hvantage.medicineapp.model.PrescriptionModel[] newArray(int size) {
+            return new com.hvantage.medicineapp.model.PrescriptionModel[size];
         }
     };
 }

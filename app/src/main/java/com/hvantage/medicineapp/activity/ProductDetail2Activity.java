@@ -25,12 +25,15 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.HomeProductAdapter;
+import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.model.CartModel;
+import com.hvantage.medicineapp.model.PrescriptionModel;
 import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.Functions;
@@ -39,7 +42,7 @@ import com.hvantage.medicineapp.util.TouchImageView;
 
 import java.util.ArrayList;
 
-public class ProductDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class ProductDetail2Activity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "ProductDetailActivity";
     ArrayList<ProductModel> productList = new ArrayList<ProductModel>();
@@ -58,7 +61,7 @@ public class ProductDetailActivity extends AppCompatActivity implements View.OnC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_product_detail);
+        setContentView(R.layout.activity_product_detail2);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         context = this;
         toolbar_title = (TextView) toolbar.findViewById(R.id.toolbar_title);
@@ -180,16 +183,46 @@ public class ProductDetailActivity extends AppCompatActivity implements View.OnC
                 decrementItem();
                 break;
             case R.id.btnAddToCart:
-                if (FirebaseAuth.getInstance().getCurrentUser() != null)
-                    addToCart();
-                else {
-                    Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(context, LoginActivity.class));
-                    finish();
-                }
-
+                showProgressDialog();
+                CartModel model = new CartModel();
+                model.setItem(data.getName());
+                model.setImage(data.getImage());
+                model.setQty_no(Integer.parseInt(tvQty.getText().toString()));
+                PrescPreviewActivity.cartList.add(model);
+                Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
+                PrescriptionModel tempModel = UploadPrecriptionFragment.presList.get(PrescPreviewActivity.position);
+                tempModel.setItem_list(PrescPreviewActivity.cartList);
+                UploadPrecriptionFragment.presList.set(PrescPreviewActivity.position, tempModel);
+                finish();
+                //saveList();
                 break;
         }
+    }
+
+    private void saveList() {
+        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+                .child(AppConstants.FIREBASE_KEY.TEMP_PRESCRIPTION)
+                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                .child(PrescPreviewActivity.position + "")
+                .child("z_items")
+                .setValue(PrescPreviewActivity.cartList)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        hideProgressDialog();
+                        Log.e(TAG, "onSuccess: added");
+                        Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "onFailure: failed");
+                        hideProgressDialog();
+                        Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void showProgressDialog() {

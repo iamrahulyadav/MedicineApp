@@ -72,7 +72,7 @@ public class AllUploadedPreAdapter extends RecyclerView.Adapter<AllUploadedPreAd
             @Override
             public void onClick(View view) {
                 Log.e(TAG, "onBindViewHolder: data >> " + data);
-                // context.startActivity(new Intent(context, ImagePreviewActivity.class).putExtra("prescription_data", data));
+                // context.startActivity(new Intent(context, PrescPreviewActivity.class).putExtra("prescription_data", data));
                 showPreviewDialog(Functions.base64ToBitmap(data.getImage_base64()));
 
             }

@@ -207,6 +207,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         setRecylclerviewDaily2();
         setSearchBar();
         getRandomCatData();
+
         return rootView;
     }
 

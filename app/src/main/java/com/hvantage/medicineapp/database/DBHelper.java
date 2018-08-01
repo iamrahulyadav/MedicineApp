@@ -152,7 +152,7 @@ public class DBHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             list = new ArrayList<String>();
             do {
-                list.add(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                list.add    (cursor.getString(cursor.getColumnIndex(KEY_NAME)));
             } while (cursor.moveToNext());
         }
         return list;

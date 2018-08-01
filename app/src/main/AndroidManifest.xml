@@ -58,6 +58,10 @@
             android:label=""
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".activity.ProductDetail2Activity"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/AppTheme" />
         <activity
@@ -90,9 +94,10 @@
             android:stopWithTask="true" />
 
         <activity
-            android:name=".activity.ImagePreviewActivity"
+            android:name=".activity.PrescPreviewActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan|stateAlwaysHidden" />
         <activity
             android:name=".activity.CartActivity"
             android:label=""
