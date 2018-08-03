@@ -3,7 +3,6 @@ package com.hvantage.medicineapp.adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,15 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.activity.PrescPreviewActivity;
+import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.model.CartModel;
-import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 
@@ -61,7 +56,7 @@ public class PPItemAdapter extends RecyclerView.Adapter<PPItemAdapter.ViewHolder
         holder.tvDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deleteItem(data);
+                deleteItem(data, position);
             }
         });
     }
@@ -80,37 +75,15 @@ public class PPItemAdapter extends RecyclerView.Adapter<PPItemAdapter.ViewHolder
             progressBar.dismiss();
     }
 
-    private void deleteItem(final CartModel data) {
+    private void deleteItem(final CartModel data, final int position) {
         new AlertDialog.Builder(context)
                 .setMessage("Remove " + data.getItem())
                 .setPositiveButton("Remove", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        showProgressDialog();
-                        FirebaseDatabase.getInstance().getReference()
-                                .child(AppConstants.APP_NAME)
-                                .child(AppConstants.FIREBASE_KEY.CART)
-                                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                                .child(AppConstants.FIREBASE_KEY.CART_ITEMS)
-                                .child(data.getKey())
-                                .removeValue()
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        hideProgressDialog();
-                                        notifyDataSetChanged();
-                                        Toast.makeText(context, "Removed", Toast.LENGTH_SHORT).show();
-
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        notifyDataSetChanged();
-                                        hideProgressDialog();
-                                        Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                        UploadPrecriptionFragment.presList.get(PrescPreviewActivity.position).getItem_list().remove(position);
+                        notifyDataSetChanged();
+//
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

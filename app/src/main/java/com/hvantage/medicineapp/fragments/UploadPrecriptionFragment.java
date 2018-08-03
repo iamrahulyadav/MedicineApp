@@ -88,7 +88,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private String userChoosenTask;
     private int spacing = 30, spanCount = 3;
     private boolean includeEdge = true;
-    private ArrayList<CartModel> cartList = new ArrayList<CartModel>();
+    private ArrayList<CartModel> cartList;
     private CartItemAdapter adapterCart;
     private double total = 0;
     private RecyclerView recylcer_view_cart;
@@ -107,10 +107,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
         if (intraction != null) {
             intraction.actionbarsetTitle("Upload Prescription");
         }
-        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.TEMP_PRESCRIPTION)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                .removeValue();
+        cartList = new ArrayList<CartModel>();
         init();
         setRecyclerView();
         setRecyclerViewCart();
@@ -159,7 +156,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 }
             }
         });
-//        builder.setCancelable(false);
+//      builder.setCancelable(false);
         builder.show();
     }
 
@@ -195,8 +192,6 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                                             etSearch.setText("");
                                             break;
                                         }
-
-
                                     }
 
                                     @Override

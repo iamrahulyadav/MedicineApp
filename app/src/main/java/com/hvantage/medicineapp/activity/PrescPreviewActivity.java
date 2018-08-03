@@ -19,7 +19,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -94,40 +93,12 @@ public class PrescPreviewActivity extends AppCompatActivity {
         }
     }
 
-    private void getData() {
-        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.TEMP_PRESCRIPTION)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                .child(position + "")
-                .child("z_items")
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            Log.e(TAG, "onDataChange:postSnapshot >> " + postSnapshot.getValue());
-                            if (postSnapshot.getValue() != null) {
-                                CartModel model = postSnapshot.getValue(CartModel.class);
-                                cartList.add(model);
-                                adapterCart.notifyDataSetChanged();
-                            }
-                        }
-                        hideProgressDialog();
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        hideProgressDialog();
-                    }
-                });
-    }
-
     private void setRecyclerViewCart() {
         adapterCart = new PPItemAdapter(context, cartList);
         recylcer_view_cart.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view_cart.setAdapter(adapterCart);
         adapterCart.notifyDataSetChanged();
     }
-
 
     private void setBottomBar() {
         final BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
@@ -138,12 +109,10 @@ public class PrescPreviewActivity extends AppCompatActivity {
                 switch (newState) {
                     case BottomSheetBehavior.STATE_HIDDEN:
                         break;
-                    case BottomSheetBehavior.STATE_EXPANDED: {
-                    }
-                    break;
-                    case BottomSheetBehavior.STATE_COLLAPSED: {
-                    }
-                    break;
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        break;
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        break;
                     case BottomSheetBehavior.STATE_DRAGGING:
                         break;
                     case BottomSheetBehavior.STATE_SETTLING:
@@ -153,10 +122,8 @@ public class PrescPreviewActivity extends AppCompatActivity {
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                Log.e("onSlide", "onSlide");
             }
         });
-
     }
 
     private void setSearchBar() {
@@ -218,7 +185,6 @@ public class PrescPreviewActivity extends AppCompatActivity {
         if (progressBar != null)
             progressBar.dismiss();
     }
-
 
     private void init() {
         imageFull = (TouchImageView) findViewById(R.id.imageFull);
