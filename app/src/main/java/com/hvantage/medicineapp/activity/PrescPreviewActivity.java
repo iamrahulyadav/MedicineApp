@@ -59,7 +59,6 @@ public class PrescPreviewActivity extends AppCompatActivity {
             adapterCart.notifyDataSetChanged();
         }
     }
-
     @Override
     protected void onStart() {
         super.onStart();
