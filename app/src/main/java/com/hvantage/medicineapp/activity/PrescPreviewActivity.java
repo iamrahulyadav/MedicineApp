@@ -18,7 +18,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -82,7 +81,6 @@ public class PrescPreviewActivity extends AppCompatActivity {
             Log.e(TAG, "onCreate: itemList >> " + itemList);
             if (itemList != null)
                 cartList = itemList;
-
             imageFull.setImageBitmap(Functions.base64ToBitmap(data.getImage_base64()));
             setBottomBar();
             setSearchBar();
