@@ -61,25 +61,14 @@ public class HomeProductAdapter2 extends RecyclerView.Adapter<HomeProductAdapter
         holder.tvPriceDrop.setText("Rs. " + data.getPrice());
         holder.tvPriceDrop.setPaintFlags(holder.tvPriceDrop.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         double discount_amt = data.getPrice() * 10 / 100;
-        holder.tvPrice.setText("Rs. " + (data.getPrice() - discount_amt));
+        holder.tvPrice.setText("Rs. " + Functions.roundTwoDecimals(data.getPrice() - discount_amt));
 
 
         if (!data.getImage().equalsIgnoreCase("")) {
             Bitmap bitmap = Functions.base64ToBitmap(data.getImage());
             if (bitmap != null) {
                 holder.img.setImageBitmap(bitmap);
-               /* Glide.with(context)
-                        .load(data.getImage())
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .skipMemoryCache(true)
-                        .into(holder.img);*/
-                /*holder.img.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                    }
-                });*/
             }
-
         }
 
         holder.container.setOnClickListener(new View.OnClickListener() {

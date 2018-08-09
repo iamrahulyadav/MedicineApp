@@ -43,22 +43,22 @@
             android:maxLines="1"
             android:padding="3dp"
             android:text="Rs. 00"
-            android:textColor="@color/colorTextSubHeading"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@color/colorTextSubHeading" />
 
         <TextView
             android:id="@+id/tvPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvTitle"
+            android:layout_marginLeft="2dp"
             android:layout_toRightOf="@id/tvPriceDrop"
-            android:maxLines="1"
+            android:maxLines="2"
             android:padding="3dp"
             android:text="Rs. 00"
-            android:textStyle="bold"
-            android:layout_marginLeft="2dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textColor="@color/colorTextHeading"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvOffers"
