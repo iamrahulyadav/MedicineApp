@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -59,6 +60,7 @@ public class PrescPreviewActivity extends AppCompatActivity {
             adapterCart.notifyDataSetChanged();
         }
     }
+
     @Override
     protected void onStart() {
         super.onStart();

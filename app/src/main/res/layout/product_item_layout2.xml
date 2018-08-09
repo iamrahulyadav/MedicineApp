@@ -35,7 +35,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tvPrice"
+            android:id="@+id/tvPriceDrop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvTitle"
@@ -43,6 +43,21 @@
             android:maxLines="1"
             android:padding="3dp"
             android:text="Rs. 00"
+            android:textColor="@color/colorTextSubHeading"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+        <TextView
+            android:id="@+id/tvPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvTitle"
+            android:layout_toRightOf="@id/tvPriceDrop"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:text="Rs. 00"
+            android:textStyle="bold"
+            android:layout_marginLeft="2dp"
+            android:textColor="@color/colorTextHeading"
             android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
         <TextView

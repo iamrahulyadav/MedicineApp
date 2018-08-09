@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.annotation.Nullable;
@@ -18,6 +20,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -48,6 +51,7 @@ import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.adapter.CategoryAdapter;
 import com.hvantage.medicineapp.adapter.HomeProductAdapter;
 import com.hvantage.medicineapp.adapter.HomeProductAdapter2;
+import com.hvantage.medicineapp.adapter.OfferPagerAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.CategoryModel;
 import com.hvantage.medicineapp.model.ProductModel;
@@ -70,6 +74,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     ArrayList<CategoryModel> catList = new ArrayList<CategoryModel>();
     ArrayList<ProductModel> productList = new ArrayList<ProductModel>();
     ArrayList<ProductModel> listDailyNeeds = new ArrayList<ProductModel>();
+    ArrayList<Bitmap> offerList = new ArrayList<Bitmap>();
     private RecyclerView recylcer_view;
     private CategoryAdapter adapter;
     private HomeProductAdapter adapterRecco;
@@ -87,6 +92,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private RecyclerView recylcer_view_daily2;
     private HomeProductAdapter2 adapterDaily2;
     private FloatingActionMenu floatingActionMenu;
+    private ViewPager viewPagerOffers;
 
     private void setFloatingButton() {
         new FloatingButton().showFloatingButton(rootView, context);
@@ -202,6 +208,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 //        Log.e(TAG, "onCreateView: randomCat >> " + randomCat);
 
         setCategory();
+        setOffers();
         //setProduct();
         setRecylclerviewDaily();
         setRecylclerviewDaily2();
@@ -209,6 +216,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         getRandomCatData();
 
         return rootView;
+    }
+
+    private void setOffers() {
+        viewPagerOffers = (ViewPager) rootView.findViewById(R.id.viewPagerOffers);
+        offerList.clear();
+        offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer1));
+        //offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer2));
+        offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer3));
+        offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer4));
+        viewPagerOffers.setAdapter(new OfferPagerAdapter(getActivity(), offerList));
     }
 
     private void getRandomCatData() {

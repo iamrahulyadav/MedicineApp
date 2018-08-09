@@ -126,6 +126,32 @@
 
             </android.support.v7.widget.CardView>
 
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewPagerOffers"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_marginLeft="-10dp"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                android:paddingLeft="25dp"
+                android:paddingRight="25dp">
+
+            </android.support.v4.view.ViewPager>
+
+            <!--  <android.support.v7.widget.CardView
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginBottom="8dp"
+                  android:layout_marginLeft="8dp"
+                  android:layout_marginRight="8dp"
+                  app:cardBackgroundColor="@color/colorWhite"
+                  app:cardCornerRadius="3dp"
+                  app:cardElevation="1dp"
+                  app:contentPadding="15dp">
+
+
+              </android.support.v7.widget.CardView>-->
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -253,6 +279,7 @@
 
         </LinearLayout>
     </ScrollView>
+
     <include layout="@layout/layout_floating_button" />
 
 </android.support.constraint.ConstraintLayout>

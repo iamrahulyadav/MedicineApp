@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -12,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,7 +58,11 @@ public class HomeProductAdapter2 extends RecyclerView.Adapter<HomeProductAdapter
         final ProductModel data = arrayList.get(position);
         Log.d(TAG, position + " data : " + data);
         holder.tvTitle.setText(data.getName());
-        holder.tvPrice.setText("Rs. " + data.getPrice());
+        holder.tvPriceDrop.setText("Rs. " + data.getPrice());
+        holder.tvPriceDrop.setPaintFlags(holder.tvPriceDrop.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        double discount_amt = data.getPrice() * 10 / 100;
+        holder.tvPrice.setText("Rs. " + (data.getPrice() - discount_amt));
+
 
         if (!data.getImage().equalsIgnoreCase("")) {
             Bitmap bitmap = Functions.base64ToBitmap(data.getImage());
@@ -164,7 +168,7 @@ public class HomeProductAdapter2 extends RecyclerView.Adapter<HomeProductAdapter
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView img;
-        TextView tvTitle, tvPrice, tvQty, tvMinus, tvPlus;
+        TextView tvTitle, tvPriceDrop, tvPrice, tvQty, tvMinus, tvPlus;
         RelativeLayout container;
         CardView btnAddToCart;
 
@@ -172,6 +176,7 @@ public class HomeProductAdapter2 extends RecyclerView.Adapter<HomeProductAdapter
             super(itemView);
             img = (ImageView) itemView.findViewById(R.id.img);
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
+            tvPriceDrop = (TextView) itemView.findViewById(R.id.tvPriceDrop);
             tvPrice = (TextView) itemView.findViewById(R.id.tvPrice);
             container = (RelativeLayout) itemView.findViewById(R.id.container);
             tvQty = (TextView) itemView.findViewById(R.id.tvQty);

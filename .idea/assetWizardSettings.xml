@@ -23,7 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="paddingPercent" value="10" />
+                                                <entry key="paddingPercent" value="15" />
                                                 <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
@@ -35,10 +35,10 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="C:\Users\RK\Downloads\medicine\upload.png" />
-                                      <entry key="outputName" value="fab_upload" />
+                                      <entry key="imageAsset" value="C:\Users\RK\Downloads\medicine\discount.png" />
+                                      <entry key="outputName" value="drawable_discount" />
                                       <entry key="theme" value="CUSTOM" />
-                                      <entry key="themeColor" value="ffffff" />
+                                      <entry key="themeColor" value="000000" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -101,7 +101,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/content/ic_add_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/maps/ic_local_offer_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -111,8 +111,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_add_white_24dp" />
+                            <entry key="color" value="111111" />
+                            <entry key="outputName" value="ic_local_offer_black_24dp" />
                             <entry key="sourceFile" value="C:\Users\Hvantage" />
                           </map>
                         </option>

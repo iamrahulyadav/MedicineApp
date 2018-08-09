@@ -31,6 +31,7 @@ import com.hvantage.medicineapp.activity.business.BusinessLoginActivity;
 import com.hvantage.medicineapp.fragments.CartFragment;
 import com.hvantage.medicineapp.fragments.HomeFragment;
 import com.hvantage.medicineapp.fragments.MyOrderFragment;
+import com.hvantage.medicineapp.fragments.OfferDiscountFragment;
 import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.fragments.VaultFragment;
 import com.hvantage.medicineapp.util.FragmentIntraction;
@@ -221,6 +222,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_orders:
                 fragment = new MyOrderFragment();
+                ft.replace(R.id.main_container, fragment);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+                break;
+             case R.id.nav_discount_offer:
+                fragment = new OfferDiscountFragment();
                 ft.replace(R.id.main_container, fragment);
                 ft.addToBackStack(null);
                 ft.commitAllowingStateLoss();
