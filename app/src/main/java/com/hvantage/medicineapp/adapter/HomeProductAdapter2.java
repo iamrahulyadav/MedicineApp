@@ -63,7 +63,6 @@ public class HomeProductAdapter2 extends RecyclerView.Adapter<HomeProductAdapter
         double discount_amt = data.getPrice() * 10 / 100;
         holder.tvPrice.setText("Rs. " + Functions.roundTwoDecimals(data.getPrice() - discount_amt));
 
-
         if (!data.getImage().equalsIgnoreCase("")) {
             Bitmap bitmap = Functions.base64ToBitmap(data.getImage());
             if (bitmap != null) {
