@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Medicine App</string>
+    <string name="app_name">Online Medicine App</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Login/Signup</string>
@@ -13,9 +13,8 @@
     <string name="agree_text"><![CDATA[I agree to Terms of Use & Privacy Policy]]></string>
     <string name="upload_rx_text">(We only accept valid prescription, with doctor\'s name and registration clearly visible.)</string>
     <string name="no_internet_text">No Internet Connection.</string>
-    <string name="speech_not_supported">speech not supported</string>
+    <string name="speech_not_supported">Speech Not Supported</string>
     <string name="Rs">\u20B9  </string>
     <string name="title_activity_select_presc">SelectPrescActivity</string>
     <string name="title_activity_presc_preview">PrescPreviewActivity</string>
-
 </resources>
