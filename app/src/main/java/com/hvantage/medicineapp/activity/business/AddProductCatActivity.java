@@ -112,7 +112,6 @@ public class AddProductCatActivity extends AppCompatActivity implements View.OnC
                 spinnerCat.setSelection(0);
                 spinnerSubCat.setVisibility(View.GONE);
                 viewLine.setVisibility(View.GONE);
-
             } else if (!data.getCategory_name().equalsIgnoreCase("") && !data.getCategory_name().equalsIgnoreCase("")) {
                 String[] arrayCat = getResources().getStringArray(R.array.categories);
                 for (int i = 0; i < arrayCat.length; i++) {
@@ -120,8 +119,6 @@ public class AddProductCatActivity extends AppCompatActivity implements View.OnC
                         spinnerCat.setSelection(i);
                 }
             }
-
-
         }
     }
 

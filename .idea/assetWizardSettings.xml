@@ -35,7 +35,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="C:\Users\RK\Downloads\medicine\discount.png" />
+                                      <entry key="imageAsset" value="$USER_HOME$/C:\Users\RK\Downloads\medicine\discount.png" />
                                       <entry key="outputName" value="drawable_discount" />
                                       <entry key="theme" value="CUSTOM" />
                                       <entry key="themeColor" value="000000" />
@@ -54,7 +54,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="scalingPercent" value="51" />
+                                                <entry key="scalingPercent" value="62" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -65,17 +65,13 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="foregroundImage" value="C:\Users\Hvantage\Downloads\medicineapp\pills_themed.png" />
+                                      <entry key="backgroundColor" value="2e5ece" />
+                                      <entry key="foregroundImage" value="$USER_HOME$/Downloads/app_icon.png" />
                                     </map>
                                   </option>
                                 </PersistentState>
                               </value>
                             </entry>
-                          </map>
-                        </option>
-                        <option name="values">
-                          <map>
-                            <entry key="outputIconType" value="ACTIONBAR" />
                           </map>
                         </option>
                       </PersistentState>
