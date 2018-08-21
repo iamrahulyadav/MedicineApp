@@ -7,20 +7,20 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Created by Kirti Tiwari on 13-10-2017.
+ * Created by RK on 13-10-2017.
  */
 
 public class WelcomePagerAdapter extends PagerAdapter {
     private int[] layouts;
     private Context context;
-    private LayoutInflater layoutInflater ;
+    private LayoutInflater layoutInflater;
 
-    public WelcomePagerAdapter(int[] layouts, Context context)
-    {
+    public WelcomePagerAdapter(int[] layouts, Context context) {
         this.layouts = layouts;
         this.context = context;
-        layoutInflater = (LayoutInflater)context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
+        layoutInflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
     }
+
     @Override
     public int getCount() {
         return layouts.length;
@@ -28,19 +28,19 @@ public class WelcomePagerAdapter extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
-        return view==object;
+        return view == object;
     }
+
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        View view=layoutInflater.inflate(layouts[position],container,false);
+        View view = layoutInflater.inflate(layouts[position], container, false);
         container.addView(view);
         return view;
     }
 
     @Override
-    public void destroyItem(ViewGroup container,int position,Object object)
-    {
-        View view = (View)object;
+    public void destroyItem(ViewGroup container, int position, Object object) {
+        View view = (View) object;
         container.removeView(view);
     }
 }

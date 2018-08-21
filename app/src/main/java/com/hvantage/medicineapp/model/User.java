@@ -2,13 +2,14 @@ package com.hvantage.medicineapp.model;
 
 public class User {
 
-    String uid = "", name = "", email = "", mob_no = "";
+    String uid = "", name = "", email = "", mob_no = "", password = "";
 
-    public User(String uid,String name, String email, String mob_no) {
+    public User(String uid, String name, String email, String mob_no, String password) {
         this.uid = uid;
         this.name = name;
         this.email = email;
         this.mob_no = mob_no;
+        this.password = password;
     }
 
     public User() {
@@ -36,5 +37,21 @@ public class User {
 
     public void setMob_no(String mob_no) {
         this.mob_no = mob_no;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

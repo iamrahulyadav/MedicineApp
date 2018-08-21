@@ -25,7 +25,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.business.BusinessLoginActivity;
 import com.hvantage.medicineapp.fragments.CartFragment;
@@ -34,6 +33,7 @@ import com.hvantage.medicineapp.fragments.MyOrderFragment;
 import com.hvantage.medicineapp.fragments.OfferDiscountFragment;
 import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.fragments.VaultFragment;
+import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, FragmentIntraction {
@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String TAG = "MainActivity";
     private static final int REQUEST_ALL_PERMISSIONS = 100;
     private TextView toolbar_title;
-    private FirebaseAuth auth;
     private Context context;
     private NavigationView navigationView;
     private TextView tvLogin, tvUsername;
@@ -57,20 +56,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initDrawer(toolbar);
         setDefaultFragment();
 
-        auth = FirebaseAuth.getInstance();
-        if (auth.getCurrentUser() == null) {
+
+        if (AppPreferences.getUserId(context).equalsIgnoreCase("")) {
             hideMenus();
             tvUsername.setVisibility(View.GONE);
             tvLogin.setVisibility(View.VISIBLE);
         } else {
             tvUsername.setVisibility(View.VISIBLE);
             tvLogin.setVisibility(View.GONE);
-            Log.e(TAG, "onCreate: uid >> " + auth.getCurrentUser().getUid());
-            Log.e(TAG, "onCreate: name >> " + auth.getCurrentUser().getDisplayName());
-            Log.e(TAG, "onCreate: phone >> " + auth.getCurrentUser().getPhoneNumber());
-            tvUsername.setText("Hello, " + auth.getCurrentUser().getDisplayName());
+            Log.e(TAG, "onCreate: uid >> " + AppPreferences.getUserId(context));
+            Log.e(TAG, "onCreate: name >> " + AppPreferences.getUserName(context));
+            Log.e(TAG, "onCreate: phone >> " + AppPreferences.getMobileNo(context));
+            tvUsername.setText("Hello, " + AppPreferences.getUserName(context));
         }
-
     }
 
     private boolean checkPermission() {
@@ -182,8 +180,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (id) {
             case R.id.action_cart:
                 //openCartFragment();
-                startActivity(new Intent(context, CartActivity.class));
-
+                if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
+                    startActivity(new Intent(context, CartActivity.class));
+                } else {
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -204,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 clearBackStack();
                 break;
             case R.id.nav_upload_pre:
-                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
                     fragment = new UploadPrecriptionFragment();
                     ft.replace(R.id.main_container, fragment);
                     ft.addToBackStack(null);
@@ -226,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ft.addToBackStack(null);
                 ft.commitAllowingStateLoss();
                 break;
-             case R.id.nav_discount_offer:
+            case R.id.nav_discount_offer:
                 fragment = new OfferDiscountFragment();
                 ft.replace(R.id.main_container, fragment);
                 ft.addToBackStack(null);
@@ -259,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        FirebaseAuth.getInstance().signOut();
+                        AppPreferences.clearPreference(context);
                         startActivity(new Intent(context, LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     }
                 })

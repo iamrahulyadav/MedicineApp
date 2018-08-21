@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Created by flaviusmester on 23/02/15.
+ * Created by RK on 23/02/15.
  */
 public class FastScrollRecyclerView extends RecyclerView {
     private Context ctx;

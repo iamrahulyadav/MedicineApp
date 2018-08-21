@@ -7,19 +7,10 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.database.DBHelper;
-import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.services.DBService;
-import com.hvantage.medicineapp.util.AppConstants;
-import com.hvantage.medicineapp.util.Functions;
+import com.hvantage.medicineapp.util.AppPreferences;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -49,7 +40,8 @@ public class SplashActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+
+                if (AppPreferences.getUserId(context).equalsIgnoreCase("")) {
                     Intent intent = new Intent(SplashActivity.this, WelcomeActivity.class);
                     startActivity(intent);
                     finish();
@@ -58,45 +50,7 @@ public class SplashActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 }
-
             }
         }, SPLASH_TIME_OUT);
     }
-
-    private void getData() {
-        if (Functions.isConnectingToInternet(context)) {
-            Log.e(TAG, "getDataFromServer: deleteMedicineData() >> " + new DBHelper(context).deleteMedicineData());
-            FirebaseDatabase.getInstance().getReference()
-                    .child(AppConstants.APP_NAME)
-                    .child(AppConstants.FIREBASE_KEY.MEDICINE)
-                    .orderByChild("name")
-                    .addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                                ProductModel data = postSnapshot.getValue(ProductModel.class);
-                                new DBHelper(context).saveMedicine(data);
-                            }
-                            if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-                                Intent intent = new Intent(SplashActivity.this, WelcomeActivity.class);
-                                startActivity(intent);
-                                finish();
-                            } else {
-                                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            Log.w(TAG, "deleteMedicineData:onCancelled", databaseError.toException());
-
-                        }
-                    });
-        } else {
-            Toast.makeText(context, "No internet connection", Toast.LENGTH_LONG).show();
-        }
-    }
-
 }

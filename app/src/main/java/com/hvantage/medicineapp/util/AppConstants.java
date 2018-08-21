@@ -3,6 +3,7 @@ package com.hvantage.medicineapp.util;
 public class AppConstants {
 
     public static final String APP_NAME = "medicine_app";
+    public static final String BASE_URL = "https://onlinemedicineapp.com/APP/";
 
 
     public class FIREBASE_KEY {
@@ -31,5 +32,15 @@ public class AppConstants {
     public class ORDER_TYPE {
         public static final int ORDER_WITH_PRESCRIPTION = 1;
         public static final int ORDER_WITHOUT_PRESCRIPTION = 2;
+    }
+
+    public class ENDPOINT {
+        public static final String REGISTER = "register.php";
+    }
+
+    public class METHODS {
+        public static final String USER_SIGNUP = "user_signup";
+        public static final String USER_LOGIN = "user_login";
+        public static final String CHECK_PHONE_NO = "check_phone_no";
     }
 }

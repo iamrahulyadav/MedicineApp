@@ -5,14 +5,16 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
 /**
- * Created by Peter on 11-Jul-17.
+ * Created by RK on 11-Jul-17.
  */
 
 public class AppPreferences {
 
-    public static final String PREFERENCES = "my_home_check";
+    public static final String PREFERENCES = "medicine";
 
     public static final String MOBILE_NO = "mobile_no";
+    public static final String USER_ID = "user_id";
+    public static final String USER_NAME = "user_name";
     public static final String ORDER_TYPE = "order_type";
 
     private static AppPreferences instance;
@@ -24,6 +26,20 @@ public class AppPreferences {
         String prefsFile = context.getPackageName();
         sharedPreferences = context.getSharedPreferences(prefsFile, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+    }
+
+    public static void setUserId(Context context, String value) {
+        SharedPreferences preferences = context.getSharedPreferences(
+                PREFERENCES, 0);
+        Editor editor = preferences.edit();
+        editor.putString(USER_ID, value);
+        editor.commit();
+    }
+
+    public static String getUserId(Context context) {
+        SharedPreferences pereference = context.getSharedPreferences(
+                PREFERENCES, 0);
+        return pereference.getString(USER_ID, "");
     }
 
     public static void setMobileNo(Context context, String value) {
@@ -40,6 +56,20 @@ public class AppPreferences {
         return pereference.getString(MOBILE_NO, "");
     }
 
+    public static void setUserName(Context context, String value) {
+        SharedPreferences preferences = context.getSharedPreferences(
+                PREFERENCES, 0);
+        Editor editor = preferences.edit();
+        editor.putString(USER_NAME, value);
+        editor.commit();
+    }
+
+    public static String getUserName(Context context) {
+        SharedPreferences pereference = context.getSharedPreferences(
+                PREFERENCES, 0);
+        return pereference.getString(USER_NAME, "");
+    }
+
     public static void setOrderType(Context context, int value) {
         SharedPreferences preferences = context.getSharedPreferences(
                 PREFERENCES, 0);
@@ -53,4 +83,13 @@ public class AppPreferences {
                 PREFERENCES, 0);
         return pereference.getInt(MOBILE_NO, 0);
     }
+
+    public static void clearPreference(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(PREFERENCES, 0);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.commit();
+    }
+
+
 }

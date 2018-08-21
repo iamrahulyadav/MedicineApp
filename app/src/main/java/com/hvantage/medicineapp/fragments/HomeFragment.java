@@ -40,7 +40,6 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -56,6 +55,7 @@ import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.CategoryModel;
 import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
+import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
@@ -319,7 +319,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             progressBar.dismiss();
     }
 
-
     private void init() {
         etSearch = (AppCompatAutoCompleteTextView) rootView.findViewById(R.id.etSearch);
         btnUpload = (CardView) rootView.findViewById(R.id.btnUpload);
@@ -463,16 +462,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnUpload:
-                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
                     FragmentManager manager = getFragmentManager();
                     FragmentTransaction ft = manager.beginTransaction();
                     ft.replace(R.id.main_container, new UploadPrecriptionFragment());
                     ft.addToBackStack(null);
                     ft.commitAllowingStateLoss();
                 } else {
-                    startActivity(new Intent(getActivity(), LoginActivity.class));
+                    startActivity(new Intent(context, LoginActivity.class));
                 }
-
                 break;
             case R.id.btnVoiceInput:
                 promptSpeechInput();

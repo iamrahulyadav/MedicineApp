@@ -12,7 +12,7 @@ import com.hvantage.medicineapp.model.ProductModel;
 import java.util.ArrayList;
 
 /**
- * Created by Hvantage2 on 12/1/2017.
+ * Created by RK on 12/1/2017.
  */
 
 public class DBHelper extends SQLiteOpenHelper {

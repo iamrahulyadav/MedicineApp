@@ -10,7 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import com.hvantage.medicineapp.R;
 
 /**
- * Created by flaviusmester on 23/02/15.
+ * Created by RK on 23/02/15.
  */
 public class FastScrollRecyclerViewItemDecoration extends RecyclerView.ItemDecoration {
     private Context mContext;

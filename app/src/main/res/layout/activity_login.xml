@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.SignupActivity">
+    tools:context=".activity.LoginActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -31,13 +31,13 @@
                 android:gravity="center"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:text="Signup"
+                android:text="Login"
                 android:textColor="@color/colorToolbarTitle" />
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_signup_mobile" />
+    <include layout="@layout/content_login" />
 
 
 </android.support.design.widget.CoordinatorLayout>

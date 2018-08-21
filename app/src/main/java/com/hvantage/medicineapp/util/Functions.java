@@ -25,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by Hvantage2 on 2018-02-26.
+ * Created by RK on 2018-02-26.
  */
 
 public class Functions {
