@@ -22,19 +22,16 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
-import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.CartItemAdapter;
 import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
 import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.model.AddressModel;
+import com.hvantage.medicineapp.model.CartData;
 import com.hvantage.medicineapp.model.CartModel;
 import com.hvantage.medicineapp.model.OrderData;
-import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.Functions;
@@ -64,7 +61,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private RecyclerView recylcer_view;
     private UploadedPreAdapter adapterPres;
 
-    private ArrayList<CartModel> cartList = new ArrayList<CartModel>();
+    private ArrayList<CartData> cartList = new ArrayList<CartData>();
     private CartItemAdapter adapterCart;
 
     private double total = 0;
@@ -100,15 +97,13 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 llMedicine.setVisibility(View.VISIBLE);
                 llPayMode.setVisibility(View.GONE);
                 llAmount.setVisibility(View.GONE);
-                //getData();
-//                presList = UploadPrecriptionFragment.presList;
-                getCartData();
+                //getCartData();
             } else {
                 llPrescription.setVisibility(View.GONE);
                 llPayMode.setVisibility(View.VISIBLE);
                 llMedicine.setVisibility(View.VISIBLE);
                 llAmount.setVisibility(View.VISIBLE);
-                getCartData();
+                // getCartData();
             }
 
 
@@ -162,72 +157,72 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         adapterCart.notifyDataSetChanged();
     }
 
-    private void getCartData() {
-        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.CART)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                .child(AppConstants.FIREBASE_KEY.CART_ITEMS)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        cartList.clear();
-                        total = 0;
-                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            final CartModel model1 = postSnapshot.getValue(CartModel.class);
-                            Log.e(TAG, "onDataChange: model1 >> " + model1);
-                            FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-                                    .child(AppConstants.FIREBASE_KEY.MEDICINE)
-                                    .child(model1.getKey())
-                                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot1) {
-                                            ProductModel model2 = dataSnapshot1.getValue(ProductModel.class);
-                                            Log.d(TAG, "onDataChange: model2 >> " + model2);
-                                            CartModel final_model = new CartModel();
-                                            final_model.setKey(model1.getKey());
-                                            final_model.setQty_no(model1.getQty_no());
-                                            final_model.setItem(model2.getName());
-                                            final_model.setImage(model2.getImage());
-                                            final_model.setItem_price(String.valueOf(model2.getPrice()));
-                                            final_model.setItem_total_price(String.valueOf(model1.getQty_no() * model2.getPrice()));
-                                            cartList.add(final_model);
-                                            adapterCart.notifyDataSetChanged();
-                                            total = total + Double.parseDouble(final_model.getItem_total_price());
-                                            tvTotalPrice.setText("Rs. " + total);
-                                            tvPayableAmt.setText("Rs. " + total);
-                                            if (adapterCart.getItemCount() == 0) {
-                                                llMedicine.setVisibility(View.GONE);
-                                            } else {
-                                                llMedicine.setVisibility(View.VISIBLE);
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-                                            adapterCart.notifyDataSetChanged();
-                                            if (adapterCart.getItemCount() == 0) {
-                                                llMedicine.setVisibility(View.GONE);
-                                            } else {
-                                                llMedicine.setVisibility(View.VISIBLE);
-                                            }
-                                            Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
-                                        }
-                                    });
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        adapterCart.notifyDataSetChanged();
-                        if (adapterCart.getItemCount() == 0) {
-                            llMedicine.setVisibility(View.GONE);
-                        } else {
-                            llMedicine.setVisibility(View.VISIBLE);
-                        }
-                        Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
-                    }
-                });
-    }
+//    private void getCartData() {
+//        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+//                .child(AppConstants.FIREBASE_KEY.CART)
+//                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+//                .child(AppConstants.FIREBASE_KEY.CART_ITEMS)
+//                .addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        cartList.clear();
+//                        total = 0;
+//                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+//                            final CartData model1 = postSnapshot.getValue(CartData.class);
+//                            Log.e(TAG, "onDataChange: model1 >> " + model1);
+//                            FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
+//                                    .child(AppConstants.FIREBASE_KEY.MEDICINE)
+//                                    .child(model1.getKey())
+//                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+//                                        @Override
+//                                        public void onDataChange(DataSnapshot dataSnapshot1) {
+//                                            ProductModel model2 = dataSnapshot1.getValue(ProductModel.class);
+//                                            Log.d(TAG, "onDataChange: model2 >> " + model2);
+//                                            CartData final_model = new CartData();
+//                                            final_model.setKey(model1.getKey());
+//                                            final_model.setQty_no(model1.getQty_no());
+//                                            final_model.setItem(model2.getName());
+//                                            final_model.setImage(model2.getImage());
+//                                            final_model.setItem_price(String.valueOf(model2.getPrice()));
+//                                            final_model.setItem_total_price(String.valueOf(model1.getQty_no() * model2.getPrice()));
+//                                            cartList.add(final_model);
+//                                            adapterCart.notifyDataSetChanged();
+//                                            total = total + Double.parseDouble(final_model.getItem_total_price());
+//                                            tvTotalPrice.setText("Rs. " + total);
+//                                            tvPayableAmt.setText("Rs. " + total);
+//                                            if (adapterCart.getItemCount() == 0) {
+//                                                llMedicine.setVisibility(View.GONE);
+//                                            } else {
+//                                                llMedicine.setVisibility(View.VISIBLE);
+//                                            }
+//                                        }
+//
+//                                        @Override
+//                                        public void onCancelled(DatabaseError databaseError) {
+//                                            adapterCart.notifyDataSetChanged();
+//                                            if (adapterCart.getItemCount() == 0) {
+//                                                llMedicine.setVisibility(View.GONE);
+//                                            } else {
+//                                                llMedicine.setVisibility(View.VISIBLE);
+//                                            }
+//                                            Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
+//                                        }
+//                                    });
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//                        adapterCart.notifyDataSetChanged();
+//                        if (adapterCart.getItemCount() == 0) {
+//                            llMedicine.setVisibility(View.GONE);
+//                        } else {
+//                            llMedicine.setVisibility(View.VISIBLE);
+//                        }
+//                        Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
+//                    }
+//                });
+//    }
 
 //    private void getData() {
 //        showProgressDialog();
@@ -330,7 +325,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         //delivery details
         orderData.setDelivery_details(addressData);
         //cart items
-        orderData.setItems(cartList);
+        orderData.setItems(new ArrayList<CartModel>());
         //presriptions
         orderData.setPrescriptions(UploadPrecriptionFragment.presList);
 

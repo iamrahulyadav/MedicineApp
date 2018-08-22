@@ -49,7 +49,7 @@ import com.hvantage.medicineapp.activity.SelectAddressActivity;
 import com.hvantage.medicineapp.adapter.CartItemAdapter;
 import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
-import com.hvantage.medicineapp.model.CartModel;
+import com.hvantage.medicineapp.model.CartData;
 import com.hvantage.medicineapp.model.PrescriptionModel;
 import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.util.AppConstants;
@@ -88,7 +88,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private String userChoosenTask;
     private int spacing = 30, spanCount = 3;
     private boolean includeEdge = true;
-    private ArrayList<CartModel> cartList;
+    private ArrayList<CartData> cartList;
     private CartItemAdapter adapterCart;
     private double total = 0;
     private RecyclerView recylcer_view_cart;
@@ -107,7 +107,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
         if (intraction != null) {
             intraction.actionbarsetTitle("Upload Prescription");
         }
-        cartList = new ArrayList<CartModel>();
+        cartList = new ArrayList<CartData>();
         init();
         setRecyclerView();
         setRecyclerViewCart();
@@ -124,7 +124,8 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
         }
         setSearchBar();
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            getCartData();
+            // getCartData();
+            cartList = new DBHelper(context).getCartData();
         } else {
             startActivity(new Intent(getActivity(), LoginActivity.class));
         }
@@ -215,58 +216,6 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
         recylcer_view_cart.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view_cart.setAdapter(adapterCart);
         adapterCart.notifyDataSetChanged();
-    }
-
-    private void getCartData() {
-        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.CART)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                .child(AppConstants.FIREBASE_KEY.CART_ITEMS)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        cartList.clear();
-                        total = 0;
-                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            final CartModel model1 = postSnapshot.getValue(CartModel.class);
-                            Log.e(TAG, "onDataChange: model1 >> " + model1);
-                            FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-                                    .child(AppConstants.FIREBASE_KEY.MEDICINE)
-                                    .child(model1.getKey())
-                                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot1) {
-                                            ProductModel model2 = dataSnapshot1.getValue(ProductModel.class);
-                                            Log.d(TAG, "onDataChange: model2 >> " + model2);
-                                            CartModel final_model = new CartModel();
-                                            final_model.setKey(model1.getKey());
-                                            final_model.setQty_no(model1.getQty_no());
-                                            final_model.setItem(model2.getName());
-                                            final_model.setImage(model2.getImage());
-                                            final_model.setItem_price(String.valueOf(model2.getPrice()));
-                                            final_model.setItem_total_price(String.valueOf(model1.getQty_no() * model2.getPrice()));
-                                            cartList.add(final_model);
-                                            adapterCart.notifyDataSetChanged();
-                                            total = total + Double.parseDouble(final_model.getItem_total_price());
-                                            if (adapterCart.getItemCount() > 0)
-                                                tvCartItemEmpty.setVisibility(View.GONE);
-                                            //tvTotalPrice.setText("Rs. " + total);
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-                                            Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                                        }
-                                    });
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        // Getting Post failed, log a message
-                        Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                    }
-                });
     }
 
 

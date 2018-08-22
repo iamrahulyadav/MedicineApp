@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.hvantage.medicineapp.model.CartData;
 import com.hvantage.medicineapp.model.ProductModel;
 
 import java.util.ArrayList;
@@ -36,8 +37,17 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String KEY_PRESCRIPTION_REQUIRED = "prescription_required";
     private static final String KEY_TOTAL_AVAILABLE = "total_available";
 
+    //cart
+    private static final String KEY_ITEM_ID = "KEY_ITEM_ID";
+    private static final String KEY_ITEM_NAME = "KEY_ITEM_NAME";
+    private static final String KEY_ITEM_QTY = "KEY_ITEM_QTY";
+    private static final String KEY_ITEM_PRICE = "KEY_ITEM_PRICE";
+    private static final String KEY_ITEM_TOTAL_PRICE = "KEY_ITEM_TOTAL_PRICE";
+    private static final String KEY_ITEM_IMG = "KEY_ITEM_IMG";
+
     //tables
     private static final String TABLE_MEDICINE = "medicine";
+    private static final String TABLE_CART = "cart";
 
     private static final String TAG = "DBHelper";
     private static final int DATABASE_VERSION = 1;
@@ -60,6 +70,15 @@ public class DBHelper extends SQLiteOpenHelper {
             + KEY_PRESCRIPTION_REQUIRED + " TEXT,"
             + KEY_TOTAL_AVAILABLE + " INTEGER "
             + ")";
+    String CREATE_TABLE_CART = "CREATE TABLE " + TABLE_CART +
+            "( " + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + KEY_ITEM_ID + " TEXT, "
+            + KEY_ITEM_NAME + " TEXT, "
+            + KEY_ITEM_QTY + " INTEGER, "
+            + KEY_ITEM_PRICE + " REAL, "
+            + KEY_ITEM_TOTAL_PRICE + " REAL, "
+            + KEY_ITEM_IMG + " TEXT "
+            + ")";
 
 
     public DBHelper(Context context) {
@@ -69,6 +88,7 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(CREATE_TABLE_MEDICINE);
+        sqLiteDatabase.execSQL(CREATE_TABLE_CART);
     }
 
 
@@ -106,7 +126,6 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return rowCount;
     }
-
 
     public ArrayList<ProductModel> getMedicines() {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -152,7 +171,7 @@ public class DBHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             list = new ArrayList<String>();
             do {
-                list.add    (cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                list.add(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
             } while (cursor.moveToNext());
         }
         return list;
@@ -180,9 +199,90 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         SQLiteDatabase db = getWritableDatabase();
-        // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_MEDICINE);
-        // Create tables again
         onCreate(db);
     }
+
+    public boolean addToCart(CartData modal) {
+        boolean isInserted = false;
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        Log.d(TAG, "addToCart: modal >> " + modal.toString());
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_CART + " WHERE " + KEY_ITEM_ID + "=" + modal.getItem_id(), null);
+        if (c.moveToFirst()) {
+            values.put(KEY_ITEM_NAME, modal.getItem());
+            values.put(KEY_ITEM_QTY, modal.getQty());
+            values.put(KEY_ITEM_PRICE, modal.getItem_price());
+            values.put(KEY_ITEM_TOTAL_PRICE, modal.getItem_total_price());
+            values.put(KEY_ITEM_IMG, modal.getImage());
+            if (db.update(TABLE_CART, values, KEY_ITEM_ID + "=" + modal.getItem_id(), null) > 0) {
+                isInserted = true;
+                Log.e("addToCart : ", "Updated");
+            } else {
+                isInserted = false;
+                Log.e("addToCart : ", "Not Updated");
+            }
+        } else {
+            values.put(KEY_ITEM_ID, modal.getItem_id());
+            values.put(KEY_ITEM_NAME, modal.getItem());
+            values.put(KEY_ITEM_QTY, modal.getQty());
+            values.put(KEY_ITEM_PRICE, modal.getItem_price());
+            values.put(KEY_ITEM_TOTAL_PRICE, modal.getItem_total_price());
+            values.put(KEY_ITEM_IMG, modal.getImage());
+            boolean bb = db.insert(TABLE_CART, null, values) > 0;
+            if (bb) {
+                isInserted = true;
+                Log.e("addToCart : ", "Inserted");
+            } else {
+                isInserted = false;
+                Log.e("addToCart : ", "Not inserted");
+            }
+        }
+        db.close();
+        return isInserted;
+    }
+
+    public ArrayList<CartData> getCartData() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<CartData> list = null;
+        String query = "SELECT * FROM " + TABLE_CART;
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor == null) {
+            return list;
+        }
+        if (cursor.moveToFirst()) {
+            list = new ArrayList<CartData>();
+            do {
+                CartData d = new CartData();
+                d.setId(cursor.getString(cursor.getColumnIndex(KEY_ID)));
+                d.setItem_id(cursor.getString(cursor.getColumnIndex(KEY_ITEM_ID)));
+                d.setItem(cursor.getString(cursor.getColumnIndex(KEY_ITEM_NAME)));
+                d.setImage(cursor.getString(cursor.getColumnIndex(KEY_ITEM_IMG)));
+                d.setItem_price(cursor.getDouble(cursor.getColumnIndex(KEY_ITEM_PRICE)));
+                d.setQty(cursor.getInt(cursor.getColumnIndex(KEY_ITEM_QTY)));
+                d.setItem_total_price(cursor.getDouble(cursor.getColumnIndex(KEY_ITEM_TOTAL_PRICE)));
+                list.add(d);
+            } while (cursor.moveToNext());
+        }
+        return list;
+    }
+
+
+    public boolean updateCartItem(CartData modal) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_ITEM_QTY, modal.getQty());
+        values.put(KEY_ITEM_TOTAL_PRICE, modal.getItem_total_price());
+        return db.update(TABLE_CART, values, KEY_ID + "=" + modal.getId(), null) > 0;
+    }
+
+    public int deleteCartItem(String item_id) {
+        int rowCount = 0;
+        SQLiteDatabase db = this.getWritableDatabase();
+        rowCount = db.delete(TABLE_CART, KEY_ITEM_ID + "=?", new String[]{item_id});
+        Log.e(TAG, "deleteCartItem: rowCount" + rowCount);
+        db.close();
+        return rowCount;
+    }
+
 }

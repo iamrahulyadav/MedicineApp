@@ -51,7 +51,6 @@ import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.LoginActivity;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.adapter.CategoryAdapter;
-import com.hvantage.medicineapp.adapter.HomeProductAdapter;
 import com.hvantage.medicineapp.adapter.HomeProductAdapter2;
 import com.hvantage.medicineapp.adapter.OfferPagerAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
@@ -90,9 +89,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     ArrayList<Bitmap> offerList = new ArrayList<Bitmap>();
     private RecyclerView recylcer_view;
     private CategoryAdapter adapter;
-    private HomeProductAdapter adapterRecco;
     private RecyclerView recylcer_view_daily;
-    private HomeProductAdapter adapterDaily;
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
@@ -252,7 +249,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                             /*if (listDailyNeeds.size() == 10)
                                 break;*/
                         }
-                        adapterDaily.notifyDataSetChanged();
                         adapterDaily2.notifyDataSetChanged();
                         hideProgressDialog();
                     }
@@ -396,9 +392,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    Log.e(TAG, "CategoryTask: Response >> " + response.body().toString());
-                    String resp = response.body().toString();
                     try {
+                        Log.e(TAG, "CategoryTask: Response >> " + response.body().toString());
+                        String resp = response.body().toString();
                         catList.clear();
                         JSONObject jsonObject = new JSONObject(resp);
                         if (jsonObject.getString("status").equalsIgnoreCase("200")) {
@@ -413,7 +409,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                             String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
                             publishProgress("400", msg);
                         }
-                    } catch (JSONException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                         publishProgress("400", getActivity().getResources().getString(R.string.api_error_msg));
                     }
@@ -441,64 +437,25 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
 
-    private void setProduct() {
-        recylcer_view_recco = (RecyclerView) rootView.findViewById(R.id.recylcer_view_recco);
-        adapterRecco = new HomeProductAdapter(context, productList);
-        recylcer_view_recco.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        recylcer_view_recco.setAdapter(adapterRecco);
-        recylcer_view_recco.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view_recco, new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                startActivity(new Intent(context, ProductDetailActivity.class));
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-
-            }
-        }));
-        adapterRecco.notifyDataSetChanged();
-    }
-
-    private void setRecylclerviewDaily() {
-        recylcer_view_daily = (RecyclerView) rootView.findViewById(R.id.recylcer_view_daily);
-        adapterDaily = new HomeProductAdapter(context, listDailyNeeds);
-        recylcer_view_daily.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        recylcer_view_daily.setAdapter(adapterDaily);
-        recylcer_view_daily.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view_daily, new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-               /* startActivity(new Intent(context, ProductDetailActivity.class)
-                        .putExtra("medicine_data", listDailyNeeds.get(position)));*/
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-
-            }
-        }));
-        adapterDaily.notifyDataSetChanged();
-    }
-
-    private void setRecylclerviewDaily2() {
-        recylcer_view_daily2 = (RecyclerView) rootView.findViewById(R.id.recylcer_view_daily2);
-        recylcer_view_daily2.setLayoutManager(new LinearLayoutManager(context));
-        adapterDaily2 = new HomeProductAdapter2(context, listDailyNeeds);
-        recylcer_view_daily2.setAdapter(adapterDaily2);
-        recylcer_view_daily2.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view_daily, new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-               /* startActivity(new Intent(context, ProductDetailActivity.class)
-                        .putExtra("medicine_data", listDailyNeeds.get(position)));*/
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-
-            }
-        }));
-        adapterDaily2.notifyDataSetChanged();
-    }
+//    private void setRecylclerviewDaily2() {
+//        recylcer_view_daily2 = (RecyclerView) rootView.findViewById(R.id.recylcer_view_daily2);
+//        recylcer_view_daily2.setLayoutManager(new LinearLayoutManager(context));
+//        adapterDaily2 = new HomeProductAdapter2(context, listDailyNeeds);
+//        recylcer_view_daily2.setAdapter(adapterDaily2);
+//        recylcer_view_daily2.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view_daily, new RecyclerItemClickListener.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(View view, int position) {
+//               /* startActivity(new Intent(context, ProductDetailActivity.class)
+//                        .putExtra("medicine_data", listDailyNeeds.get(position)));*/
+//            }
+//
+//            @Override
+//            public void onItemLongClick(View view, int position) {
+//
+//            }
+//        }));
+//        adapterDaily2.notifyDataSetChanged();
+//    }
 
     @Override
     public void onAttach(Context context) {
@@ -588,6 +545,4 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
         }
     }
-
-
 }

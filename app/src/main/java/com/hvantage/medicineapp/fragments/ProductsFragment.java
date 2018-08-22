@@ -2,7 +2,7 @@ package com.hvantage.medicineapp.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,34 +15,41 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.activity.ProductDetailActivity;
-import com.hvantage.medicineapp.adapter.CatProductAdapter;
-import com.hvantage.medicineapp.model.ProductModel;
+import com.hvantage.medicineapp.adapter.HomeProductAdapter2;
+import com.hvantage.medicineapp.model.ProductData;
+import com.hvantage.medicineapp.model.SubCategoryData;
+import com.hvantage.medicineapp.retrofit.ApiClient;
+import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.RecyclerItemClickListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class ProductsFragment extends Fragment implements View.OnClickListener {
-
     private static final String TAG = "ProductsFragment";
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
     private RecyclerView recylcer_view;
-    private CatProductAdapter adapter;
-    private ArrayList<ProductModel> list = new ArrayList<ProductModel>();
+    private HomeProductAdapter2 adapter;
+    private ArrayList<ProductData> list = new ArrayList<ProductData>();
     private ProgressBar progressBar;
-    private String data;
+    private SubCategoryData data;
     private CardView cardEmptyText;
 
     @Nullable
@@ -51,81 +58,99 @@ public class ProductsFragment extends Fragment implements View.OnClickListener {
         context = container.getContext();
         rootView = inflater.inflate(R.layout.fragment_browse_category, container, false);
 
-        data = getArguments().getString("data");
+        data = getArguments().getParcelable("data");
         Log.e(TAG, "onCreateView: data >> " + data);
         if (intraction != null) {
             if (data != null)
-                intraction.actionbarsetTitle(data);
+                intraction.actionbarsetTitle(data.getSubCatName());
             else
                 intraction.actionbarsetTitle("Browse Products");
         }
         init();
-        setRecyclerView();
         if (Functions.isConnectingToInternet(context))
-            getData();
+            new ProductTask().execute();
         else
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
         return rootView;
     }
 
-    private void getData() {
-        showProgressDialog();
-        FirebaseDatabase.getInstance().getReference()
-                .child(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.MEDICINE)
-                .orderByChild("sub_category_name")
-                .equalTo(data)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        list.clear();
-                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            ProductModel model = postSnapshot.getValue(ProductModel.class);
-                            Log.e(TAG, "onDataChange: model >> " + model);
-                            list.add(model);
-                        }
-                        adapter.notifyDataSetChanged();
-                        if (adapter.getItemCount() > 0)
-                            cardEmptyText.setVisibility(View.GONE);
-                        else
-                            cardEmptyText.setVisibility(View.VISIBLE);
-                        hideProgressDialog();
-                    }
+    class ProductTask extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        // Getting Post failed, log a message
-                        Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                        if (adapter.getItemCount() > 0)
-                            cardEmptyText.setVisibility(View.GONE);
-                        else
-                            cardEmptyText.setVisibility(View.VISIBLE);
-                        hideProgressDialog();
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.GET_SUBCAT_PRODUCTS);
+            jsonObject.addProperty("sub_cat_id", data.getSubCatId());
+            Log.e(TAG, "ProductTask: Request >> " + jsonObject.toString());
+
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.products(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "ProductTask: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    list.clear();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            JSONArray jsonArray = jsonObject.getJSONArray("result");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                Gson gson = new Gson();
+                                ProductData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), ProductData.class);
+                                list.add(data);
+                            }
+                            publishProgress("200", "");
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getActivity().getResources().getString(R.string.api_error_msg));
                     }
-                });
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    publishProgress("400", getResources().getString(R.string.api_error_msg));
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+            adapter.notifyDataSetChanged();
+            String status = values[0];
+            String msg = values[1];
+            if (adapter.getItemCount() > 0)
+                cardEmptyText.setVisibility(View.GONE);
+            if (status.equalsIgnoreCase("400")) {
+                cardEmptyText.setVisibility(View.VISIBLE);
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
+
 
     private void init() {
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
         cardEmptyText = (CardView) rootView.findViewById(R.id.cardEmptyText);
-
+        setRecyclerView();
     }
 
     private void setRecyclerView() {
-        adapter = new CatProductAdapter(context, list);
+        adapter = new HomeProductAdapter2(context, list);
         recylcer_view.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view.setAdapter(adapter);
-        recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", list.get(position)));
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-
-            }
-        }));
         adapter.notifyDataSetChanged();
     }
 
@@ -167,5 +192,4 @@ public class ProductsFragment extends Fragment implements View.OnClickListener {
         if (progressBar != null)
             progressBar.dismiss();
     }
-
 }

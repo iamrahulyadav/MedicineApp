@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.model.ProductModel;
+import com.hvantage.medicineapp.model.ProductData;
 import com.hvantage.medicineapp.util.Functions;
 
 import java.util.ArrayList;
@@ -19,10 +19,10 @@ public class CatProductAdapter extends RecyclerView.Adapter<CatProductAdapter.Vi
 
     private static final String TAG = "CategoryAdapter";
     Context context;
-    ArrayList<ProductModel> arrayList;
+    ArrayList<ProductData> arrayList;
 
 
-    public CatProductAdapter(Context context, ArrayList<ProductModel> arrayList) {
+    public CatProductAdapter(Context context, ArrayList<ProductData> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
     }
@@ -37,10 +37,10 @@ public class CatProductAdapter extends RecyclerView.Adapter<CatProductAdapter.Vi
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final ProductModel data = arrayList.get(position);
+        final ProductData data = arrayList.get(position);
         Log.e(TAG, position + " data : " + data);
         holder.tvTitle.setText(data.getName());
-        holder.tvPrice.setText("Rs. " + data.getPrice());
+        holder.tvPrice.setText("Rs. " + data.getPriceMrp());
         if (!data.getImage().equalsIgnoreCase(""))
             holder.imageThumb.setImageBitmap(Functions.base64ToBitmap(data.getImage()));
     }

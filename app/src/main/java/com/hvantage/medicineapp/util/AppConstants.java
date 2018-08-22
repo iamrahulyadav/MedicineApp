@@ -45,5 +45,6 @@ public class AppConstants {
         public static final String CHECK_PHONE_NO = "check_phone_no";
         public static final String GET_ALL_CATEGORIES = "getAllCategories";
         public static final String GET_ALL_SUBCATEGORIES = "getAllSubCategories";
+        public static final String GET_SUBCAT_PRODUCTS = "get_subcat_products";
     }
 }

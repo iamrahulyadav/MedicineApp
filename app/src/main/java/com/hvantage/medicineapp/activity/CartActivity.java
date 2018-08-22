@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -16,18 +15,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.CartItemAdapter;
-import com.hvantage.medicineapp.model.CartModel;
-import com.hvantage.medicineapp.model.ProductModel;
+import com.hvantage.medicineapp.database.DBHelper;
+import com.hvantage.medicineapp.model.CartData;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
-import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 
 import java.util.ArrayList;
@@ -35,7 +28,7 @@ import java.util.ArrayList;
 public class CartActivity extends AppCompatActivity {
     private static final String TAG = "CartActivity";
     private Context context;
-    private ArrayList<CartModel> list = new ArrayList<CartModel>();
+    private ArrayList<CartData> list = new ArrayList<CartData>();
     private RecyclerView recylcer_view;
     private ProgressBar progressBar;
     private CartItemAdapter adapter;
@@ -53,14 +46,19 @@ public class CartActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         init();
-        setRecyclerView();
-        if (FirebaseAuth.getInstance().getCurrentUser() != null)
-            getData();
-        else {
+        if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
+            list = new DBHelper(context).getCartData();
+            if (list != null)
+                setRecyclerView();
+            else {
+                btnSubmit.setVisibility(View.GONE);
+            }
+        } else {
             Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(context, LoginActivity.class));
             finish();
         }
+
     }
 
     private void init() {
@@ -83,6 +81,9 @@ public class CartActivity extends AppCompatActivity {
         recylcer_view.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+        if (adapter.getItemCount() > 0)
+            btnSubmit.setVisibility(View.VISIBLE);
+
     }
 
 
@@ -98,83 +99,6 @@ public class CartActivity extends AppCompatActivity {
     private void hideProgressDialog() {
         if (progressBar != null)
             progressBar.dismiss();
-    }
-
-    private void getData() {
-        showProgressDialog();
-        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.CART)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                .child(AppConstants.FIREBASE_KEY.CART_ITEMS)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        list.clear();
-                        total = 0;
-                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            final CartModel model1 = postSnapshot.getValue(CartModel.class);
-                            Log.e(TAG, "onDataChange: model1 >> " + model1);
-                            FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-                                    .child(AppConstants.FIREBASE_KEY.MEDICINE)
-                                    .child(model1.getKey())
-                                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot1) {
-                                            ProductModel model2 = dataSnapshot1.getValue(ProductModel.class);
-                                            Log.d(TAG, "onDataChange: model2 >> " + model2);
-                                            CartModel final_model = new CartModel();
-                                            final_model.setKey(model1.getKey());
-                                            final_model.setQty_no(model1.getQty_no());
-                                            final_model.setItem(model2.getName());
-                                            final_model.setImage(model2.getImage());
-                                            final_model.setItem_price(String.valueOf(model2.getPrice()));
-                                            final_model.setItem_total_price(String.valueOf(model1.getQty_no() * model2.getPrice()));
-                                            list.add(final_model);
-                                            total = total + Double.parseDouble(final_model.getItem_total_price());
-                                            adapter.notifyDataSetChanged();
-                                            tvTotalPrice.setText("Rs. " + Functions.roundTwoDecimals(total));
-                                            tvPayableAmt.setText("Rs. " + Functions.roundTwoDecimals(total));
-                                            if (adapter.getItemCount() == 0) {
-                                                llAmount.setVisibility(View.GONE);
-                                                btnSubmit.setVisibility(View.GONE);
-                                            } else {
-                                                llAmount.setVisibility(View.VISIBLE);
-                                                btnSubmit.setVisibility(View.VISIBLE);
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-                                            adapter.notifyDataSetChanged();
-                                            if (adapter.getItemCount() == 0) {
-                                                llAmount.setVisibility(View.GONE);
-                                                btnSubmit.setVisibility(View.GONE);
-                                            } else {
-                                                llAmount.setVisibility(View.VISIBLE);
-                                                btnSubmit.setVisibility(View.VISIBLE);
-                                            }
-                                            Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
-                                        }
-                                    });
-
-                        }
-                        hideProgressDialog();
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        if (adapter.getItemCount() == 0) {
-                            llAmount.setVisibility(View.GONE);
-                            btnSubmit.setVisibility(View.GONE);
-                        } else {
-                            llAmount.setVisibility(View.VISIBLE);
-                            btnSubmit.setVisibility(View.VISIBLE);
-                        }
-                        Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
-                        hideProgressDialog();
-                    }
-                });
     }
 
     @Override

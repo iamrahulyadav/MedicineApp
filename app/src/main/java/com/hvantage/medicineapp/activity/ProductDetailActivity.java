@@ -6,34 +6,23 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
+import com.bumptech.glide.Glide;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.adapter.HomeProductAdapter;
-import com.hvantage.medicineapp.model.CartModel;
+import com.hvantage.medicineapp.model.ProductData;
 import com.hvantage.medicineapp.model.ProductModel;
-import com.hvantage.medicineapp.util.AppConstants;
-import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.TouchImageView;
 
@@ -47,8 +36,7 @@ public class ProductDetailActivity extends AppCompatActivity implements View.OnC
     private TextView toolbar_title;
     private Context context;
     private RecyclerView recylcer_view;
-    private HomeProductAdapter adapter;
-    private ProductModel data;
+    private ProductData data;
     private ImageView imageThumb;
     private TextView tvMinus, tvQty, tvPlus;
     private CardView btnAddToCart;
@@ -66,33 +54,31 @@ public class ProductDetailActivity extends AppCompatActivity implements View.OnC
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         init();
         if (getIntent().hasExtra("medicine_data")) {
-            data = (ProductModel) getIntent().getSerializableExtra("medicine_data");
+            data = (ProductData) getIntent().getParcelableExtra("medicine_data");
             Log.e(TAG, "onCreate: data >> " + data);
             toolbar_title.setText(data.getName());
             tvName.setText(data.getName());
             tvManufacturer.setText("by " + data.getManufacturer());
-            tvPrice.setText("Rs. " + data.getPrice());
-            tvAvailable.setText("In-Stock");
-            if (data.isPrescription_required() == true)
+            tvPrice.setText("Rs. " + data.getPriceMrp());
+            if (data.getTotalAvailable() > 0)
+                tvAvailable.setText("In-Stock");
+            else
+                tvAvailable.setText("Out Of Stock");
+            if (data.getPrescriptionRequired() == true)
                 tvPreRequired.setVisibility(View.VISIBLE);
             else
                 tvPreRequired.setVisibility(View.GONE);
-            tvProductType.setText(data.getProduct_type());
+            tvProductType.setText(data.getProductType());
             tvPower.setText(data.getPower());
-            tvQty2.setText(data.getQty());
-            tvQty3.setText("Contains " + data.getQty());
-            tvCategory.setText(data.getCategory_name());
-            tvDesciption.setText(data.getDescription());
+            tvQty2.setText(data.getPackagingContain());
+            tvQty3.setText("Contains " + data.getPackagingContain());
+            tvCategory.setText(data.getCategoryName());
+            tvDesciption.setText(data.getShortDescription());
             if (!data.getImage().equalsIgnoreCase("")) {
-                imageThumb.setImageBitmap(Functions.base64ToBitmap(data.getImage()));
-                imageThumb.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        //startActivity(new Intent(context, PrescPreviewActivity.class).putExtra("product_data", data));
-                        showPreviewDialog(Functions.base64ToBitmap(data.getImage()));
-                        return false;
-                    }
-                });
+                Glide.with(context)
+                        .load(data.getImage())
+                        .crossFade()
+                        .into(imageThumb);
             }
         }
         //setProduct();
@@ -128,13 +114,6 @@ public class ProductDetailActivity extends AppCompatActivity implements View.OnC
         return true;
     }
 
-    private void setProduct() {
-        recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
-        adapter = new HomeProductAdapter(context, productList);
-        recylcer_view.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        recylcer_view.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-    }
 
     private void init() {
         tvName = (TextView) findViewById(R.id.tvName);
@@ -180,13 +159,13 @@ public class ProductDetailActivity extends AppCompatActivity implements View.OnC
                 decrementItem();
                 break;
             case R.id.btnAddToCart:
-                if (FirebaseAuth.getInstance().getCurrentUser() != null)
-                    addToCart();
-                else {
-                    Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(context, LoginActivity.class));
-                    finish();
-                }
+               /* if (FirebaseAuth.getInstance().getCurrentUser() != null)
+//                    addToCart();
+                else{
+                Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(context, LoginActivity.class));
+                finish();
+            }*/
 
                 break;
         }
@@ -206,7 +185,7 @@ public class ProductDetailActivity extends AppCompatActivity implements View.OnC
             progressBar.dismiss();
     }
 
-    private void addToCart() {
+    /*private void addToCart() {
         CartModel model = new CartModel(data.getKey(), Integer.parseInt(tvQty.getText().toString()));
         FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
                 .child(AppConstants.FIREBASE_KEY.CART)
@@ -229,5 +208,5 @@ public class ProductDetailActivity extends AppCompatActivity implements View.OnC
                 Log.e(TAG, "Error writing document", e);
             }
         });
-    }
+    }*/
 }

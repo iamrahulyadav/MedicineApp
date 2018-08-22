@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -30,7 +29,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.adapter.HomeProductAdapter;
 import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.model.CartModel;
 import com.hvantage.medicineapp.model.PrescriptionModel;
@@ -50,7 +48,6 @@ public class ProductDetail2Activity extends AppCompatActivity implements View.On
     private TextView toolbar_title;
     private Context context;
     private RecyclerView recylcer_view;
-    private HomeProductAdapter adapter;
     private ProductModel data;
     private ImageView imageThumb;
     private TextView tvMinus, tvQty, tvPlus;
@@ -129,14 +126,6 @@ public class ProductDetail2Activity extends AppCompatActivity implements View.On
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
-    }
-
-    private void setProduct() {
-        recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
-        adapter = new HomeProductAdapter(context, productList);
-        recylcer_view.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        recylcer_view.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
     }
 
     private void init() {

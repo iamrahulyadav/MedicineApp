@@ -14,7 +14,7 @@ import com.hvantage.medicineapp.util.AppPreferences;
 
 public class SplashActivity extends AppCompatActivity {
 
-    private static final long SPLASH_TIME_OUT = 5 * 1000;
+    private static final long SPLASH_TIME_OUT = 3 * 1000;
     private static final String TAG = "SplashActivity";
 
     private Context context;

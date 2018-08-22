@@ -91,7 +91,7 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
             public void onItemClick(View view, int position) {
                 ProductsFragment fragment = new ProductsFragment();
                 Bundle args = new Bundle();
-                args.putString("data", list.get(position).getSubCatName());
+                args.putParcelable("data", list.get(position));
                 fragment.setArguments(args);
                 FragmentManager manager = getFragmentManager();
                 FragmentTransaction ft = manager.beginTransaction();

@@ -3,9 +3,7 @@ package com.hvantage.medicineapp.adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Paint;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,31 +15,27 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
+import com.bumptech.glide.Glide;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.LoginActivity;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
-import com.hvantage.medicineapp.model.CartModel;
-import com.hvantage.medicineapp.model.ProductModel;
-import com.hvantage.medicineapp.util.AppConstants;
-import com.hvantage.medicineapp.util.Functions;
+import com.hvantage.medicineapp.database.DBHelper;
+import com.hvantage.medicineapp.model.CartData;
+import com.hvantage.medicineapp.model.ProductData;
+import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.ProgressBar;
 
 import java.util.ArrayList;
 
 public class HomeProductAdapter2 extends RecyclerView.Adapter<HomeProductAdapter2.ViewHolder> {
 
-    private static final String TAG = "HomeProductAdapter";
+    private static final String TAG = "HomeProductAdapter2";
     Context context;
-    ArrayList<ProductModel> arrayList;
+    ArrayList<ProductData> arrayList;
     private ProgressBar progressBar;
 
 
-    public HomeProductAdapter2(Context context, ArrayList<ProductModel> arrayList) {
+    public HomeProductAdapter2(Context context, ArrayList<ProductData> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
     }
@@ -55,19 +49,21 @@ public class HomeProductAdapter2 extends RecyclerView.Adapter<HomeProductAdapter
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final ProductModel data = arrayList.get(position);
+        final ProductData data = arrayList.get(position);
         Log.d(TAG, position + " data : " + data);
         holder.tvTitle.setText(data.getName());
-        holder.tvPriceDrop.setText("Rs. " + data.getPrice());
+        holder.tvPrice.setText("Rs. " + data.getPriceDiscount());
+        holder.tvPriceDrop.setText("Rs. " + data.getPriceMrp());
+        holder.tvOffers.setText(data.getDiscountText());
         holder.tvPriceDrop.setPaintFlags(holder.tvPriceDrop.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-        double discount_amt = data.getPrice() * 10 / 100;
-        holder.tvPrice.setText("Rs. " + Functions.roundTwoDecimals(data.getPrice() - discount_amt));
+        //double discount_amt = data.getPrice() * 10 / 100;
+        //holder.tvPrice.setText("Rs. " + Functions.roundTwoDecimals(data.getPrice() - discount_amt));
 
         if (!data.getImage().equalsIgnoreCase("")) {
-            Bitmap bitmap = Functions.base64ToBitmap(data.getImage());
-            if (bitmap != null) {
-                holder.img.setImageBitmap(bitmap);
-            }
+            Glide.with(context)
+                    .load(data.getImage())
+                    .crossFade()
+                    .into(holder.img);
         }
 
         holder.container.setOnClickListener(new View.OnClickListener() {
@@ -98,39 +94,60 @@ public class HomeProductAdapter2 extends RecyclerView.Adapter<HomeProductAdapter
             }
         });
 
-        holder.btnAddToCart.setOnClickListener(new View.OnClickListener() {
+       /* holder.btnAddToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                    showProgressDialog();
-                    CartModel model = new CartModel(data.getKey(), Integer.parseInt(holder.tvQty.getText().toString()));
-                    FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-                            .child(AppConstants.FIREBASE_KEY.CART)
-                            .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                            .child(AppConstants.FIREBASE_KEY.CART_ITEMS)
-                            .child(data.getKey())
-                            .setValue(model)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    hideProgressDialog();
-                                    Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
-                                    Log.e(TAG, "DocumentSnapshot successfully written!");
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            hideProgressDialog();
-                            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-                            Log.e(TAG, "Error writing document", e);
-                        }
-                    });
+                if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
+                    double item_total = Integer.parseInt(holder.tvQty.getText().toString()) * Double.parseDouble(data.getPriceDiscount());
+                    CartData model = new CartData(
+                            data.getProductId(),
+                            data.getName(),
+                            data.getImage(),
+                            Integer.parseInt(holder.tvQty.getText().toString()),
+                            Double.parseDouble(data.getPriceDiscount()),
+                            item_total
+                    );
+                    if (new DBHelper(context).addToCart(model))
+                        Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
+                    else
+                        Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
                     context.startActivity(new Intent(context, LoginActivity.class));
                 }
             }
-        });
+        });*/
+        if (data.getTotalAvailable() > 0) {
+            holder.btnAddToCart.setCardBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
+            holder.tvBtnText.setText("Add To Cart");
+            holder.btnAddToCart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
+                        double item_total = Integer.parseInt(holder.tvQty.getText().toString()) * Double.parseDouble(data.getPriceDiscount());
+                        CartData model = new CartData(
+                                data.getProductId(),
+                                data.getName(),
+                                data.getImage(),
+                                Integer.parseInt(holder.tvQty.getText().toString()),
+                                Double.parseDouble(data.getPriceDiscount()),
+                                item_total
+                        );
+                        if (new DBHelper(context).addToCart(model))
+                            Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
+                        else
+                            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
+                        context.startActivity(new Intent(context, LoginActivity.class));
+                    }
+                }
+            });
+        } else {
+            holder.btnAddToCart.setCardBackgroundColor(context.getResources().getColor(R.color.colorSuccess));
+            holder.tvBtnText.setText("Sold Out");
+            holder.btnAddToCart.setOnClickListener(null);
+        }
     }
 
 
@@ -156,7 +173,7 @@ public class HomeProductAdapter2 extends RecyclerView.Adapter<HomeProductAdapter
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView img;
-        TextView tvTitle, tvPriceDrop, tvPrice, tvQty, tvMinus, tvPlus;
+        TextView tvTitle, tvPriceDrop, tvOffers, tvPrice, tvQty, tvMinus, tvPlus, tvBtnText;
         RelativeLayout container;
         CardView btnAddToCart;
 
@@ -166,12 +183,14 @@ public class HomeProductAdapter2 extends RecyclerView.Adapter<HomeProductAdapter
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
             tvPriceDrop = (TextView) itemView.findViewById(R.id.tvPriceDrop);
             tvPrice = (TextView) itemView.findViewById(R.id.tvPrice);
+            tvOffers = (TextView) itemView.findViewById(R.id.tvOffers);
             container = (RelativeLayout) itemView.findViewById(R.id.container);
             tvQty = (TextView) itemView.findViewById(R.id.tvQty);
             tvMinus = (TextView) itemView.findViewById(R.id.tvMinus);
             tvPlus = (TextView) itemView.findViewById(R.id.tvPlus);
             tvPlus = (TextView) itemView.findViewById(R.id.tvPlus);
             btnAddToCart = (CardView) itemView.findViewById(R.id.btnAddToCart);
+            tvBtnText = (TextView) itemView.findViewById(R.id.tvBtnText);
         }
     }
 }
