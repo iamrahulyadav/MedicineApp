@@ -36,11 +36,14 @@ public class AppConstants {
 
     public class ENDPOINT {
         public static final String REGISTER = "register.php";
+        public static final String PRODUCT = "product.php";
     }
 
     public class METHODS {
         public static final String USER_SIGNUP = "user_signup";
         public static final String USER_LOGIN = "user_login";
         public static final String CHECK_PHONE_NO = "check_phone_no";
+        public static final String GET_ALL_CATEGORIES = "getAllCategories";
+        public static final String GET_ALL_SUBCATEGORIES = "getAllSubCategories";
     }
 }

@@ -9,8 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.model.CategoryModel;
+import com.hvantage.medicineapp.model.CategoryData;
 
 import java.util.ArrayList;
 
@@ -18,9 +19,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     private static final String TAG = "CategoryAdapter";
     Context context;
-    ArrayList<CategoryModel> arrayList;
+    ArrayList<CategoryData> arrayList;
 
-    public CategoryAdapter(Context context, ArrayList<CategoryModel> arrayList) {
+    public CategoryAdapter(Context context, ArrayList<CategoryData> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
     }
@@ -34,11 +35,15 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final CategoryModel data = arrayList.get(position);
-        Log.e(TAG, position + " data : " + data);
-        Log.e(TAG, "onBindViewHolder: data >> " + data.getName());
-        holder.tvTitle.setText(data.getName());
-        holder.img.setImageResource(data.getImg());
+        final CategoryData data = arrayList.get(position);
+        Log.d(TAG, position + " data : " + data);
+        holder.tvTitle.setText(data.getCatName());
+        if (!data.getCatImage().equalsIgnoreCase(""))
+            Glide.with(context)
+                    .load(data.getCatImage())
+                    .crossFade()
+                    .override(100, 100)
+                    .into(holder.img);
     }
 
 

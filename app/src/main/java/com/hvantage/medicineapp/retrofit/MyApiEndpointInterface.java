@@ -15,4 +15,7 @@ public interface MyApiEndpointInterface {
     @POST(AppConstants.ENDPOINT.REGISTER)
     Call<JsonObject> user_register(@Body JsonObject jsonObject);
 
+    @POST(AppConstants.ENDPOINT.PRODUCT)
+    Call<JsonObject> products(@Body JsonObject jsonObject);
+
 }

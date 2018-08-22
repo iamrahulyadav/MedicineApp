@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.annotation.Nullable;
@@ -44,6 +45,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.LoginActivity;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
@@ -52,8 +55,10 @@ import com.hvantage.medicineapp.adapter.HomeProductAdapter;
 import com.hvantage.medicineapp.adapter.HomeProductAdapter2;
 import com.hvantage.medicineapp.adapter.OfferPagerAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
-import com.hvantage.medicineapp.model.CategoryModel;
+import com.hvantage.medicineapp.model.CategoryData;
 import com.hvantage.medicineapp.model.ProductModel;
+import com.hvantage.medicineapp.retrofit.ApiClient;
+import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.FragmentIntraction;
@@ -61,8 +66,16 @@ import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.RecyclerItemClickListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -71,7 +84,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "HomeFragment";
     private static final int REQUEST_ALL_PERMISSIONS = 100;
     private final int REQ_CODE_SPEECH_INPUT = 101;
-    ArrayList<CategoryModel> catList = new ArrayList<CategoryModel>();
+    ArrayList<CategoryData> catList = new ArrayList<CategoryData>();
     ArrayList<ProductModel> productList = new ArrayList<ProductModel>();
     ArrayList<ProductModel> listDailyNeeds = new ArrayList<ProductModel>();
     ArrayList<Bitmap> offerList = new ArrayList<Bitmap>();
@@ -202,19 +215,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         setFloatingButton();
 
         list = new DBHelper(context).getMedicinesSearch();
-//        catArray = getResources().getStringArray(R.array.categories);
-//        Log.e(TAG, "onCreateView: catArray >> " + catArray);
-//        randomCat = catArray[new Random().nextInt(catArray.length)];
-//        Log.e(TAG, "onCreateView: randomCat >> " + randomCat);
-
-        setCategory();
-        setOffers();
+        new CategoryTask().execute();
+       /* setCategory();
         //setProduct();
         setRecylclerviewDaily();
         setRecylclerviewDaily2();
         setSearchBar();
-        getRandomCatData();
-
+        getRandomCatData();*/
         return rootView;
     }
 
@@ -222,7 +229,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         viewPagerOffers = (ViewPager) rootView.findViewById(R.id.viewPagerOffers);
         offerList.clear();
         offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer1));
-        //offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer2));
         offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer3));
         offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer4));
         viewPagerOffers.setAdapter(new OfferPagerAdapter(getActivity(), offerList));
@@ -332,20 +338,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 return false;
             }
         });
+        setOffers();
+        setCategoryAdapter();
     }
 
-    private void setCategory() {
-        catList.clear();
-        catList.add(new CategoryModel(1, "Prescriptions", R.drawable.cat_prescription));
-        catList.add(new CategoryModel(1, AppConstants.CATEGORY.OTC, R.drawable.cat_otc));
-        catList.add(new CategoryModel(1, AppConstants.CATEGORY.PERSONAL_CARE, R.drawable.cat_personal_care));
-        catList.add(new CategoryModel(1, AppConstants.CATEGORY.BABY_AND_MOTHER, R.drawable.cat_baby_mother));
-        catList.add(new CategoryModel(1, AppConstants.CATEGORY.WELLNESS, R.drawable.cat_wellness));
-        catList.add(new CategoryModel(1, "Diabetes", R.drawable.cat_diabetes));
-        catList.add(new CategoryModel(1, "Health Aid", R.drawable.cat_aid));
-        catList.add(new CategoryModel(1, "Ayurvedic", R.drawable.cat_ayurvedic));
-        catList.add(new CategoryModel(1, "Homeopathy", R.drawable.cat_homeo));
-
+    private void setCategoryAdapter() {
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
         adapter = new CategoryAdapter(context, catList);
         recylcer_view.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
@@ -363,7 +360,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 } else {
                     BrowseCategoryFragment fragment = new BrowseCategoryFragment();
                     Bundle args = new Bundle();
-                    args.putString("data", catList.get(position).getName());
+                    args.putParcelable("data", catList.get(position));
                     fragment.setArguments(args);
                     FragmentManager manager = getFragmentManager();
                     FragmentTransaction ft = manager.beginTransaction();
@@ -378,9 +375,71 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
             }
         }));
-
         adapter.notifyDataSetChanged();
     }
+
+    class CategoryTask extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.GET_ALL_CATEGORIES);
+            Log.e(TAG, "CategoryTask: Request >> " + jsonObject.toString());
+
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.products(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "CategoryTask: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    try {
+                        catList.clear();
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            JSONArray jsonArray = jsonObject.getJSONArray("result");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                Gson gson = new Gson();
+                                CategoryData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), CategoryData.class);
+                                catList.add(data);
+                            }
+                            publishProgress("200", "");
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getActivity().getResources().getString(R.string.api_error_msg));
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    publishProgress("400", getResources().getString(R.string.api_error_msg));
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+            adapter.notifyDataSetChanged();
+            String status = values[0];
+            String msg = values[1];
+            if (status.equalsIgnoreCase("400")) {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
     private void setProduct() {
         recylcer_view_recco = (RecyclerView) rootView.findViewById(R.id.recylcer_view_recco);

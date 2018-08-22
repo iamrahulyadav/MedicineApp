@@ -6,10 +6,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.model.SubCategoryData;
 
 import java.util.ArrayList;
 
@@ -17,10 +17,10 @@ public class BrowseCategoryAdapter extends RecyclerView.Adapter<BrowseCategoryAd
 
     private static final String TAG = "CategoryAdapter";
     Context context;
-    ArrayList<String> arrayList;
+    ArrayList<SubCategoryData> arrayList;
 
 
-    public BrowseCategoryAdapter(Context context, ArrayList<String> arrayList) {
+    public BrowseCategoryAdapter(Context context, ArrayList<SubCategoryData> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
     }
@@ -35,9 +35,9 @@ public class BrowseCategoryAdapter extends RecyclerView.Adapter<BrowseCategoryAd
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final String data = arrayList.get(position);
+        final SubCategoryData data = arrayList.get(position);
         Log.e(TAG, position + " data : " + data);
-        holder.tvTitle.setText(data);
+        holder.tvTitle.setText(data.getSubCatName());
 
     }
 
