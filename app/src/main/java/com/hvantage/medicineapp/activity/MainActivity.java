@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             tvLogin.setVisibility(View.GONE);
             Log.e(TAG, "onCreate: uid >> " + AppPreferences.getUserId(context));
             Log.e(TAG, "onCreate: name >> " + AppPreferences.getUserName(context));
-            Log.e(TAG, "onCreate: phone >> " + AppPreferences.getMobileNo(context));
             tvUsername.setText("Hello, " + AppPreferences.getUserName(context));
         }
     }
