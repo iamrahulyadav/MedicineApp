@@ -2,8 +2,8 @@ package com.hvantage.medicineapp.activity;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -14,15 +14,20 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.model.AddressModel;
+import com.hvantage.medicineapp.retrofit.ApiClient;
+import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
+import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.ProgressBar;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AddAddressActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -83,11 +88,78 @@ public class AddAddressActivity extends AppCompatActivity implements View.OnClic
                 else if (TextUtils.isEmpty(etPostalCode.getText().toString()))
                     Toast.makeText(this, "Enter Postal Code", Toast.LENGTH_SHORT).show();
                 else
-                    saveData();
-
+                    new SaveTask().execute();
                 break;
         }
     }
+
+    class SaveTask extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.ADD_ADDRESS);
+            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
+            jsonObject.addProperty("address", etAddress.getText().toString());
+            jsonObject.addProperty("city", etCity.getText().toString());
+            jsonObject.addProperty("contact_no", etPhoneNo.getText().toString());
+            jsonObject.addProperty("is_default", 0);
+            jsonObject.addProperty("landmark", etLandmark.getText().toString());
+            jsonObject.addProperty("name", etName.getText().toString());
+            jsonObject.addProperty("pincode", etPostalCode.getText().toString());
+            jsonObject.addProperty("state", etState.getText().toString());
+
+            Log.e(TAG, "SaveTask: Request >> " + jsonObject.toString());
+
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.address(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "SaveTask: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            publishProgress("200", "");
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getResources().getString(R.string.api_error_msg));
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    publishProgress("400", getResources().getString(R.string.api_error_msg));
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+            String status = values[0];
+            String msg = values[1];
+            if (status.equalsIgnoreCase("200")) {
+                finish();
+            } else if (status.equalsIgnoreCase("400")) {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
 
     private void showProgressDialog() {
         progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
@@ -103,47 +175,4 @@ public class AddAddressActivity extends AppCompatActivity implements View.OnClic
             progressBar.dismiss();
     }
 
-    private void saveData() {
-        Log.e(TAG, "saveData: ");
-        showProgressDialog();
-        String key = FirebaseDatabase.getInstance()
-                .getReference(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.MEDICINE)
-                .push().getKey();
-
-        AddressModel model = new AddressModel(
-                etName.getText().toString(),
-                etPhoneNo.getText().toString(),
-                key,
-                etPostalCode.getText().toString(),
-                etAddress.getText().toString(),
-                etLandmark.getText().toString(),
-                etCity.getText().toString(),
-                etState.getText().toString(),
-                false
-        );
-
-        FirebaseDatabase.getInstance()
-                .getReference(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.ADDRESS)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                .child(key)
-                .setValue(model)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        hideProgressDialog();
-                        Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
-                        finish();
-                        Log.e(TAG, "DocumentSnapshot successfully written!");
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                hideProgressDialog();
-                Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Error writing document", e);
-            }
-        });
-    }
 }

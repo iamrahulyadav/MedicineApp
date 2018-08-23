@@ -1,13 +1,10 @@
 package com.hvantage.medicineapp.adapter;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,33 +12,26 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.model.PrescriptionModel;
-import com.hvantage.medicineapp.util.AppConstants;
-import com.hvantage.medicineapp.util.Functions;
+import com.hvantage.medicineapp.model.PrescriptionData;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.TouchImageView;
 
 import java.util.ArrayList;
 
 public class AllUploadedPreAdapter extends RecyclerView.Adapter<AllUploadedPreAdapter.ViewHolder> {
-
+    private final MyAdapterListener listener;
     private static final String TAG = "UploadedPreAdapter";
     Context context;
-    ArrayList<PrescriptionModel> arrayList;
+    ArrayList<PrescriptionData> arrayList;
     private ProgressBar progressBar;
 
-    public AllUploadedPreAdapter(Context context, ArrayList<PrescriptionModel> arrayList) {
+    public AllUploadedPreAdapter(Context context, ArrayList<PrescriptionData> arrayList, MyAdapterListener listener) {
         this.context = context;
         this.arrayList = arrayList;
+        this.listener = listener;
+
     }
 
     @Override
@@ -53,73 +43,20 @@ public class AllUploadedPreAdapter extends RecyclerView.Adapter<AllUploadedPreAd
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final PrescriptionModel data = arrayList.get(position);
+        final PrescriptionData data = arrayList.get(position);
         Log.d(TAG, "onBindViewHolder: data >> " + data);
-        holder.tvTitle.setText(data.getTitle());
-        holder.tvDate.setText(data.getDate_time());
-        byte[] imageByteArray = Base64.decode(data.getImage_base64(), Base64.DEFAULT);
-        Glide.with(context)
-                .load(imageByteArray)
-                .crossFade()
-                .centerCrop()
-                .override(100, 100)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(holder.image);
-//        holder.image.setImageBitmap(data);
-
-
-        holder.image.setOnClickListener(new View.OnClickListener() {
+        holder.tvDeases.setText(data.getDiagnosisDetails());
+        holder.tvDate.setText(data.getDate());
+        holder.tvView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.e(TAG, "onBindViewHolder: data >> " + data);
-                // context.startActivity(new Intent(context, PrescPreviewActivity.class).putExtra("prescription_data", data));
-                showPreviewDialog(Functions.base64ToBitmap(data.getImage_base64()));
-
+                listener.viewOrder(view, position);
             }
         });
-        holder.imgRemove.setOnClickListener(new View.OnClickListener() {
+        holder.tvOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.e(TAG, "onBindViewHolder: data >> " + data);
-                new AlertDialog.Builder(context)
-                        .setMessage("Delete this prescription?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                showProgressDialog();
-                                FirebaseDatabase.getInstance().getReference()
-                                        .child(AppConstants.APP_NAME)
-                                        .child(AppConstants.FIREBASE_KEY.VAULT)
-                                        .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                                        .child(AppConstants.FIREBASE_KEY.MY_PRESCRIPTIONS)
-                                        .child(data.getKey())
-                                        .removeValue()
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                hideProgressDialog();
-                                                notifyDataSetChanged();
-                                                // removeAt(position);
-                                                Toast.makeText(context, "Removed", Toast.LENGTH_SHORT).show();
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                notifyDataSetChanged();
-                                                hideProgressDialog();
-                                                Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        })
-                        .show();
+                listener.placeOrder(view, position);
             }
         });
     }
@@ -166,14 +103,22 @@ public class AllUploadedPreAdapter extends RecyclerView.Adapter<AllUploadedPreAd
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView image, imgRemove;
-        TextView  tvTitle, tvDate;
+        TextView tvDeases, tvDate, tvView, tvOrder;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            image = (ImageView) itemView.findViewById(R.id.image);
             imgRemove = (ImageView) itemView.findViewById(R.id.imgRemove);
-            tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
+            tvDeases = (TextView) itemView.findViewById(R.id.tvDeases);
             tvDate = (TextView) itemView.findViewById(R.id.tvDate);
+            tvView = (TextView) itemView.findViewById(R.id.tvView);
+            tvOrder = (TextView) itemView.findViewById(R.id.tvOrder);
         }
     }
+
+    public interface MyAdapterListener {
+        void viewOrder(View v, int position);
+
+        void placeOrder(View v, int position);
+    }
+
 }

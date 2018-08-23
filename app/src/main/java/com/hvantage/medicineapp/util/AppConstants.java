@@ -37,6 +37,8 @@ public class AppConstants {
     public class ENDPOINT {
         public static final String REGISTER = "register.php";
         public static final String PRODUCT = "product.php";
+        public static final String ORDER = "order.php";
+        public static final String ADDRESS = "address.php";
     }
 
     public class METHODS {
@@ -46,5 +48,10 @@ public class AppConstants {
         public static final String GET_ALL_CATEGORIES = "getAllCategories";
         public static final String GET_ALL_SUBCATEGORIES = "getAllSubCategories";
         public static final String GET_SUBCAT_PRODUCTS = "get_subcat_products";
+        public static final String ADD_PRESCRIPTION = "add_prescription";
+        public static final String GET_MY_PRESCRIPTIONS = "get_my_prescriptions";
+        public static final String ADD_ADDRESS = "add_address";
+        public static final String GET_MY_ADDRESSES = "get_my_addresses";
+        public static final String DELETE_ADDRESS = "delete_address";
     }
 }

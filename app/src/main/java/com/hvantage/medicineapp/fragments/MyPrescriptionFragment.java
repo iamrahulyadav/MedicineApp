@@ -2,6 +2,8 @@ package com.hvantage.medicineapp.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -9,7 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,23 +19,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.activity.SelectAddressActivity;
 import com.hvantage.medicineapp.adapter.AllUploadedPreAdapter;
-import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
-import com.hvantage.medicineapp.model.PrescriptionModel;
+import com.hvantage.medicineapp.model.PrescriptionData;
+import com.hvantage.medicineapp.retrofit.ApiClient;
+import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
+import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
-import com.hvantage.medicineapp.util.GridSpacingItemDecoration;
 import com.hvantage.medicineapp.util.ProgressBar;
-import com.hvantage.medicineapp.util.RecyclerItemClickListener;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class MyPrescriptionFragment extends Fragment implements View.OnClickListener {
@@ -44,7 +52,7 @@ public class MyPrescriptionFragment extends Fragment implements View.OnClickList
     private FragmentIntraction intraction;
     private RecyclerView recylcer_view;
     private AllUploadedPreAdapter adapter;
-    private ArrayList<PrescriptionModel> list = new ArrayList<PrescriptionModel>();
+    private ArrayList<PrescriptionData> list = new ArrayList<PrescriptionData>();
     private ProgressBar progressBar;
     private String data;
     private CardView cardEmptyText;
@@ -59,68 +67,95 @@ public class MyPrescriptionFragment extends Fragment implements View.OnClickList
             intraction.actionbarsetTitle("My Prescriptions");
         }
         init();
-        setRecyclerView();
-        if (Functions.isConnectingToInternet(context))
-            getData();
+        if (Functions.isConnectingToInternet(context)) {
+            new GetDataTask().execute();
+        }//getData();
         else
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
         return rootView;
     }
 
-    private void getData() {
-        showProgressDialog();
-        FirebaseDatabase.getInstance().getReference()
-                .child(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.VAULT)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                .child(AppConstants.FIREBASE_KEY.MY_PRESCRIPTIONS)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        list.clear();
-                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            PrescriptionModel data = postSnapshot.getValue(PrescriptionModel.class);
-                            Log.e(TAG, "onDataChange: data >> " + data);
-                            list.add(data);
-                        }
-                        adapter.notifyDataSetChanged();
-                        if (adapter.getItemCount() > 0)
-                            cardEmptyText.setVisibility(View.GONE);
-                        else
-                            cardEmptyText.setVisibility(View.VISIBLE);
-                        hideProgressDialog();
-                    }
+    class GetDataTask extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.d(TAG, "loadPost:onCancelled", databaseError.toException());
-                        if (adapter.getItemCount() > 0)
-                            cardEmptyText.setVisibility(View.GONE);
-                        else
-                            cardEmptyText.setVisibility(View.VISIBLE);
-                        hideProgressDialog();
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.GET_MY_PRESCRIPTIONS);
+            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
+
+            Log.e(TAG, "GetDataTask: Request >> " + jsonObject.toString());
+
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.order(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "GetDataTask: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    list.clear();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            JSONArray jsonArray = jsonObject.getJSONArray("result");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                Gson gson = new Gson();
+                                PrescriptionData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), PrescriptionData.class);
+                                Log.e(TAG, "onResponse: data >> " + data);
+                                list.add(data);
+                            }
+                            publishProgress("200", "");
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getActivity().getResources().getString(R.string.api_error_msg));
                     }
-                });
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    publishProgress("400", getResources().getString(R.string.api_error_msg));
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+            adapter.notifyDataSetChanged();
+            String status = values[0];
+            String msg = values[1];
+            if (status.equalsIgnoreCase("400")) {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
+
 
     private void init() {
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
         fabAdd = (FloatingActionButton) rootView.findViewById(R.id.fabAdd);
         cardEmptyText = (CardView) rootView.findViewById(R.id.cardEmptyText);
         fabAdd.setOnClickListener(this);
+        setRecyclerView();
+
     }
 
     private void setRecyclerView() {
-        int spacing = 30, spanCount = 3;
         boolean includeEdge = true;
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
-        adapter = new AllUploadedPreAdapter (context, list);
-        recylcer_view.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
-        recylcer_view.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
-        recylcer_view.setAdapter(adapter);
-        recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
+        adapter = new AllUploadedPreAdapter(context, list, new AllUploadedPreAdapter.MyAdapterListener() {
             @Override
-            public void onItemClick(View view, int position) {
+            public void viewOrder(View v, int position) {
                 FragmentManager manager = getFragmentManager();
                 FragmentTransaction ft = manager.beginTransaction();
                 Fragment fragment = new AddPrescrFragment();
@@ -133,10 +168,14 @@ public class MyPrescriptionFragment extends Fragment implements View.OnClickList
             }
 
             @Override
-            public void onItemLongClick(View view, int position) {
-
+            public void placeOrder(View v, int position) {
+                AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
+                Intent intent = new Intent(getActivity(), SelectAddressActivity.class);
+                startActivity(intent);
             }
-        }));
+        });
+        recylcer_view.setLayoutManager(new LinearLayoutManager(context));
+        recylcer_view.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
 

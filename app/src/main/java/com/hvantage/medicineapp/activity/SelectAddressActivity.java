@@ -1,8 +1,10 @@
 package com.hvantage.medicineapp.activity;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -12,28 +14,40 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.AddressAdapter;
-import com.hvantage.medicineapp.model.AddressModel;
-import com.hvantage.medicineapp.model.PrescriptionModel;
+import com.hvantage.medicineapp.model.AddressData;
+import com.hvantage.medicineapp.retrofit.ApiClient;
+import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
+import com.hvantage.medicineapp.util.AppPreferences;
+import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
-import com.hvantage.medicineapp.util.RecyclerItemClickListener;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SelectAddressActivity extends AppCompatActivity {
 
     private static final String TAG = "SelectAddressActivity";
-    ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
     private Context context;
-    private ArrayList<AddressModel> list = new ArrayList<AddressModel>();
+    private ArrayList<AddressData> list = new ArrayList<AddressData>();
     private AddressAdapter adapter;
     private RecyclerView recylcer_view;
     private ProgressBar progressBar;
@@ -47,17 +61,17 @@ public class SelectAddressActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-       /* if (getIntent().hasExtra("data"))
-            presList = getIntent().getParcelableArrayListExtra("data");*/
-
-       /* Bundle bundle = getIntent().getBundleExtra("data");   //<< get Bundle from Intent
-        presList = bundle.getParcelableArrayList("listPresc");
-        Log.e(TAG, "onCreate: presList >> " + presList);*/
         init();
         setRecyclerView();
-        getData();
+    }
 
-//        Toast.makeText(context, "Select Delivery Address", Toast.LENGTH_SHORT).show();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Functions.isConnectingToInternet(context))
+            new GetDataTask().execute();
+        else
+            Toast.makeText(context, "Connect to internet", Toast.LENGTH_SHORT).show();
     }
 
     private void init() {
@@ -70,28 +84,151 @@ public class SelectAddressActivity extends AppCompatActivity {
         });
     }
 
+    class GetDataTask extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.GET_MY_ADDRESSES);
+            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
+
+            Log.e(TAG, "GetDataTask: Request >> " + jsonObject.toString());
+
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.address(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "GetDataTask: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    list.clear();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            JSONArray jsonArray = jsonObject.getJSONArray("result");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                Gson gson = new Gson();
+                                AddressData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), AddressData.class);
+                                Log.e(TAG, "onResponse: data >> " + data);
+                                list.add(data);
+                            }
+                            publishProgress("200", "");
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getResources().getString(R.string.api_error_msg));
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    publishProgress("400", getResources().getString(R.string.api_error_msg));
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+            adapter.notifyDataSetChanged();
+            String status = values[0];
+            String msg = values[1];
+            if (status.equalsIgnoreCase("400")) {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
     private void setRecyclerView() {
         list.clear();
         recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
-        adapter = new AddressAdapter(context, list);
-        recylcer_view.setLayoutManager(new LinearLayoutManager(context));
-        recylcer_view.setAdapter(adapter);
-        recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
+        adapter = new AddressAdapter(context, list, new AddressAdapter.MyAdapterListener() {
             @Override
-            public void onItemClick(View view, int position) {
+            public void delete(View v, int position) {
+                deleteAddress(list.get(position), position);
+            }
+
+            @Override
+            public void select(View v, int position) {
                 Intent intent = new Intent(context, ConfirmOrderActivity.class);
                 intent.putExtra("data", list.get(position));
                 startActivity(intent);
                 finish();
             }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-
-            }
-        }));
+        });
+        recylcer_view.setLayoutManager(new LinearLayoutManager(context));
+        recylcer_view.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
+
+    private void deleteAddress(final AddressData data, final int position) {
+        new AlertDialog.Builder(context)
+                .setMessage("Delete this address")
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        removeAddress(data, position);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .show();
+    }
+
+    private void removeAddress(AddressData data, final int position) {
+        showProgressDialog();
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("method", AppConstants.METHODS.DELETE_ADDRESS);
+        jsonObject.addProperty("address_id", data.getAddressId());
+        Log.e(TAG, "SaveTask: Request >> " + jsonObject.toString());
+        MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+        Call<JsonObject> call = apiService.address(jsonObject);
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                Log.e(TAG, "SaveTask: Response >> " + response.body().toString());
+                String resp = response.body().toString();
+                try {
+                    JSONObject jsonObject = new JSONObject(resp);
+                    if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                        list.remove(position);
+                        adapter.notifyDataSetChanged();
+                        hideProgressDialog();
+                    } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                        String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+                        hideProgressDialog();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, context.getResources().getString(R.string.api_error_msg), Toast.LENGTH_SHORT).show();
+                    hideProgressDialog();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(context, context.getResources().getString(R.string.api_error_msg), Toast.LENGTH_SHORT).show();
+                hideProgressDialog();
+            }
+        });
+    }
+
 
     private void showProgressDialog() {
         progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
@@ -118,7 +255,7 @@ public class SelectAddressActivity extends AppCompatActivity {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         list.clear();
                         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            AddressModel data = postSnapshot.getValue(AddressModel.class);
+                            AddressData data = postSnapshot.getValue(AddressData.class);
                             if (data != null) {
                                 list.add(data);
                                 adapter.notifyDataSetChanged();

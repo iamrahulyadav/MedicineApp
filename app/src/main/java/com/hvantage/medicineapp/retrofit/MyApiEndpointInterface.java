@@ -18,4 +18,10 @@ public interface MyApiEndpointInterface {
     @POST(AppConstants.ENDPOINT.PRODUCT)
     Call<JsonObject> products(@Body JsonObject jsonObject);
 
+    @POST(AppConstants.ENDPOINT.ORDER)
+    Call<JsonObject> order(@Body JsonObject jsonObject);
+
+    @POST(AppConstants.ENDPOINT.ADDRESS)
+    Call<JsonObject> address(@Body JsonObject jsonObject);
+
 }

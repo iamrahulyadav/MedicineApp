@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/etMedType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tablet, Capsule, Syrub, Drop etc."
+        android:imeOptions="actionNext"
+        android:inputType="textCapWords"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textColor="@color/colorTextHeading" />
+
+
+    <EditText
+        android:id="@+id/etMedName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Medicine Name"
+        android:imeOptions="actionNext"
+        android:inputType="textCapWords"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textColor="@color/colorTextHeading" />
+
+
+    <EditText
+        android:id="@+id/etMedDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Description"
+        android:imeOptions="actionNext"
+        android:inputType="textCapWords"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textColor="@color/colorTextHeading" />
+
+    <EditText
+        android:id="@+id/etMedQty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Quantity"
+        android:imeOptions="actionNext"
+        android:inputType="number"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textColor="@color/colorTextHeading" />
+
+    <EditText
+        android:id="@+id/etMedDoses"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="false"
+        android:hint="Select Doses?"
+        android:imeOptions="actionDone"
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textColor="@color/colorTextHeading" />
+
+
+</LinearLayout>

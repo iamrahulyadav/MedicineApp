@@ -20,8 +20,7 @@ import android.widget.TextView;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.OrderDetailItemAdapter;
 import com.hvantage.medicineapp.adapter.OrderDetailPresAdapter;
-import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
-import com.hvantage.medicineapp.model.AddressModel;
+import com.hvantage.medicineapp.model.AddressData;
 import com.hvantage.medicineapp.model.CartModel;
 import com.hvantage.medicineapp.model.OrderData;
 import com.hvantage.medicineapp.model.PrescriptionModel;
@@ -74,9 +73,9 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
             tvPayableAmt.setText("Rs. " + data.getPayable_amount());
             tvTotalPrice.setText("Rs. " + data.getPayable_amount());
             tvPayMode.setText(data.getPayment_mode());
-            AddressModel deliveryData = data.getDelivery_details();
+            AddressData deliveryData = data.getDelivery_details();
 
-            tvAddress1.setText(deliveryData.getName() + ", " + deliveryData.getContact_no());
+            tvAddress1.setText(deliveryData.getName() + ", " + deliveryData.getContactNo());
             tvAddress2.setText(deliveryData.getAddress() + ", " + deliveryData.getLandmark());
             tvAddress3.setText(deliveryData.getCity() + ", " + deliveryData.getPincode());
             tvAddress4.setText(deliveryData.getState() + ", " + "India");

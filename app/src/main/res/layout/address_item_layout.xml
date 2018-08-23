@@ -12,6 +12,7 @@
     app:cardBackgroundColor="@color/colorWhite"
     app:cardCornerRadius="3dp"
     app:cardElevation="1dp"
+    android:id="@+id/item"
     app:contentPadding="10dp">
 
     <LinearLayout

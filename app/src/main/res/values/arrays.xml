@@ -65,6 +65,18 @@
         <item>10</item>
         <item>15</item>
         <item>20</item>
+    </string-array>
 
+    <string-array name="doses">
+        <item>After Wake-Up</item>
+        <item>Before Sleeping</item>
+        <item>After Breakfast</item>
+        <item>Before Breakfast</item>
+        <item>After Lunch</item>
+        <item>Before Lunch</item>
+        <item>After High-Tea</item>
+        <item>Before High-Tea</item>
+        <item>After Dinner</item>
+        <item>Before Dinner</item>
     </string-array>
 </resources>

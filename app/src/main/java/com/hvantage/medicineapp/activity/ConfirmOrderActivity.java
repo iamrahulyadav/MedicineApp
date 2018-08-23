@@ -28,6 +28,7 @@ import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.CartItemAdapter;
 import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
 import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
+import com.hvantage.medicineapp.model.AddressData;
 import com.hvantage.medicineapp.model.AddressModel;
 import com.hvantage.medicineapp.model.CartData;
 import com.hvantage.medicineapp.model.CartModel;
@@ -51,7 +52,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private TextView tvCheckout;
     private LinearLayout llPrescription, llMedicine, llAmount;
     private LinearLayout llPayMode;
-    private AddressModel addressData;
+    private AddressData addressData;
     private TextView tvAddress1, tvAddress2, tvAddress3, tvAddress4;
     private TextView tvChangeAddress;
     private Map<String, String> timestamp;
@@ -81,7 +82,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         timestamp = ServerValue.TIMESTAMP;
         Log.e(TAG, "onCreate: ServerValue.TIMESTAMP >> " + ServerValue.TIMESTAMP);
         if (getIntent().hasExtra("data"))
-            addressData = (AddressModel) getIntent().getSerializableExtra("data");
+            addressData = (AddressData) getIntent().getParcelableExtra("data");
         else {
             startActivity(new Intent(context, SelectAddressActivity.class));
             finish();
@@ -108,7 +109,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
 
 
             if (addressData != null) {
-                tvAddress1.setText(addressData.getName() + ", +91" + addressData.getContact_no());
+                tvAddress1.setText(addressData.getName() + ", +91" + addressData.getContactNo());
                 tvAddress2.setText(addressData.getAddress() + ", " + addressData.getLandmark());
                 tvAddress3.setText(addressData.getCity() + ", " + addressData.getPincode());
                 tvAddress4.setText(addressData.getState() + ", India");

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class OrderData implements Serializable {
 
-    private AddressModel delivery_details;
+    private AddressData delivery_details;
     private ArrayList<PrescriptionModel> prescriptions = new ArrayList<PrescriptionModel>();
     private ArrayList<CartModel> items = new ArrayList<CartModel>();
     private String item_total;
@@ -69,11 +69,11 @@ public class OrderData implements Serializable {
     public OrderData() {
     }
 
-    public AddressModel getDelivery_details() {
+    public AddressData getDelivery_details() {
         return delivery_details;
     }
 
-    public void setDelivery_details(AddressModel delivery_details) {
+    public void setDelivery_details(AddressData delivery_details) {
         this.delivery_details = delivery_details;
     }
 
