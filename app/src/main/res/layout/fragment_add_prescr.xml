@@ -40,9 +40,12 @@
                     android:layout_height="match_parent" />
 
                 <ImageView
-                    android:id="@+id/imgThumb"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:id="@+id/imgFullView"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="end"
+                    android:layout_margin="8dp"
+                    android:src="@drawable/action_full_size" />
             </android.support.v7.widget.CardView>
 
 

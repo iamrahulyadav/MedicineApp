@@ -81,7 +81,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
     private ProgressBar progressBar;
     private CardView btnSubmit, cardUpload;
     private PrescriptionData data = null;
-    private ImageView imgThumb;
+    private ImageView imgThumb, imgFullView;
     private String image_base64;
     private TextView tvAdd;
     ArrayList<PreMedicineData> medList = new ArrayList<PreMedicineData>();
@@ -147,9 +147,10 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
 
     private void init() {
         tvAdd = rootView.findViewById(R.id.tvAdd);
-        btnSubmit = (CardView) rootView.findViewById(R.id.btnSubmit);
-        cardUpload = (CardView) rootView.findViewById(R.id.cardUpload);
-        imgThumb = (ImageView) rootView.findViewById(R.id.imgThumb);
+        btnSubmit = rootView.findViewById(R.id.btnSubmit);
+        cardUpload = rootView.findViewById(R.id.cardUpload);
+        imgThumb = rootView.findViewById(R.id.imgThumb);
+        imgFullView = rootView.findViewById(R.id.imgFullView);
         recylcer_view = rootView.findViewById(R.id.recylcer_view);
         etDName = rootView.findViewById(R.id.etDName);
         etAddress = rootView.findViewById(R.id.etAddress);
@@ -164,6 +165,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
 
         btnSubmit.setOnClickListener(this);
         cardUpload.setOnClickListener(this);
+        imgFullView.setOnClickListener(this);
         tvAdd.setOnClickListener(this);
         initDoses();
     }
@@ -221,6 +223,9 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                 break;
             case R.id.cardUpload:
                 selectImage();
+                break;
+            case R.id.imgThumb:
+
                 break;
             case R.id.tvAdd:
                 addMedDialog();
