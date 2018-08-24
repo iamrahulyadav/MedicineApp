@@ -42,6 +42,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -420,6 +421,8 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             jsonObject.addProperty("name", etName.getText().toString());
             jsonObject.addProperty("email", etEmail.getText().toString());
             jsonObject.addProperty("password", etPassword.getText().toString());
+            jsonObject.addProperty("fcm_token", FirebaseInstanceId.getInstance().getToken());
+
 
             Log.e(TAG, "SignupTask: Request >> " + jsonObject.toString());
 

@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -139,6 +140,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             jsonObject.addProperty("method", AppConstants.METHODS.USER_LOGIN);
             jsonObject.addProperty("username", etPhoneNo.getText().toString());
             jsonObject.addProperty("password", etPassword.getText().toString());
+            jsonObject.addProperty("fcm_token", FirebaseInstanceId.getInstance().getToken());
 
             Log.e(TAG, "LoginTask: Request >> " + jsonObject.toString());
 

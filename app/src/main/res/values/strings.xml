@@ -18,4 +18,5 @@
     <string name="title_activity_select_presc">SelectPrescActivity</string>
     <string name="title_activity_presc_preview">PrescPreviewActivity</string>
     <string name="api_error_msg">Internal server error.</string>
+    <string name="title_activity_add_presc">AddPrescActivity</string>
 </resources>

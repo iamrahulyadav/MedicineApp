@@ -25,6 +25,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.business.BusinessLoginActivity;
 import com.hvantage.medicineapp.fragments.CartFragment;
@@ -55,8 +58,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
         initDrawer(toolbar);
         setDefaultFragment();
-
-
+        Log.e(TAG, "onCreate: fcm token >> " + FirebaseInstanceId.getInstance().getToken());
+        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(MainActivity.this, new OnSuccessListener<InstanceIdResult>() {
+            @Override
+            public void onSuccess(InstanceIdResult instanceIdResult) {
+                String mToken = instanceIdResult.getToken();
+                Log.e("Token", mToken);
+            }
+        });
         if (AppPreferences.getUserId(context).equalsIgnoreCase("")) {
             hideMenus();
             tvUsername.setVisibility(View.GONE);

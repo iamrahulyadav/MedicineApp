@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorActivityBackground"
+    android:fitsSystemWindows="true"
+    tools:context=".activity.AddPrescActivity">
+
+
+    <RelativeLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/cardUpload"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp">
+
+            <com.hvantage.medicineapp.util.TouchImageView
+                android:id="@+id/imageFull"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Tap here \nto upload prescription" />
+
+            <ImageView
+                android:id="@+id/imgThumb"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </android.support.v7.widget.CardView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize">
+
+            <ImageView
+                android:id="@+id/imgBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:padding="10dp"
+                android:src="@drawable/action_back_light"
+                android:tint="@color/colorWhite" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="130dp"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="-12dp"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorWhite"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="15dp"
+            app:cardMaxElevation="15dp"
+            app:contentPadding="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="5dp"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:layout_gravity="center"
+                    app:cardBackgroundColor="@color/colorGray"
+                    app:cardCornerRadius="3dp"
+                    app:cardElevation="0dp"></android.support.v7.widget.CardView>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/round_edge">
+
+                    <android.support.v7.widget.AppCompatAutoCompleteTextView
+                        android:id="@+id/etSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:drawableLeft="@drawable/action_search_dark"
+                        android:drawablePadding="5dp"
+                        android:fontFamily="@font/quicksand"
+                        android:hint="Search medicine in your prescription"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:overScrollMode="never"
+                        android:scrollbars="none"
+                        android:singleLine="true"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical">
+
+
+                    <android.support.v7.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        app:cardCornerRadius="3dp"
+                        app:cardElevation="1dp"
+                        app:contentPadding="10dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Doctor"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorPrimary"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/etDName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Name"
+                                android:imeOptions="actionNext"
+                                android:inputType="textCapWords"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorTextHeading" />
+
+                            <EditText
+                                android:id="@+id/etAddress"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Address"
+                                android:imeOptions="actionNext"
+                                android:inputType="textCapWords|textPostalAddress"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorTextHeading" />
+
+                            <EditText
+                                android:id="@+id/etEmail"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Email"
+                                android:imeOptions="actionNext"
+                                android:inputType="textEmailAddress"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorTextHeading" />
+
+                            <EditText
+                                android:id="@+id/etPhoneNo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Phone No"
+                                android:imeOptions="actionDone"
+                                android:inputType="number"
+                                android:maxLength="10"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorTextHeading" />
+                        </LinearLayout>
+                    </android.support.v7.widget.CardView>
+
+                    <android.support.v7.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        app:cardCornerRadius="3dp"
+                        app:cardElevation="1dp"
+                        app:contentPadding="10dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Patient"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorPrimary"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/etPName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Name"
+                                android:imeOptions="actionNext"
+                                android:inputType="textCapWords"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorTextHeading" />
+
+                            <EditText
+                                android:id="@+id/etAge"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Age"
+                                android:imeOptions="actionNext"
+                                android:inputType="number"
+                                android:maxLength="3"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorTextHeading" />
+
+                            <EditText
+                                android:id="@+id/etWeight"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Weight"
+                                android:imeOptions="actionDone"
+                                android:inputType="numberDecimal"
+                                android:maxLength="3"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorTextHeading" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <RadioGroup
+                                    android:id="@+id/rgGender"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginLeft="5dp"
+                                        android:text="Gender"
+                                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                        android:textColor="@color/colorTextHeading" />
+
+                                    <RadioButton
+                                        android:id="@+id/rbMale"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:checked="true"
+                                        android:text="Male"
+                                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                        android:textColor="@color/colorTextHeading" />
+
+                                    <RadioButton
+                                        android:id="@+id/rbfemale"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginLeft="5dp"
+                                        android:text="Female"
+                                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                        android:textColor="@color/colorTextHeading" />
+                                </RadioGroup>
+                            </LinearLayout>
+                        </LinearLayout>
+                    </android.support.v7.widget.CardView>
+
+                    <android.support.v7.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        app:cardCornerRadius="3dp"
+                        app:cardElevation="1dp"
+                        app:contentPadding="10dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Diagnosis (Deseases)"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorPrimary"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/etDiagnosis"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Mention all diseases. "
+                                android:imeOptions="actionDone"
+                                android:inputType="textCapWords|textMultiLine"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorTextHeading" />
+                        </LinearLayout>
+                    </android.support.v7.widget.CardView>
+
+                    <android.support.v7.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        app:cardCornerRadius="3dp"
+                        app:cardElevation="1dp"
+                        app:contentPadding="10dp">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvPM"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Prescription Medicines"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorPrimary"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvAdd"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_alignParentRight="true"
+                                android:text="Add"
+                                android:textAllCaps="true"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                                android:textColor="@color/colorPrimary"
+                                android:textStyle="bold" />
+
+                            <android.support.v4.widget.NestedScrollView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/tvPM">
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center_horizontal"
+                                        android:padding="5dp"
+                                        android:text="Add your prescription medicines here."
+                                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                                        android:textColor="@color/colorTextSubHeading" />
+
+                                    <android.support.v7.widget.RecyclerView
+                                        android:id="@+id/recylcer_view"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:background="@color/colorWhite" />
+                                </RelativeLayout>
+                            </android.support.v4.widget.NestedScrollView>
+                        </RelativeLayout>
+                    </android.support.v7.widget.CardView>
+
+                    <android.support.v7.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        app:cardCornerRadius="3dp"
+                        app:cardElevation="1dp"
+                        app:contentPadding="10dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Note"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorPrimary"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/etNote"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Your note.."
+                                android:imeOptions="actionDone"
+                                android:inputType="textCapWords|textMultiLine"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorTextHeading" />
+                        </LinearLayout>
+                    </android.support.v7.widget.CardView>
+
+
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/btnSubmit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="10dp"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
+                        app:cardBackgroundColor="@color/colorPrimary"
+                        app:cardCornerRadius="3dp"
+                        app:cardElevation="1dp"
+                        app:contentPadding="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Submit"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                            android:textColor="@color/colorToolbarTitle"
+                            android:textStyle="bold" />
+                    </android.support.v7.widget.CardView>
+                </LinearLayout>
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+    </FrameLayout>
+
+</android.support.design.widget.CoordinatorLayout>

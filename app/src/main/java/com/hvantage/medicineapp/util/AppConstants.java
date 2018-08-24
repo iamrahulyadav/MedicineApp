@@ -54,4 +54,13 @@ public class AppConstants {
         public static final String GET_MY_ADDRESSES = "get_my_addresses";
         public static final String DELETE_ADDRESS = "delete_address";
     }
+
+    public class NOTIFICATION_KEY {
+        public static final String ORDER_PLACED = "order_placed";
+        public static final String ORDER_UPDATED = "order_updated";
+    }
+
+    public class NOTIFICATION_ID {
+        public static final int ORDER_PLACED_ID = 1;
+    }
 }

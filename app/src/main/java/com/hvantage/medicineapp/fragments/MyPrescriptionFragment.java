@@ -79,7 +79,7 @@ public class MyPrescriptionFragment extends Fragment implements View.OnClickList
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            showProgressDialog();
+            //showProgressDialog();
         }
 
         @Override
@@ -130,7 +130,7 @@ public class MyPrescriptionFragment extends Fragment implements View.OnClickList
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            hideProgressDialog();
+            //hideProgressDialog();
             adapter.notifyDataSetChanged();
             String status = values[0];
             String msg = values[1];

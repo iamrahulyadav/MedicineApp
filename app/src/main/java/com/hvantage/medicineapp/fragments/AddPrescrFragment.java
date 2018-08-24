@@ -10,9 +10,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,7 +34,6 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -50,6 +53,8 @@ import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
+import com.hvantage.medicineapp.util.TouchImageView;
+import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -70,25 +75,38 @@ import static android.app.Activity.RESULT_OK;
 
 
 public class AddPrescrFragment extends Fragment implements View.OnClickListener {
-
     private static final int REQUEST_STORAGE = 0;
     private static final int REQUEST_IMAGE_CAPTURE = REQUEST_STORAGE + 1;
     private static final int REQUEST_LOAD_IMAGE = REQUEST_IMAGE_CAPTURE + 1;
     private static final String TAG = "AddPrescrFragment";
+    ArrayList<PreMedicineData> medList = new ArrayList<PreMedicineData>();
+    EditText etDName, etAddress, etEmail, etPhoneNo, etPName, etAge,
+            etWeight, etDiagnosis, etNote, etMedType, etMedName,
+            etMedDescription, etMedQty, etMedDoses;
+    RadioGroup rgGender;
+    String[] doses = new String[]{"After Wake - Up", "Before Sleeping", "After Breakfast", "Before Breakfast", "After Lunch", "Before Lunch", "After High - Tea", "Before High - Tea", "After Dinner", "Before Dinner"};
+    boolean[] checkedValues = new boolean[]{false, false, false, false, false, false, false, false, false, false};
+    //    List<String> dosesList = new ArrayList<String>();
+    List<DoseData> dosesList = new ArrayList<DoseData>();
+    String selectedDosesId = "";
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
     private ProgressBar progressBar;
-    private CardView btnSubmit, cardUpload;
+    private CardView btnSubmit, btnAdd, btnCancel;
     private PrescriptionData data = null;
-    private ImageView imgThumb, imgFullView;
+    private ImageView imgArrow;
     private String image_base64;
     private TextView tvAdd;
-    ArrayList<PreMedicineData> medList = new ArrayList<PreMedicineData>();
     private RecyclerView recylcer_view;
     private PreMedicineItemAdapter adapter;
-    EditText etDName, etAddress, etEmail, etPhoneNo, etPName, etAge, etWeight, etDiagnosis, etNote;
-    RadioGroup rgGender;
+    private CoordinatorLayout coordinatorLayout;
+    private View bottomSheet;
+    private BottomSheetBehavior<View> behavior;
+    private NestedScrollView layout_add_med, layout_main;
+    private TouchImageView imgThumb;
+    private TextView tvUpload;
+    private byte[] byteArray;
 
     @Nullable
     @Override
@@ -109,16 +127,18 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
 
         init();
         setRecyclerView();
-
+        setBottomBar();
         if (!Functions.isConnectingToInternet(context))
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
         if (data != null) {
             if (!data.getImage().equalsIgnoreCase("")) {
-                Glide.with(context)
+                Picasso.with(context)
                         .load(data.getImage())
-                        .crossFade()
                         .into(imgThumb);
             }
+            bottomSheet.setVisibility(View.VISIBLE);
+            tvUpload.setText("Prescription is loading...");
+            tvUpload.setClickable(false);
             DoctorDetails doctorData = data.getDoctorDetails();
             etDName.setText(doctorData.getName());
             etEmail.setText(doctorData.getEmail());
@@ -144,13 +164,63 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         return rootView;
     }
 
+    private void setBottomBar() {
+        coordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.main_content);
+        bottomSheet = coordinatorLayout.findViewById(R.id.bottom_sheet);
+        behavior = BottomSheetBehavior.from(bottomSheet);
+        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                Log.e("onStateChanged", "onStateChanged:" + newState);
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        Log.d(TAG, "onStateChanged: STATE_HIDDEN");
+                        Functions.hideSoftKeyboard(context, bottomSheet);
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        Log.d(TAG, "onStateChanged: STATE_EXPANDED");
+                        Functions.hideSoftKeyboard(context, bottomSheet);
+                        break;
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        Log.d(TAG, "onStateChanged: STATE_COLLAPSED");
+                        Functions.hideSoftKeyboard(context, bottomSheet);
+                        break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        Log.d(TAG, "onStateChanged: STATE_DRAGGING");
+                        Functions.hideSoftKeyboard(context, bottomSheet);
+
+                        break;
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        Log.d(TAG, "onStateChanged: STATE_SETTLING");
+                        Functions.hideSoftKeyboard(context, bottomSheet);
+
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                if (isAdded()) {
+                    animateBottomSheetArrows(slideOffset);
+                }
+            }
+        });
+    }
+
+    private void animateBottomSheetArrows(float slideOffset) {
+        // Animate counter-clockwise
+//        imgArrow.setRotation(slideOffset * -180);
+        // Animate clockwise
+        imgArrow.setRotation(slideOffset * 180);
+    }
 
     private void init() {
         tvAdd = rootView.findViewById(R.id.tvAdd);
         btnSubmit = rootView.findViewById(R.id.btnSubmit);
-        cardUpload = rootView.findViewById(R.id.cardUpload);
+        btnAdd = rootView.findViewById(R.id.btnAdd);
+        btnCancel = rootView.findViewById(R.id.btnCancel);
         imgThumb = rootView.findViewById(R.id.imgThumb);
-        imgFullView = rootView.findViewById(R.id.imgFullView);
+        imgArrow = rootView.findViewById(R.id.imgArrow);
         recylcer_view = rootView.findViewById(R.id.recylcer_view);
         etDName = rootView.findViewById(R.id.etDName);
         etAddress = rootView.findViewById(R.id.etAddress);
@@ -162,11 +232,42 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         rgGender = rootView.findViewById(R.id.rgGender);
         etDiagnosis = rootView.findViewById(R.id.etDiagnosis);
         etNote = rootView.findViewById(R.id.etNote);
-
+        layout_add_med = rootView.findViewById(R.id.layout_add_med);
+        layout_main = rootView.findViewById(R.id.layout_main);
+        etMedType = rootView.findViewById(R.id.etMedType);
+        etMedName = rootView.findViewById(R.id.etMedName);
+        etMedDescription = rootView.findViewById(R.id.etMedDescription);
+        etMedQty = rootView.findViewById(R.id.etMedQty);
+        etMedDoses = rootView.findViewById(R.id.etMedDoses);
+        tvUpload = rootView.findViewById(R.id.tvUpload);
+        tvUpload.setOnClickListener(this);
+        etMedDoses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final DialogMultipleChoiceAdapter adapter1 = new DialogMultipleChoiceAdapter(context, dosesList);
+                new android.app.AlertDialog.Builder(context).setTitle("Select Doses?")
+                        .setAdapter(adapter1, null)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                selectedDosesId = TextUtils.join(",", adapter1.getSelectedItemIds());
+                                String selectedDosage = TextUtils.join(", ", adapter1.getSelectedItemNames());
+                                Log.e(TAG, "onClick: selectedTableIds >> " + selectedDosesId);
+                                Log.e(TAG, "onClick: selectedDosage >> " + selectedDosage);
+                                etMedDoses.setText(selectedDosage);
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        }).show();
+            }
+        });
         btnSubmit.setOnClickListener(this);
-        cardUpload.setOnClickListener(this);
-        imgFullView.setOnClickListener(this);
         tvAdd.setOnClickListener(this);
+        btnAdd.setOnClickListener(this);
+        btnCancel.setOnClickListener(this);
         initDoses();
     }
 
@@ -189,7 +290,6 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         recylcer_view.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -222,13 +322,36 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                 }
                 break;
             case R.id.cardUpload:
+                break;
+            case R.id.tvUpload:
                 selectImage();
                 break;
-            case R.id.imgThumb:
-
-                break;
             case R.id.tvAdd:
-                addMedDialog();
+                layout_main.setVisibility(View.GONE);
+                layout_add_med.setVisibility(View.VISIBLE);
+                break;
+            case R.id.btnCancel:
+                layout_add_med.setVisibility(View.GONE);
+                layout_main.setVisibility(View.VISIBLE);
+                break;
+            case R.id.btnAdd:
+                layout_add_med.setVisibility(View.GONE);
+                layout_main.setVisibility(View.VISIBLE);
+                PreMedicineData data = new PreMedicineData();
+                data.setType(etMedType.getText().toString());
+                data.setName(etMedName.getText().toString());
+                data.setDescription(etMedDescription.getText().toString());
+                data.setQuantity(etMedQty.getText().toString());
+                data.setDoses(etMedDoses.getText().toString());
+                data.setDoses_id(selectedDosesId);
+                medList.add(data);
+                adapter.notifyDataSetChanged();
+                etMedType.setText("");
+                etMedName.setText("");
+                etMedDescription.setText("");
+                etMedQty.setText("");
+                etMedDoses.setText("");
+                selectedDosesId = "";
                 break;
         }
     }
@@ -240,85 +363,6 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         Log.e(TAG, "saveData: ");
         new UploadTask().execute();
 
-    }
-
-    class UploadTask extends AsyncTask<Void, String, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showProgressDialog();
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            JsonObject jsonDoctor = new JsonObject();
-            jsonDoctor.addProperty("name", etDName.getText().toString());
-            jsonDoctor.addProperty("address", etAddress.getText().toString());
-            jsonDoctor.addProperty("email", etEmail.getText().toString());
-            jsonDoctor.addProperty("phone_no", etPhoneNo.getText().toString());
-
-            JsonObject jsonPatient = new JsonObject();
-            jsonPatient.addProperty("name", etPName.getText().toString());
-            jsonPatient.addProperty("age", etAddress.getText().toString());
-            jsonPatient.addProperty("weight", etWeight.getText().toString());
-            jsonPatient.addProperty("gender", "" + ((RadioButton) rootView.findViewById(rgGender.getCheckedRadioButtonId())).getText());
-
-            JsonArray jsonMedicine = new GsonBuilder().create().toJsonTree(medList).getAsJsonArray();
-
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("method", AppConstants.METHODS.ADD_PRESCRIPTION);
-            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
-            jsonObject.addProperty("image", image_base64);
-            jsonObject.add("doctor_details", jsonDoctor);
-            jsonObject.add("patient_details", jsonPatient);
-            jsonObject.add("medicine_details", jsonMedicine);
-            jsonObject.addProperty("diagnosis_details", etDiagnosis.getText().toString());
-            jsonObject.addProperty("notes", etNote.getText().toString());
-
-            Log.e(TAG, "UploadTask: Request >> " + jsonObject.toString());
-
-            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
-            Call<JsonObject> call = apiService.order(jsonObject);
-            call.enqueue(new Callback<JsonObject>() {
-                @Override
-                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    Log.e(TAG, "UploadTask: Response >> " + response.body().toString());
-                    String resp = response.body().toString();
-                    try {
-                        JSONObject jsonObject = new JSONObject(resp);
-                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
-                            publishProgress("200", "");
-                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
-                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
-                            publishProgress("400", msg);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        publishProgress("400", getActivity().getResources().getString(R.string.api_error_msg));
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
-                    publishProgress("400", getResources().getString(R.string.api_error_msg));
-                }
-            });
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-            hideProgressDialog();
-            adapter.notifyDataSetChanged();
-            String status = values[0];
-            String msg = values[1];
-            if (status.equalsIgnoreCase("200")) {
-                getActivity().onBackPressed();
-            } else if (status.equalsIgnoreCase("400")) {
-                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     private void showProgressDialog() {
@@ -418,7 +462,10 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                         e.printStackTrace();
                     }
                     imgThumb.setImageBitmap(bitmap);
+                    bottomSheet.setVisibility(View.VISIBLE);
+                    btnSubmit.setVisibility(View.VISIBLE);
                     new ImageTask().execute(bitmap);
+
                 } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                     Toast.makeText(getActivity(), "Cropping failed: " + result.getError(), Toast.LENGTH_LONG).show();
                 }
@@ -432,43 +479,10 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                 .setMultiTouchEnabled(false)
                 .setAspectRatio(3, 4)
                 .setOutputCompressQuality(50)
-//                .setRequestedSize(200, 200)
+                .setRequestedSize(768, 1024)
                 .setScaleType(CropImageView.ScaleType.CENTER_INSIDE)
                 .start(getContext(), this);
     }
-
-    class ImageTask extends AsyncTask<Bitmap, Void, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showProgressDialog();
-        }
-
-        @Override
-        protected Void doInBackground(Bitmap... bitmaps) {
-            Bitmap bitmapImage = bitmaps[0];
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            bitmapImage.compress(Bitmap.CompressFormat.PNG, 90, byteArrayOutputStream);
-            byte[] byteArray = byteArrayOutputStream.toByteArray();
-            image_base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
-            Log.d(TAG, "Picture Image :-" + image_base64);
-            publishProgress();
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-            hideProgressDialog();
-        }
-    }
-
-    String[] doses = new String[]{"After Wake - Up", "Before Sleeping", "After Breakfast", "Before Breakfast", "After Lunch", "Before Lunch", "After High - Tea", "Before High - Tea", "After Dinner", "Before Dinner"};
-    boolean[] checkedValues = new boolean[]{false, false, false, false, false, false, false, false, false, false};
-    //    List<String> dosesList = new ArrayList<String>();
-    List<DoseData> dosesList = new ArrayList<DoseData>();
-    String selectedDosesId = "";
-
 
     private void addMedDialog() {
         selectedDosesId = "";
@@ -505,38 +519,8 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                             public void onClick(DialogInterface dialogInterface, int i) {
                             }
                         }).show();
-                /*AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMultiChoiceItems(doses, checkedValues, new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                        checkedValues[which] = isChecked;
-                        if (isChecked)
-                            dosesList.add(doses[which]);
-                        else
-                            dosesList.remove(doses[which]);
-                    }
-                });
-                builder.setCancelable(false);
-                builder.setTitle("Select Doses?");
-                builder.setCancelable(false);
-                builder.setPositiveButton("Select", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        etMedDoses.setText(TextUtils.join(", ", dosesList) + "");
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-                AlertDialog dialog = builder.create();
-                dialog.show();*/
             }
         });
-
-       /* final AlertDialog alertDialog = dialog.create();
-        alertDialog.show();*/
 
         dialog.setPositiveButton("Add", new DialogInterface.OnClickListener() {
             @Override
@@ -548,7 +532,6 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                 data.setQuantity(etMedQty.getText().toString());
                 data.setDoses(etMedDoses.getText().toString());
                 data.setDoses_id(selectedDosesId);
-
                 medList.add(data);
                 adapter.notifyDataSetChanged();
             }
@@ -562,6 +545,111 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         dialog.show();
 //        alertDialog.getButton(AlertDialog.BUTTON1).setEnabled(false);
 
+    }
+
+    class UploadTask extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonDoctor = new JsonObject();
+            jsonDoctor.addProperty("name", etDName.getText().toString());
+            jsonDoctor.addProperty("address", etAddress.getText().toString());
+            jsonDoctor.addProperty("email", etEmail.getText().toString());
+            jsonDoctor.addProperty("phone_no", etPhoneNo.getText().toString());
+
+            JsonObject jsonPatient = new JsonObject();
+            jsonPatient.addProperty("name", etPName.getText().toString());
+            jsonPatient.addProperty("age", etAddress.getText().toString());
+            jsonPatient.addProperty("weight", etWeight.getText().toString());
+            jsonPatient.addProperty("gender", "" + ((RadioButton) rootView.findViewById(rgGender.getCheckedRadioButtonId())).getText());
+
+            JsonArray jsonMedicine = new GsonBuilder().create().toJsonTree(medList).getAsJsonArray();
+
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.ADD_PRESCRIPTION);
+            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
+            jsonObject.addProperty("image", image_base64);
+            jsonObject.add("doctor_details", jsonDoctor);
+            jsonObject.add("patient_details", jsonPatient);
+            jsonObject.add("medicine_details", jsonMedicine);
+            jsonObject.addProperty("diagnosis_details", etDiagnosis.getText().toString());
+            jsonObject.addProperty("notes", etNote.getText().toString());
+
+            Log.e(TAG, "UploadTask: Request >> " + jsonObject.toString());
+
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.order(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "UploadTask: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            publishProgress("200", "");
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getActivity().getResources().getString(R.string.api_error_msg));
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    publishProgress("400", getResources().getString(R.string.api_error_msg));
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+            adapter.notifyDataSetChanged();
+            String status = values[0];
+            String msg = values[1];
+            if (status.equalsIgnoreCase("200")) {
+                getActivity().onBackPressed();
+            } else if (status.equalsIgnoreCase("400")) {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    class ImageTask extends AsyncTask<Bitmap, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
+
+        @Override
+        protected Void doInBackground(Bitmap... bitmaps) {
+            Bitmap bitmapImage = bitmaps[0];
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 70, byteArrayOutputStream);
+            byteArray = byteArrayOutputStream.toByteArray();
+            image_base64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+            Log.d(TAG, "Picture Image :-" + image_base64);
+            publishProgress();
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+        }
     }
 
 
