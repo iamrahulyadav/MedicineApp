@@ -130,7 +130,6 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 startActivity(new Intent(context, SelectAddressActivity.class));
                 finish();
             }
-
         } else {
             startActivity(new Intent(context, LoginActivity.class));
         }
