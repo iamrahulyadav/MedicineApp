@@ -327,6 +327,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    productList.clear();
                     Log.e(TAG, "ProductTask: Response >> " + response.body().toString());
                     String resp = response.body().toString();
                     try {

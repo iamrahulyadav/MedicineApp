@@ -109,6 +109,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
     private TextView tvUpload;
     private byte[] byteArray;
     private boolean isExpand = false;
+    private String from;
 
     @Nullable
     @Override
@@ -117,7 +118,9 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         rootView = inflater.inflate(R.layout.fragment_add_prescr, container, false);
         if (getArguments() != null) {
             data = getArguments().getParcelable("data");
+            from = getArguments().getString("from");
             Log.e(TAG, "onCreateView: data >> " + data);
+            Log.e(TAG, "onCreateView: from >> " + from);
         }
 
         if (intraction != null) {
@@ -193,7 +196,8 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
             etDiagnosis.setText(data.getDiagnosisDetails());
             etNote.setText(data.getNotes());
 
-        }
+        } else
+            selectImage();
         return rootView;
     }
 

@@ -18,17 +18,10 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.SelectPrescAdapter;
 import com.hvantage.medicineapp.model.PrescriptionModel;
-import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
@@ -70,48 +63,10 @@ public class SelectPrescFragment extends Fragment implements View.OnClickListene
                 Log.e(TAG, "onCreateView: data >> " + selectedlist.size());
             /*presList.add(data);*/
         }
-        if (Functions.isConnectingToInternet(context))
-            getData();
-        else
-            Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
+
         return rootView;
     }
 
-    private void getData() {
-        showProgressDialog();
-        FirebaseDatabase.getInstance().getReference()
-                .child(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.VAULT)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                .child(AppConstants.FIREBASE_KEY.MY_PRESCRIPTIONS)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        list.clear();
-                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            PrescriptionModel data = postSnapshot.getValue(PrescriptionModel.class);
-                            Log.d(TAG, "onDataChange: data >> " + data);
-                            list.add(data);
-                        }
-                        adapter.notifyDataSetChanged();
-                        if (adapter.getItemCount() > 0)
-                            cardEmptyText.setVisibility(View.GONE);
-                        else
-                            cardEmptyText.setVisibility(View.VISIBLE);
-                        hideProgressDialog();
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.d(TAG, "loadPost:onCancelled", databaseError.toException());
-                        if (adapter.getItemCount() > 0)
-                            cardEmptyText.setVisibility(View.GONE);
-                        else
-                            cardEmptyText.setVisibility(View.VISIBLE);
-                        hideProgressDialog();
-                    }
-                });
-    }
 
     private void init() {
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);

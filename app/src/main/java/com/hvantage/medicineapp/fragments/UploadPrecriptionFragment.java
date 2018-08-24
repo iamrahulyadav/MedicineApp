@@ -42,7 +42,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.activity.LoginActivity;
 import com.hvantage.medicineapp.activity.PrescPreviewActivity;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.activity.SelectAddressActivity;
@@ -123,17 +122,12 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
             btnContinue.setOnClickListener(this);
         }
         setSearchBar();
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            // getCartData();
-            cartList = new DBHelper(context).getCartData();
-        } else {
-            startActivity(new Intent(getActivity(), LoginActivity.class));
-        }
+        cartList = new DBHelper(context).getCartData();
         return rootView;
     }
 
     private void askAlert() {
-        final CharSequence[] items = {"Choose Existing", "Camera", "Gallery"};
+        final CharSequence[] items = {"Choose Existing", "Upload New"};
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
@@ -148,13 +142,25 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                     ft.replace(R.id.main_container, fragment);
                     ft.addToBackStack(null);
                     ft.commitAllowingStateLoss();
-                } else if (items[item].equals("Camera")) {
+                } else if (items[item].equals("Upload New")) {
+                    userChoosenTask = "Upload New";
+                    FragmentManager manager = getFragmentManager();
+                    FragmentTransaction ft = manager.beginTransaction();
+                    Fragment fragment = new AddPrescrFragment();
+                    Bundle args = new Bundle();
+                    args.putParcelable("data", null);
+                    args.putString("from", "new");
+                    fragment.setArguments(args);
+                    ft.replace(R.id.main_container, fragment);
+                    ft.addToBackStack(null);
+                    ft.commitAllowingStateLoss();
+                } /*else if (items[item].equals("Camera")) {
                     userChoosenTask = "Camera";
                     cameraIntent();
                 } else if (items[item].equals("Gallery")) {
                     userChoosenTask = "Gallery";
                     galleryIntent();
-                }
+                }*/
             }
         });
 //      builder.setCancelable(false);

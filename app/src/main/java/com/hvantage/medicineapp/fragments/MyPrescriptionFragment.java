@@ -161,6 +161,7 @@ public class MyPrescriptionFragment extends Fragment implements View.OnClickList
                 Fragment fragment = new AddPrescrFragment();
                 Bundle args = new Bundle();
                 args.putParcelable("data", list.get(position));
+                args.putString("from", "view");
                 fragment.setArguments(args);
                 ft.replace(R.id.main_container, fragment);
                 ft.addToBackStack(null);
