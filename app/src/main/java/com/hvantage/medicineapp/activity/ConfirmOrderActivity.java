@@ -3,6 +3,7 @@ package com.hvantage.medicineapp.activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,23 +26,32 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
+import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.CartItemAdapter;
 import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
 import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.model.AddressData;
-import com.hvantage.medicineapp.model.AddressModel;
 import com.hvantage.medicineapp.model.CartData;
 import com.hvantage.medicineapp.model.CartModel;
 import com.hvantage.medicineapp.model.OrderData;
+import com.hvantage.medicineapp.retrofit.ApiClient;
+import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.GridSpacingItemDecoration;
 import com.hvantage.medicineapp.util.ProgressBar;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ConfirmOrderActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -61,15 +72,14 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private String payment_mode = "Cash On Delivery";
     private RecyclerView recylcer_view;
     private UploadedPreAdapter adapterPres;
-
     private ArrayList<CartData> cartList = new ArrayList<CartData>();
     private CartItemAdapter adapterCart;
-
     private double total = 0;
     private RecyclerView recylcer_view_items;
-
     private int spacing = 30, spanCount = 3;
     private boolean includeEdge = true;
+    private String selected_pres_id = "", selected_add_id = "";
+    private EditText etNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +90,11 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         timestamp = ServerValue.TIMESTAMP;
-        Log.e(TAG, "onCreate: ServerValue.TIMESTAMP >> " + ServerValue.TIMESTAMP);
+        selected_pres_id = AppPreferences.getSelectedPresId(context);
+        selected_add_id = AppPreferences.getSelectedAddId(context);
+        Log.e(TAG, "onCreate: selected_pres_id >> " + selected_pres_id);
+        Log.e(TAG, "onCreate: selected_add_id >> " + selected_add_id);
+
         if (getIntent().hasExtra("data"))
             addressData = (AddressData) getIntent().getParcelableExtra("data");
         else {
@@ -124,6 +138,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void init() {
+        etNote = (EditText) findViewById(R.id.etNote);
         tvTotalPrice = (TextView) findViewById(R.id.tvTotalPrice);
         tvPayableAmt = (TextView) findViewById(R.id.tvPayableAmt);
         tvCheckout = (TextView) findViewById(R.id.tvCheckout);
@@ -158,113 +173,6 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         adapterCart.notifyDataSetChanged();
     }
 
-//    private void getCartData() {
-//        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-//                .child(AppConstants.FIREBASE_KEY.CART)
-//                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-//                .child(AppConstants.FIREBASE_KEY.CART_ITEMS)
-//                .addValueEventListener(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//                        cartList.clear();
-//                        total = 0;
-//                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-//                            final CartData model1 = postSnapshot.getValue(CartData.class);
-//                            Log.e(TAG, "onDataChange: model1 >> " + model1);
-//                            FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-//                                    .child(AppConstants.FIREBASE_KEY.MEDICINE)
-//                                    .child(model1.getKey())
-//                                    .addListenerForSingleValueEvent(new ValueEventListener() {
-//                                        @Override
-//                                        public void onDataChange(DataSnapshot dataSnapshot1) {
-//                                            ProductModel model2 = dataSnapshot1.getValue(ProductModel.class);
-//                                            Log.d(TAG, "onDataChange: model2 >> " + model2);
-//                                            CartData final_model = new CartData();
-//                                            final_model.setKey(model1.getKey());
-//                                            final_model.setQty_no(model1.getQty_no());
-//                                            final_model.setItem(model2.getName());
-//                                            final_model.setImage(model2.getImage());
-//                                            final_model.setItem_price(String.valueOf(model2.getPrice()));
-//                                            final_model.setItem_total_price(String.valueOf(model1.getQty_no() * model2.getPrice()));
-//                                            cartList.add(final_model);
-//                                            adapterCart.notifyDataSetChanged();
-//                                            total = total + Double.parseDouble(final_model.getItem_total_price());
-//                                            tvTotalPrice.setText("Rs. " + total);
-//                                            tvPayableAmt.setText("Rs. " + total);
-//                                            if (adapterCart.getItemCount() == 0) {
-//                                                llMedicine.setVisibility(View.GONE);
-//                                            } else {
-//                                                llMedicine.setVisibility(View.VISIBLE);
-//                                            }
-//                                        }
-//
-//                                        @Override
-//                                        public void onCancelled(DatabaseError databaseError) {
-//                                            adapterCart.notifyDataSetChanged();
-//                                            if (adapterCart.getItemCount() == 0) {
-//                                                llMedicine.setVisibility(View.GONE);
-//                                            } else {
-//                                                llMedicine.setVisibility(View.VISIBLE);
-//                                            }
-//                                            Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
-//                                        }
-//                                    });
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//                        adapterCart.notifyDataSetChanged();
-//                        if (adapterCart.getItemCount() == 0) {
-//                            llMedicine.setVisibility(View.GONE);
-//                        } else {
-//                            llMedicine.setVisibility(View.VISIBLE);
-//                        }
-//                        Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
-//                    }
-//                });
-//    }
-
-//    private void getData() {
-//        showProgressDialog();
-//        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-//                .child(AppConstants.FIREBASE_KEY.TEMP_PRESCRIPTION)
-//                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-//                .orderByKey()
-//                .addValueEventListener(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//                        presList.clear();
-//                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-//                            PrescriptionModel data = postSnapshot.getValue(PrescriptionModel.class);
-//                            if (data != null) {
-//                                presList.add(data);
-//                                adapterPres.notifyDataSetChanged();
-//                            }
-//                            adapterPres.notifyDataSetChanged();
-//                            if (adapterPres.getItemCount() == 0) {
-//                                llPrescription.setVisibility(View.GONE);
-//                            } else {
-//                                llPrescription.setVisibility(View.VISIBLE);
-//                            }
-//                        }
-//                        hideProgressDialog();
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//                        adapterPres.notifyDataSetChanged();
-//                        if (adapterPres.getItemCount() == 0) {
-//                            llPrescription.setVisibility(View.GONE);
-//                        } else {
-//                            llPrescription.setVisibility(View.VISIBLE);
-//                        }
-//                        Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
-//                        hideProgressDialog();
-//                    }
-//                });
-//    }
-
     private void showProgressDialog() {
         progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
             @Override
@@ -293,7 +201,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         switch (v.getId()) {
             case R.id.tvCheckout:
                 if (Functions.isConnectingToInternet(context))
-                    sendData();
+                    new OrderTask().execute();
                 else {
                     Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
                 }
@@ -307,8 +215,6 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
 
     private void sendData() {
         showProgressDialog();
-
-
         String key = FirebaseDatabase.getInstance()
                 .getReference(AppConstants.APP_NAME)
                 .child(AppConstants.FIREBASE_KEY.ORDERS)
@@ -378,6 +284,70 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             }
         });
 
+    }
+
+    class OrderTask extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.PLACE_ORDER_WITH_PRESCRIPTION);
+            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
+            jsonObject.addProperty("prescription_id", selected_pres_id);
+            jsonObject.addProperty("address_id", selected_add_id);
+            jsonObject.addProperty("payment_mode", "");
+            jsonObject.addProperty("note", etNote.getText().toString());
+            jsonObject.addProperty("additional_items", "");
+
+            Log.e(TAG, "OrderTask: Request >> " + jsonObject.toString());
+
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.order(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "OrderTask: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            publishProgress("200", "");
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getResources().getString(R.string.api_error_msg));
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    publishProgress("400", getResources().getString(R.string.api_error_msg));
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+            String status = values[0];
+            String msg = values[1];
+            if (status.equalsIgnoreCase("200")) {
+                startActivity(new Intent(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            } else if (status.equalsIgnoreCase("400")) {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 }

@@ -34,6 +34,11 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -54,7 +59,6 @@ import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.TouchImageView;
-import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -84,9 +88,6 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
             etWeight, etDiagnosis, etNote, etMedType, etMedName,
             etMedDescription, etMedQty, etMedDoses;
     RadioGroup rgGender;
-    String[] doses = new String[]{"After Wake - Up", "Before Sleeping", "After Breakfast", "Before Breakfast", "After Lunch", "Before Lunch", "After High - Tea", "Before High - Tea", "After Dinner", "Before Dinner"};
-    boolean[] checkedValues = new boolean[]{false, false, false, false, false, false, false, false, false, false};
-    //    List<String> dosesList = new ArrayList<String>();
     List<DoseData> dosesList = new ArrayList<DoseData>();
     String selectedDosesId = "";
     private Context context;
@@ -107,6 +108,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
     private TouchImageView imgThumb;
     private TextView tvUpload;
     private byte[] byteArray;
+    private boolean isExpand = false;
 
     @Nullable
     @Override
@@ -132,11 +134,42 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
         if (data != null) {
             if (!data.getImage().equalsIgnoreCase("")) {
-                Picasso.with(context)
+               /* Picasso.with(context)
                         .load(data.getImage())
+                        .into(imgThumb);*/
+                /*Glide.with(getContext()).load(data.getImage()).asBitmap().into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        imgThumb.setImageBitmap(resource);
+                    }
+                });*/
+                imgThumb.setImageResource(R.drawable.no_image_ph);
+                showProgressDialog();
+                Glide.with(getActivity()).load(data.getImage())
+                        .thumbnail(0.5f)
+                        .crossFade()
+                        .placeholder(R.drawable.no_image_ph)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .listener(new RequestListener<String, GlideDrawable>() {
+                            @Override
+                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                hideProgressDialog();
+                                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                hideProgressDialog();
+                                return false;
+                            }
+                        })
                         .into(imgThumb);
+
+
             }
             bottomSheet.setVisibility(View.VISIBLE);
+            tvUpload.setVisibility(View.VISIBLE);
             tvUpload.setText("Prescription is loading...");
             tvUpload.setClickable(false);
             DoctorDetails doctorData = data.getDoctorDetails();
@@ -178,10 +211,12 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                         Functions.hideSoftKeyboard(context, bottomSheet);
                         break;
                     case BottomSheetBehavior.STATE_EXPANDED:
+                        isExpand = true;
                         Log.d(TAG, "onStateChanged: STATE_EXPANDED");
                         Functions.hideSoftKeyboard(context, bottomSheet);
                         break;
                     case BottomSheetBehavior.STATE_COLLAPSED:
+                        isExpand = false;
                         Log.d(TAG, "onStateChanged: STATE_COLLAPSED");
                         Functions.hideSoftKeyboard(context, bottomSheet);
                         break;
@@ -209,9 +244,9 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
 
     private void animateBottomSheetArrows(float slideOffset) {
         // Animate counter-clockwise
-//        imgArrow.setRotation(slideOffset * -180);
+        imgArrow.setRotation(slideOffset * -180);
         // Animate clockwise
-        imgArrow.setRotation(slideOffset * 180);
+//        imgArrow.setRotation(slideOffset * 180);
     }
 
     private void init() {
@@ -268,6 +303,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         tvAdd.setOnClickListener(this);
         btnAdd.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
+        imgArrow.setOnClickListener(this);
         initDoses();
     }
 
@@ -333,6 +369,12 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
             case R.id.btnCancel:
                 layout_add_med.setVisibility(View.GONE);
                 layout_main.setVisibility(View.VISIBLE);
+                break;
+            case R.id.imgArrow:
+                if (isExpand)
+                    behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                else
+                    behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 break;
             case R.id.btnAdd:
                 layout_add_med.setVisibility(View.GONE);
@@ -484,69 +526,6 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                 .start(getContext(), this);
     }
 
-    private void addMedDialog() {
-        selectedDosesId = "";
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-        dialog.setTitle("Add Medicine");
-        dialog.setCancelable(false);
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.input_pres_medicine, null);
-        dialog.setView(dialogView);
-        dialog.setCancelable(false);
-        final EditText etMedType = dialogView.findViewById(R.id.etMedType);
-        final EditText etMedName = dialogView.findViewById(R.id.etMedName);
-        final EditText etMedDescription = dialogView.findViewById(R.id.etMedDescription);
-        final EditText etMedQty = dialogView.findViewById(R.id.etMedQty);
-        final EditText etMedDoses = dialogView.findViewById(R.id.etMedDoses);
-        etMedDoses.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final DialogMultipleChoiceAdapter adapter1 = new DialogMultipleChoiceAdapter(context, dosesList);
-                new android.app.AlertDialog.Builder(context).setTitle("Select Doses?")
-                        .setAdapter(adapter1, null)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                selectedDosesId = TextUtils.join(",", adapter1.getSelectedItemIds());
-                                String selectedDosage = TextUtils.join(", ", adapter1.getSelectedItemNames());
-                                Log.e(TAG, "onClick: selectedTableIds >> " + selectedDosesId);
-                                Log.e(TAG, "onClick: selectedDosage >> " + selectedDosage);
-                                etMedDoses.setText(selectedDosage);
-                            }
-                        })
-                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                            }
-                        }).show();
-            }
-        });
-
-        dialog.setPositiveButton("Add", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                PreMedicineData data = new PreMedicineData();
-                data.setType(etMedType.getText().toString());
-                data.setName(etMedName.getText().toString());
-                data.setDescription(etMedDescription.getText().toString());
-                data.setQuantity(etMedQty.getText().toString());
-                data.setDoses(etMedDoses.getText().toString());
-                data.setDoses_id(selectedDosesId);
-                medList.add(data);
-                adapter.notifyDataSetChanged();
-            }
-        });
-        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-            }
-        });
-        dialog.show();
-//        alertDialog.getButton(AlertDialog.BUTTON1).setEnabled(false);
-
-    }
-
     class UploadTask extends AsyncTask<Void, String, Void> {
         @Override
         protected void onPreExecute() {
@@ -564,7 +543,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
 
             JsonObject jsonPatient = new JsonObject();
             jsonPatient.addProperty("name", etPName.getText().toString());
-            jsonPatient.addProperty("age", etAddress.getText().toString());
+            jsonPatient.addProperty("age", etAge.getText().toString());
             jsonPatient.addProperty("weight", etWeight.getText().toString());
             jsonPatient.addProperty("gender", "" + ((RadioButton) rootView.findViewById(rgGender.getCheckedRadioButtonId())).getText());
 

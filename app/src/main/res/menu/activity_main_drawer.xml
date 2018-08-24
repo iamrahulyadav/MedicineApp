@@ -10,6 +10,10 @@
         android:id="@+id/nav_upload_pre"
         android:icon="@drawable/action_upload_rx"
         android:title="Upload Prescription" />
+    <item
+        android:id="@+id/nav_my_pre"
+        android:icon="@drawable/action_upload_rx"
+        android:title="My Prescription" />
 
     <item
         android:id="@+id/nav_vault"

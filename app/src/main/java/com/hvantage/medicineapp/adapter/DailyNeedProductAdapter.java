@@ -27,15 +27,15 @@ import com.hvantage.medicineapp.util.ProgressBar;
 
 import java.util.ArrayList;
 
-public class HomeProductAdapter2 extends RecyclerView.Adapter<HomeProductAdapter2.ViewHolder> {
+public class DailyNeedProductAdapter extends RecyclerView.Adapter<DailyNeedProductAdapter.ViewHolder> {
 
-    private static final String TAG = "HomeProductAdapter2";
+    private static final String TAG = "DailyNeedProductAdapter";
     Context context;
     ArrayList<ProductData> arrayList;
     private ProgressBar progressBar;
 
 
-    public HomeProductAdapter2(Context context, ArrayList<ProductData> arrayList) {
+    public DailyNeedProductAdapter(Context context, ArrayList<ProductData> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
     }

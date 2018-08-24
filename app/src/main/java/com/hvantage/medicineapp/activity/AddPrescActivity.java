@@ -28,6 +28,9 @@ public class AddPrescActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = REQUEST_STORAGE + 1;
     private static final int REQUEST_LOAD_IMAGE = REQUEST_IMAGE_CAPTURE + 1;
     private static final String TAG = "AddPrescrFragment";
+    ArrayList<PreMedicineData> medList = new ArrayList<PreMedicineData>();
+    EditText etDName, etAddress, etEmail, etPhoneNo, etPName, etAge, etWeight, etDiagnosis, etNote;
+    RadioGroup rgGender;
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
@@ -37,11 +40,8 @@ public class AddPrescActivity extends AppCompatActivity {
     private ImageView imgThumb, imgBack;
     private String image_base64;
     private TextView tvAdd;
-    ArrayList<PreMedicineData> medList = new ArrayList<PreMedicineData>();
     private RecyclerView recylcer_view;
     private PreMedicineItemAdapter adapter;
-    EditText etDName, etAddress, etEmail, etPhoneNo, etPName, etAge, etWeight, etDiagnosis, etNote;
-    RadioGroup rgGender;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -163,7 +163,6 @@
 
                 </LinearLayout>
 
-
                 <LinearLayout
                     android:id="@+id/llPrescription"
                     android:layout_width="match_parent"
@@ -456,6 +455,46 @@
                         android:text="Apply"
                         android:textColor="@color/colorToolbarTitle"
                         android:textStyle="bold" />
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="Remark"
+                        android:textAlignment="center"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="@color/colorPrimary"
+                        android:textStyle="bold" />
+
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/promocode_round_edge"
+                    android:weightSum="1">
+
+                    <EditText
+                        android:id="@+id/etNote"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:background="@drawable/promocode_round_edge"
+                        android:drawableTint="@color/colorGray"
+                        android:gravity="start"
+                        android:hint="Enter your remark here..."
+                        android:padding="10dp"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
                 </LinearLayout>
 
             </LinearLayout>

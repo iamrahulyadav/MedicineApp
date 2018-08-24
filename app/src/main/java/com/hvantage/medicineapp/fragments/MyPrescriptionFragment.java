@@ -95,10 +95,11 @@ public class MyPrescriptionFragment extends Fragment implements View.OnClickList
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    Log.e(TAG, "GetDataTask: Response >> " + response.body().toString());
-                    String resp = response.body().toString();
-                    list.clear();
+
                     try {
+                        Log.e(TAG, "GetDataTask: Response >> " + response.body().toString());
+                        String resp = response.body().toString();
+                        list.clear();
                         JSONObject jsonObject = new JSONObject(resp);
                         if (jsonObject.getString("status").equalsIgnoreCase("200")) {
                             JSONArray jsonArray = jsonObject.getJSONArray("result");
@@ -151,7 +152,6 @@ public class MyPrescriptionFragment extends Fragment implements View.OnClickList
     }
 
     private void setRecyclerView() {
-        boolean includeEdge = true;
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
         adapter = new AllUploadedPreAdapter(context, list, new AllUploadedPreAdapter.MyAdapterListener() {
             @Override
@@ -170,6 +170,7 @@ public class MyPrescriptionFragment extends Fragment implements View.OnClickList
             @Override
             public void placeOrder(View v, int position) {
                 AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
+                AppPreferences.setSelectedPresId(context, list.get(position).getPrescription_id());
                 Intent intent = new Intent(getActivity(), SelectAddressActivity.class);
                 startActivity(intent);
             }

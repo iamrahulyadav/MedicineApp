@@ -84,72 +84,6 @@ public class SelectAddressActivity extends AppCompatActivity {
         });
     }
 
-    class GetDataTask extends AsyncTask<Void, String, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showProgressDialog();
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("method", AppConstants.METHODS.GET_MY_ADDRESSES);
-            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
-
-            Log.e(TAG, "GetDataTask: Request >> " + jsonObject.toString());
-
-            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
-            Call<JsonObject> call = apiService.address(jsonObject);
-            call.enqueue(new Callback<JsonObject>() {
-                @Override
-                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    Log.e(TAG, "GetDataTask: Response >> " + response.body().toString());
-                    String resp = response.body().toString();
-                    list.clear();
-                    try {
-                        JSONObject jsonObject = new JSONObject(resp);
-                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
-                            JSONArray jsonArray = jsonObject.getJSONArray("result");
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                Gson gson = new Gson();
-                                AddressData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), AddressData.class);
-                                Log.e(TAG, "onResponse: data >> " + data);
-                                list.add(data);
-                            }
-                            publishProgress("200", "");
-                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
-                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
-                            publishProgress("400", msg);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        publishProgress("400", getResources().getString(R.string.api_error_msg));
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
-                    publishProgress("400", getResources().getString(R.string.api_error_msg));
-                }
-            });
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-            hideProgressDialog();
-            adapter.notifyDataSetChanged();
-            String status = values[0];
-            String msg = values[1];
-            if (status.equalsIgnoreCase("400")) {
-                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-
     private void setRecyclerView() {
         list.clear();
         recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
@@ -161,6 +95,7 @@ public class SelectAddressActivity extends AppCompatActivity {
 
             @Override
             public void select(View v, int position) {
+                AppPreferences.setSelectedAddId(context, list.get(position).getAddressId());
                 Intent intent = new Intent(context, ConfirmOrderActivity.class);
                 intent.putExtra("data", list.get(position));
                 startActivity(intent);
@@ -229,7 +164,6 @@ public class SelectAddressActivity extends AppCompatActivity {
         });
     }
 
-
     private void showProgressDialog() {
         progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
             @Override
@@ -291,5 +225,70 @@ public class SelectAddressActivity extends AppCompatActivity {
         else if (item.getItemId() == R.id.action_cart) {
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    class GetDataTask extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.GET_MY_ADDRESSES);
+            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
+
+            Log.e(TAG, "GetDataTask: Request >> " + jsonObject.toString());
+
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.address(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "GetDataTask: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    list.clear();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            JSONArray jsonArray = jsonObject.getJSONArray("result");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                Gson gson = new Gson();
+                                AddressData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), AddressData.class);
+                                Log.e(TAG, "onResponse: data >> " + data);
+                                list.add(data);
+                            }
+                            publishProgress("200", "");
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getResources().getString(R.string.api_error_msg));
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    publishProgress("400", getResources().getString(R.string.api_error_msg));
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+            adapter.notifyDataSetChanged();
+            String status = values[0];
+            String msg = values[1];
+            if (status.equalsIgnoreCase("400")) {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

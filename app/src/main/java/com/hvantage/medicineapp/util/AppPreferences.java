@@ -16,6 +16,8 @@ public class AppPreferences {
     public static final String USER_ID = "user_id";
     public static final String USER_NAME = "user_name";
     public static final String ORDER_TYPE = "order_type";
+    public static final String SELECTED_PRES_ID = "selected_pres_id";
+    public static final String SELECTED_ADD_ID = "selected_add_id";
 
     private static AppPreferences instance;
     private final SharedPreferences sharedPreferences;
@@ -82,6 +84,34 @@ public class AppPreferences {
         SharedPreferences pereference = context.getSharedPreferences(
                 PREFERENCES, 0);
         return pereference.getInt(MOBILE_NO, 0);
+    }
+
+    public static void setSelectedPresId(Context context, String value) {
+        SharedPreferences preferences = context.getSharedPreferences(
+                PREFERENCES, 0);
+        Editor editor = preferences.edit();
+        editor.putString(SELECTED_PRES_ID, value);
+        editor.commit();
+    }
+
+    public static String getSelectedPresId(Context context) {
+        SharedPreferences pereference = context.getSharedPreferences(
+                PREFERENCES, 0);
+        return pereference.getString(SELECTED_PRES_ID, "");
+    }
+
+    public static void setSelectedAddId(Context context, String value) {
+        SharedPreferences preferences = context.getSharedPreferences(
+                PREFERENCES, 0);
+        Editor editor = preferences.edit();
+        editor.putString(SELECTED_ADD_ID, value);
+        editor.commit();
+    }
+
+    public static String getSelectedAddId(Context context) {
+        SharedPreferences pereference = context.getSharedPreferences(
+                PREFERENCES, 0);
+        return pereference.getString(SELECTED_ADD_ID, "");
     }
 
     public static void clearPreference(Context context) {

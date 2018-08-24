@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -28,16 +29,29 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.business.BusinessLoginActivity;
 import com.hvantage.medicineapp.fragments.CartFragment;
 import com.hvantage.medicineapp.fragments.HomeFragment;
 import com.hvantage.medicineapp.fragments.MyOrderFragment;
+import com.hvantage.medicineapp.fragments.MyPrescriptionFragment;
 import com.hvantage.medicineapp.fragments.OfferDiscountFragment;
 import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.fragments.VaultFragment;
+import com.hvantage.medicineapp.retrofit.ApiClient;
+import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
+import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.FragmentIntraction;
+import com.hvantage.medicineapp.util.Functions;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, FragmentIntraction {
 
@@ -47,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Context context;
     private NavigationView navigationView;
     private TextView tvLogin, tvUsername;
+    private String mToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +77,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(MainActivity.this, new OnSuccessListener<InstanceIdResult>() {
             @Override
             public void onSuccess(InstanceIdResult instanceIdResult) {
-                String mToken = instanceIdResult.getToken();
-                Log.e("Token", mToken);
+                mToken = instanceIdResult.getToken();
+                Log.e(TAG, "onSuccess: Token >> " + mToken);
+                if (Functions.isConnectingToInternet(context))
+                    new UpdateFCMTask().execute();
             }
         });
         if (AppPreferences.getUserId(context).equalsIgnoreCase("")) {
@@ -100,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -121,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void hideMenus() {
         Menu nav_Menu = navigationView.getMenu();
         nav_Menu.findItem(R.id.nav_upload_pre).setVisible(false);
+        nav_Menu.findItem(R.id.nav_my_pre).setVisible(false);
         nav_Menu.findItem(R.id.nav_vault).setVisible(false);
         nav_Menu.findItem(R.id.nav_orders).setVisible(false);
         nav_Menu.findItem(R.id.nav_myaccount).setVisible(false);
@@ -142,7 +159,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ft.commitAllowingStateLoss();
     }
 
-
     private void initDrawer(Toolbar toolbar) {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -163,7 +179,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
     }
-
 
     @Override
     public void onBackPressed() {
@@ -211,6 +226,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ft.replace(R.id.main_container, fragment);
                 ft.commitAllowingStateLoss();
                 clearBackStack();
+                break;
+            case R.id.nav_my_pre:
+                fragment = new MyPrescriptionFragment();
+                ft.replace(R.id.main_container, fragment);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
                 break;
             case R.id.nav_upload_pre:
                 if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
@@ -261,7 +282,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-
     private void logoutAlert() {
         new AlertDialog.Builder(context)
                 .setMessage("Do you want to logout?")
@@ -284,5 +304,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void actionbarsetTitle(String title) {
         toolbar_title.setText(title);
+    }
+
+    class UpdateFCMTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.UPDATE_FCM_TOKEN);
+            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
+            jsonObject.addProperty("fcm_token", mToken);
+            Log.e(TAG, "UpdateFCMTask: Request >> " + jsonObject.toString());
+
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.user_register(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "UpdateFCMTask: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                }
+            });
+            return null;
+        }
     }
 }

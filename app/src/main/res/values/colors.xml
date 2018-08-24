@@ -6,7 +6,7 @@
     <color name="colorAccent">#2E5ECE</color>
     <color name="colorWhite">#fff</color>
     <color name="colorBlack">#111</color>
-    <color name="colorActivityBackground">#f2f2f2</color>
+    <color name="colorActivityBackground">#f0f0f0</color>
     <color name="colorDivider">#f0f0f0</color>
     <color name="colorTextHeading">#4b4b4b</color>
     <color name="colorTextSubHeading">#767676</color>

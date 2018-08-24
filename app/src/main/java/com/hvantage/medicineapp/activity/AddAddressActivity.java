@@ -93,6 +93,20 @@ public class AddAddressActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
+    private void showProgressDialog() {
+        progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                // TODO Auto-generated method stub
+            }
+        });
+    }
+
+    private void hideProgressDialog() {
+        if (progressBar != null)
+            progressBar.dismiss();
+    }
+
     class SaveTask extends AsyncTask<Void, String, Void> {
         @Override
         protected void onPreExecute() {
@@ -157,22 +171,6 @@ public class AddAddressActivity extends AppCompatActivity implements View.OnClic
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-
-
-    private void showProgressDialog() {
-        progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                // TODO Auto-generated method stub
-            }
-        });
-    }
-
-    private void hideProgressDialog() {
-        if (progressBar != null)
-            progressBar.dismiss();
     }
 
 }

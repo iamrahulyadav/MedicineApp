@@ -51,10 +51,11 @@ import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.LoginActivity;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.adapter.CategoryAdapter;
-import com.hvantage.medicineapp.adapter.HomeProductAdapter2;
+import com.hvantage.medicineapp.adapter.DailyNeedProductAdapter;
 import com.hvantage.medicineapp.adapter.OfferPagerAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.CategoryData;
+import com.hvantage.medicineapp.model.ProductData;
 import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.retrofit.ApiClient;
 import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
@@ -81,15 +82,13 @@ import static android.app.Activity.RESULT_OK;
 
 public class HomeFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "HomeFragment";
-    private static final int REQUEST_ALL_PERMISSIONS = 100;
-    private final int REQ_CODE_SPEECH_INPUT = 101;
+    private static final int REQUEST_ALL_PERMISSIONS = 100, REQ_CODE_SPEECH_INPUT = 101;
     ArrayList<CategoryData> catList = new ArrayList<CategoryData>();
-    ArrayList<ProductModel> productList = new ArrayList<ProductModel>();
-    ArrayList<ProductModel> listDailyNeeds = new ArrayList<ProductModel>();
+    ArrayList<ProductData> productList = new ArrayList<ProductData>();
     ArrayList<Bitmap> offerList = new ArrayList<Bitmap>();
-    private RecyclerView recylcer_view;
-    private CategoryAdapter adapter;
-    private RecyclerView recylcer_view_daily;
+    private RecyclerView recylcer_view, recylcer_view_daily;
+    private CategoryAdapter categoryAdapter;
+    private DailyNeedProductAdapter productAdapter;
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
@@ -98,9 +97,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private AppCompatAutoCompleteTextView etSearch;
     private ArrayList<String> list;
     private ProgressBar progressBar;
-    private RecyclerView recylcer_view_recco;
-    private RecyclerView recylcer_view_daily2;
-    private HomeProductAdapter2 adapterDaily2;
     private FloatingActionMenu floatingActionMenu;
     private ViewPager viewPagerOffers;
 
@@ -199,7 +195,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     }
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -210,16 +205,23 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
         init();
         setFloatingButton();
-
         list = new DBHelper(context).getMedicinesSearch();
-        new CategoryTask().execute();
-       /* setCategory();
-        //setProduct();
-        setRecylclerviewDaily();
-        setRecylclerviewDaily2();
+        if (Functions.isConnectingToInternet(context)) {
+            new CategoryTask().execute();
+            new ProductTask().execute();
+        } else {
+            Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
+        }
         setSearchBar();
-        getRandomCatData();*/
         return rootView;
+    }
+
+    private void setProductAdapter() {
+        recylcer_view_daily = (RecyclerView) rootView.findViewById(R.id.recylcer_view_daily);
+        productAdapter = new DailyNeedProductAdapter(context, productList);
+        recylcer_view_daily.setLayoutManager(new LinearLayoutManager(context));
+        recylcer_view_daily.setAdapter(productAdapter);
+        productAdapter.notifyDataSetChanged();
     }
 
     private void setOffers() {
@@ -231,42 +233,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         viewPagerOffers.setAdapter(new OfferPagerAdapter(getActivity(), offerList));
     }
 
-    private void getRandomCatData() {
-        showProgressDialog();
-        FirebaseDatabase.getInstance().getReference()
-                .child(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.MEDICINE)
-                .orderByChild("category_name")
-                .equalTo("Personal Care")
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        listDailyNeeds.clear();
-                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            ProductModel model = postSnapshot.getValue(ProductModel.class);
-                            Log.d(TAG, "onDataChange: model >> " + model);
-                            listDailyNeeds.add(model);
-                            /*if (listDailyNeeds.size() == 10)
-                                break;*/
-                        }
-                        adapterDaily2.notifyDataSetChanged();
-                        hideProgressDialog();
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
-                        hideProgressDialog();
-                    }
-                });
-    }
-
     private void setSearchBar() {
         if (list != null) {
             Log.e(TAG, "setSearchBar: list >> " + list.size());
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, R.layout.auto_complete_text, list);
+            ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(context, R.layout.auto_complete_text, list);
             etSearch.setThreshold(1);
-            etSearch.setAdapter(adapter);
+            etSearch.setAdapter(categoryAdapter);
             etSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -289,8 +261,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                                             etSearch.setText("");
                                             break;
                                         }
-
-
                                     }
 
                                     @Override
@@ -336,13 +306,76 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         });
         setOffers();
         setCategoryAdapter();
+        setProductAdapter();
     }
+
+    class ProductTask extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.GET_DAILY_NEED_PRODUCTS);
+            Log.e(TAG, "ProductTask: Request >> " + jsonObject.toString());
+
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.products(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "ProductTask: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            JSONArray jsonArray = jsonObject.getJSONArray("result");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                Gson gson = new Gson();
+                                ProductData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), ProductData.class);
+                                productList.add(data);
+                            }
+                            publishProgress("200", "");
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getActivity().getResources().getString(R.string.api_error_msg));
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    publishProgress("400", getResources().getString(R.string.api_error_msg));
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+            productAdapter.notifyDataSetChanged();
+            String status = values[0];
+            String msg = values[1];
+            if (status.equalsIgnoreCase("400")) {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
     private void setCategoryAdapter() {
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
-        adapter = new CategoryAdapter(context, catList);
+        categoryAdapter = new CategoryAdapter(context, catList);
         recylcer_view.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        recylcer_view.setAdapter(adapter);
+        recylcer_view.setAdapter(categoryAdapter);
         recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -371,14 +404,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
             }
         }));
-        adapter.notifyDataSetChanged();
+        categoryAdapter.notifyDataSetChanged();
     }
 
     class CategoryTask extends AsyncTask<Void, String, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            showProgressDialog();
         }
 
         @Override
@@ -426,8 +458,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            hideProgressDialog();
-            adapter.notifyDataSetChanged();
+            categoryAdapter.notifyDataSetChanged();
             String status = values[0];
             String msg = values[1];
             if (status.equalsIgnoreCase("400")) {
@@ -435,27 +466,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             }
         }
     }
-
-
-//    private void setRecylclerviewDaily2() {
-//        recylcer_view_daily2 = (RecyclerView) rootView.findViewById(R.id.recylcer_view_daily2);
-//        recylcer_view_daily2.setLayoutManager(new LinearLayoutManager(context));
-//        adapterDaily2 = new HomeProductAdapter2(context, listDailyNeeds);
-//        recylcer_view_daily2.setAdapter(adapterDaily2);
-//        recylcer_view_daily2.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view_daily, new RecyclerItemClickListener.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(View view, int position) {
-//               /* startActivity(new Intent(context, ProductDetailActivity.class)
-//                        .putExtra("medicine_data", listDailyNeeds.get(position)));*/
-//            }
-//
-//            @Override
-//            public void onItemLongClick(View view, int position) {
-//
-//            }
-//        }));
-//        adapterDaily2.notifyDataSetChanged();
-//    }
 
     @Override
     public void onAttach(Context context) {
@@ -531,18 +541,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         switch (requestCode) {
             case REQ_CODE_SPEECH_INPUT: {
                 if (resultCode == RESULT_OK && null != data) {
-
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     etSearch.setText(result.get(0));
                 }
                 break;
             }
-
         }
     }
 }

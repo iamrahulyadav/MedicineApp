@@ -18,7 +18,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.adapter.HomeProductAdapter2;
+import com.hvantage.medicineapp.adapter.DailyNeedProductAdapter;
 import com.hvantage.medicineapp.model.ProductData;
 import com.hvantage.medicineapp.model.SubCategoryData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
@@ -27,7 +27,6 @@ import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
-import com.hvantage.medicineapp.util.RecyclerItemClickListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,7 +45,7 @@ public class ProductsFragment extends Fragment implements View.OnClickListener {
     private View rootView;
     private FragmentIntraction intraction;
     private RecyclerView recylcer_view;
-    private HomeProductAdapter2 adapter;
+    private DailyNeedProductAdapter adapter;
     private ArrayList<ProductData> list = new ArrayList<ProductData>();
     private ProgressBar progressBar;
     private SubCategoryData data;
@@ -148,7 +147,7 @@ public class ProductsFragment extends Fragment implements View.OnClickListener {
     }
 
     private void setRecyclerView() {
-        adapter = new HomeProductAdapter2(context, list);
+        adapter = new DailyNeedProductAdapter(context, list);
         recylcer_view.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view.setAdapter(adapter);
         adapter.notifyDataSetChanged();

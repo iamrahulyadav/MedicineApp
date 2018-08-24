@@ -10,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.MainActivity;
@@ -19,7 +18,7 @@ import com.hvantage.medicineapp.util.AppConstants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LatestFirebaseMessagingService extends FirebaseMessagingService {
+public class MyFirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
 
     private static final String TAG = "FirebaseInstanceService";
     private String refreshedToken = "";

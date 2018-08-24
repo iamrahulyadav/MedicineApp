@@ -39,6 +39,8 @@ import java.util.ArrayList;
 
 public class PrescPreviewActivity extends AppCompatActivity {
     private static final String TAG = "PrescPreviewActivity";
+    public static ArrayList<CartModel> cartList;
+    public static int position;
     private TouchImageView imageFull;
     private ImageView back;
     private Context context;
@@ -49,8 +51,6 @@ public class PrescPreviewActivity extends AppCompatActivity {
     private View bottomSheet;
     private RecyclerView recylcer_view_cart;
     private PPItemAdapter adapterCart;
-    public static ArrayList<CartModel> cartList;
-    public static int position;
     private PrescriptionModel data;
 
     @Override

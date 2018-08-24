@@ -127,6 +127,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    private boolean checkPermission() {
+        if ((ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
+            if ((ActivityCompat.shouldShowRequestPermissionRationale(LoginActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                    && (ActivityCompat.shouldShowRequestPermissionRationale(LoginActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE))) {
+            } else {
+                ActivityCompat.requestPermissions(LoginActivity.this,
+                        new String[]{
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.CAMERA,
+                        },
+                        REQUEST_ALL_PERMISSIONS);
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     class LoginTask extends AsyncTask<Void, String, Void> {
         @Override
         protected void onPreExecute() {
@@ -189,27 +210,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             } else if (status.equalsIgnoreCase("400")) {
                 Snackbar.make(findViewById(android.R.id.content), msg, Snackbar.LENGTH_SHORT).show();
             }
-        }
-    }
-
-    private boolean checkPermission() {
-        if ((ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-                && (ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-                && (ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
-            if ((ActivityCompat.shouldShowRequestPermissionRationale(LoginActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE))
-                    && (ActivityCompat.shouldShowRequestPermissionRationale(LoginActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE))) {
-            } else {
-                ActivityCompat.requestPermissions(LoginActivity.this,
-                        new String[]{
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                Manifest.permission.READ_EXTERNAL_STORAGE,
-                                Manifest.permission.CAMERA,
-                        },
-                        REQUEST_ALL_PERMISSIONS);
-            }
-            return false;
-        } else {
-            return true;
         }
     }
 
