@@ -191,10 +191,11 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
 
             medList = data.getMedicineDetails();
             Log.e(TAG, "onCreateView: data.getMedicineDetails() >> " + medList);
+            if (medList.contains(null)) {
+                medList.remove(null);
+                Log.e(TAG, "onCreateView: data.getMedicineDetails() >> " + medList.size());
+            }
             setRecyclerView();
-
-            etDiagnosis.setText(data.getDiagnosisDetails());
-            etNote.setText(data.getNotes());
 
         } else
             selectImage();

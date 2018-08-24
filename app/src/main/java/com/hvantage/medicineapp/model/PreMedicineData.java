@@ -8,19 +8,19 @@ public class PreMedicineData {
 
     @SerializedName("type")
     @Expose
-    private String type;
+    private String type = "";
     @SerializedName("name")
     @Expose
-    private String name;
+    private String name = "";
     @SerializedName("doses")
     @Expose
-    private String doses;
+    private String doses = "";
     @SerializedName("description")
     @Expose
-    private String description;
+    private String description = "";
     @SerializedName("quantity")
     @Expose
-    private String quantity;
+    private String quantity = "";
 
     public String getDoses_id() {
         return doses_id;
@@ -32,7 +32,7 @@ public class PreMedicineData {
 
     @SerializedName("doses_id")
     @Expose
-    private String doses_id;
+    private String doses_id = "";
 
     public String getType() {
         return type;

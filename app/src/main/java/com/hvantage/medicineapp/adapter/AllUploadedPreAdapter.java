@@ -45,7 +45,10 @@ public class AllUploadedPreAdapter extends RecyclerView.Adapter<AllUploadedPreAd
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final PrescriptionData data = arrayList.get(position);
         Log.d(TAG, "onBindViewHolder: data >> " + data);
-        holder.tvDeases.setText(data.getDiagnosisDetails());
+        if (!data.getDiagnosisDetails().equalsIgnoreCase(""))
+            holder.tvDeases.setText(data.getDiagnosisDetails());
+        else
+            holder.tvDeases.setText("No Details");
         holder.tvDate.setText(data.getDate());
         holder.tvView.setOnClickListener(new View.OnClickListener() {
             @Override

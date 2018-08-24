@@ -106,7 +106,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         init();
         setRecyclerView();
         setRecyclerViewCart();
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+        if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
             if (AppPreferences.getOrderType(context) == AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION) {
                 llPrescription.setVisibility(View.VISIBLE);
                 llMedicine.setVisibility(View.VISIBLE);
@@ -120,7 +120,6 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 llAmount.setVisibility(View.VISIBLE);
                 // getCartData();
             }
-
 
             if (addressData != null) {
                 tvAddress1.setText(addressData.getName() + ", +91" + addressData.getContactNo());
