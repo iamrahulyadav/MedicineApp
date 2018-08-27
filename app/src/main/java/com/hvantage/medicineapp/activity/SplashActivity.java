@@ -40,7 +40,6 @@ public class SplashActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-
                 if (AppPreferences.getUserId(context).equalsIgnoreCase("")) {
                     Intent intent = new Intent(SplashActivity.this, WelcomeActivity.class);
                     startActivity(intent);

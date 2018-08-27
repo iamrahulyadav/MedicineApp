@@ -56,6 +56,7 @@ public class AppConstants {
         public static final String PLACE_ORDER_WITH_PRESCRIPTION = "place_order_with_prescription";
         public static final String GET_DAILY_NEED_PRODUCTS = "get_daily_need_products";
         public static final String UPDATE_FCM_TOKEN = "update_fcm_token";
+        public static final String GET_ALL_PRODUCTS = "get_all_products";
     }
 
     public class NOTIFICATION_KEY {

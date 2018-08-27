@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.hvantage.medicineapp.model.CartData;
-import com.hvantage.medicineapp.model.ProductModel;
+import com.hvantage.medicineapp.model.ProductData;
 
 import java.util.ArrayList;
 
@@ -25,25 +25,33 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String KEY_ID = "id";
     private static final String KEY_FB = "fb_key";
     private static final String KEY_NAME = "name";
+
+
+    //product
+    private static final String KEY_PRODUCT_ID = "product_id";
+    private static final String KEY_CATEGORY_NAME = "category_name";
+    private static final String KEY_SUB_CATEGORY_NAME = "sub_category_name";
+    private static final String KEY_SHORT_DESCRIPTION = "short_description";
+    private static final String KEY_LONG_DESCRIPTION = "long_description";
+    private static final String KEY_PRICE_MRP = "price_mrp";
+    private static final String KEY_PRICE_DISCOUNT = "price_discount";
+    private static final String KEY_DISCOUNT_PERCENTAGE = "discount_percentage";
+    private static final String KEY_DISCOUNT_TEXT = "discount_text";
+    private static final String KEY_PACKAGING_CONTAIN = "packaging_contain";
     private static final String KEY_MANUFACTURER = "manufacturer";
     private static final String KEY_PRODUCT_TYPE = "product_type";
     private static final String KEY_POWER = "power";
-    private static final String KEY_CATEGORY = "category";
-    private static final String KEY_SUB_CATEGORY = "sub_category";
-    private static final String KEY_QTY = "qty";
-    private static final String KEY_PRICE = "price";
-    private static final String KEY_DESCIPTION = "desciption";
     private static final String KEY_IMAGE = "image";
     private static final String KEY_PRESCRIPTION_REQUIRED = "prescription_required";
     private static final String KEY_TOTAL_AVAILABLE = "total_available";
 
     //cart
-    private static final String KEY_ITEM_ID = "KEY_ITEM_ID";
-    private static final String KEY_ITEM_NAME = "KEY_ITEM_NAME";
-    private static final String KEY_ITEM_QTY = "KEY_ITEM_QTY";
-    private static final String KEY_ITEM_PRICE = "KEY_ITEM_PRICE";
-    private static final String KEY_ITEM_TOTAL_PRICE = "KEY_ITEM_TOTAL_PRICE";
-    private static final String KEY_ITEM_IMG = "KEY_ITEM_IMG";
+    private static final String KEY_ITEM_ID = "item_id";
+    private static final String KEY_ITEM_NAME = "item_name";
+    private static final String KEY_ITEM_QTY = "item_qty";
+    private static final String KEY_ITEM_PRICE = "item_price";
+    private static final String KEY_ITEM_TOTAL_PRICE = "item_total_price";
+    private static final String KEY_ITEM_IMG = "item_img";
 
     //tables
     private static final String TABLE_MEDICINE = "medicine";
@@ -56,20 +64,25 @@ public class DBHelper extends SQLiteOpenHelper {
     //create table structers
     String CREATE_TABLE_MEDICINE = "CREATE TABLE " + TABLE_MEDICINE +
             "( " + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + KEY_FB + " TEXT, "
-            + KEY_NAME + " TEXT, "
-            + KEY_MANUFACTURER + " TEXT, "
-            + KEY_PRODUCT_TYPE + " TEXT, "
-            + KEY_POWER + " TEXT, "
-            + KEY_CATEGORY + " TEXT, "
-            + KEY_SUB_CATEGORY + " TEXT, "
-            + KEY_QTY + " TEXT, "
-            + KEY_PRICE + " REAL, "
-            + KEY_DESCIPTION + " TEXT, "
+            + KEY_PRODUCT_ID + " TEXT, "
+            + KEY_CATEGORY_NAME + " TEXT, "
+            + KEY_SUB_CATEGORY_NAME + " TEXT, "
+            + KEY_SHORT_DESCRIPTION + " TEXT, "
+            + KEY_LONG_DESCRIPTION + " TEXT, "
             + KEY_IMAGE + " TEXT, "
+            + KEY_MANUFACTURER + " TEXT, "
+            + KEY_NAME + " TEXT, "
+            + KEY_POWER + " TEXT, "
+            + KEY_PRICE_MRP + " TEXT, "
+            + KEY_PRICE_DISCOUNT + " TEXT, "
+            + KEY_DISCOUNT_PERCENTAGE + " TEXT,"
+            + KEY_DISCOUNT_TEXT + " TEXT,"
+            + KEY_PRODUCT_TYPE + " TEXT,"
+            + KEY_PACKAGING_CONTAIN + " TEXT,"
             + KEY_PRESCRIPTION_REQUIRED + " TEXT,"
-            + KEY_TOTAL_AVAILABLE + " INTEGER "
+            + KEY_TOTAL_AVAILABLE + " TEXT "
             + ")";
+
     String CREATE_TABLE_CART = "CREATE TABLE " + TABLE_CART +
             "( " + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + KEY_ITEM_ID + " TEXT, "
@@ -92,22 +105,26 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
 
-    public void saveMedicine(ProductModel modal) {
+    public void saveMedicine(ProductData modal) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_FB, modal.getKey());
-        values.put(KEY_NAME, modal.getName());
-        values.put(KEY_MANUFACTURER, modal.getManufacturer());
-        values.put(KEY_PRODUCT_TYPE, modal.getProduct_type());
-        values.put(KEY_POWER, modal.getPower());
-        values.put(KEY_CATEGORY, modal.getCategory_name());
-        values.put(KEY_QTY, modal.getQty());
-        values.put(KEY_PRICE, modal.getPrice());
-        values.put(KEY_DESCIPTION, modal.getDescription());
-        values.put(KEY_PRESCRIPTION_REQUIRED, String.valueOf(modal.isPrescription_required()));
-        values.put(KEY_TOTAL_AVAILABLE, String.valueOf(modal.getTotal_available()));
-        values.put(KEY_SUB_CATEGORY, modal.getSub_category_name());
+        values.put(KEY_PRODUCT_ID, modal.getProductId());
+        values.put(KEY_CATEGORY_NAME, modal.getCategoryName());
+        values.put(KEY_SUB_CATEGORY_NAME, modal.getSubCategoryName());
+        values.put(KEY_SHORT_DESCRIPTION, modal.getShortDescription());
+        values.put(KEY_LONG_DESCRIPTION, modal.getLongDescription());
         values.put(KEY_IMAGE, modal.getImage());
+        values.put(KEY_MANUFACTURER, modal.getManufacturer());
+        values.put(KEY_NAME, modal.getName());
+        values.put(KEY_POWER, modal.getPower());
+        values.put(KEY_PRICE_MRP, modal.getPriceMrp());
+        values.put(KEY_PRICE_DISCOUNT, modal.getPriceDiscount() + "");
+        values.put(KEY_DISCOUNT_PERCENTAGE, modal.getDiscountPercentage());
+        values.put(KEY_DISCOUNT_TEXT, modal.getDiscountText());
+        values.put(KEY_PRODUCT_TYPE, modal.getProductType());
+        values.put(KEY_PACKAGING_CONTAIN, modal.getPackagingContain());
+        values.put(KEY_PRESCRIPTION_REQUIRED, modal.getPrescriptionRequired() + "");
+        values.put(KEY_TOTAL_AVAILABLE, modal.getTotalAvailable() + "");
         Log.d(TAG, "saveMedicine: values >> " + values.toString());
         boolean bb = db.insert(TABLE_MEDICINE, null, values) > 0;
         if (bb) {
@@ -127,32 +144,35 @@ public class DBHelper extends SQLiteOpenHelper {
         return rowCount;
     }
 
-    public ArrayList<ProductModel> getMedicines() {
+    public ArrayList<ProductData> getMedicines() {
         SQLiteDatabase db = this.getReadableDatabase();
-        ArrayList<ProductModel> list = null;
+        ArrayList<ProductData> list = null;
         String query = "SELECT * FROM " + TABLE_MEDICINE;
-//        String query = "SELECT * FROM " + TABLE_PROJECTS + " WHERE " + KEY_PROJECT_TYPE + "=" + type_id + " ORDER BY ID DESC";
         Cursor cursor = db.rawQuery(query, null);
         if (cursor == null) {
             return list;
         }
         if (cursor.moveToFirst()) {
-            list = new ArrayList<ProductModel>();
+            list = new ArrayList<ProductData>();
             do {
-                ProductModel d = new ProductModel();
-                d.setKey(cursor.getString(cursor.getColumnIndex(KEY_FB)));
-                d.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-                d.setManufacturer(cursor.getString(cursor.getColumnIndex(KEY_MANUFACTURER)));
-                d.setProduct_type(cursor.getString(cursor.getColumnIndex(KEY_PRODUCT_TYPE)));
-                d.setPower(cursor.getString(cursor.getColumnIndex(KEY_POWER)));
-                d.setCategory_name(cursor.getString(cursor.getColumnIndex(KEY_CATEGORY)));
-                d.setQty(cursor.getString(cursor.getColumnIndex(KEY_QTY)));
-                d.setSub_category_name(cursor.getString(cursor.getColumnIndex(KEY_SUB_CATEGORY)));
+                ProductData d = new ProductData();
+                d.setProductId(cursor.getString(cursor.getColumnIndex(KEY_PRODUCT_ID)));
+                d.setCategoryName(cursor.getString(cursor.getColumnIndex(KEY_CATEGORY_NAME)));
+                d.setSubCategoryName(cursor.getString(cursor.getColumnIndex(KEY_SUB_CATEGORY_NAME)));
+                d.setShortDescription(cursor.getString(cursor.getColumnIndex(KEY_SHORT_DESCRIPTION)));
+                d.setLongDescription(cursor.getString(cursor.getColumnIndex(KEY_LONG_DESCRIPTION)));
                 d.setImage(cursor.getString(cursor.getColumnIndex(KEY_IMAGE)));
-                d.setPrice(cursor.getDouble(cursor.getColumnIndex(KEY_PRICE)));
-                d.setTotal_available(cursor.getInt(cursor.getColumnIndex(KEY_TOTAL_AVAILABLE)));
-                d.setDescription(cursor.getString(cursor.getColumnIndex(KEY_DESCIPTION)));
-                d.setPrescription_required(Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(KEY_PRESCRIPTION_REQUIRED))));
+                d.setManufacturer(cursor.getString(cursor.getColumnIndex(KEY_MANUFACTURER)));
+                d.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                d.setPower(cursor.getString(cursor.getColumnIndex(KEY_POWER)));
+                d.setPriceMrp(cursor.getString(cursor.getColumnIndex(KEY_PRICE_MRP)));
+                d.setPriceDiscount(cursor.getString(cursor.getColumnIndex(KEY_PRICE_DISCOUNT)));
+                d.setDiscountPercentage(cursor.getString(cursor.getColumnIndex(KEY_DISCOUNT_PERCENTAGE)));
+                d.setDiscountText(cursor.getString(cursor.getColumnIndex(KEY_DISCOUNT_TEXT)));
+                d.setProductType(cursor.getString(cursor.getColumnIndex(KEY_PRODUCT_TYPE)));
+                d.setPackagingContain(cursor.getString(cursor.getColumnIndex(KEY_PACKAGING_CONTAIN)));
+                d.setPrescriptionRequired(Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(KEY_PACKAGING_CONTAIN))));
+                d.setTotalAvailable(Integer.parseInt(cursor.getString(cursor.getColumnIndex(KEY_TOTAL_AVAILABLE))));
                 list.add(d);
             } while (cursor.moveToNext());
         }
@@ -163,7 +183,6 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<String> list = null;
         String query = "SELECT * FROM " + TABLE_MEDICINE;
-//        String query = "SELECT * FROM " + TABLE_PROJECTS + " WHERE " + KEY_PROJECT_TYPE + "=" + type_id + " ORDER BY ID DESC";
         Cursor cursor = db.rawQuery(query, null);
         if (cursor == null) {
             return list;

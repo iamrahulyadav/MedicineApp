@@ -456,7 +456,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         final String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/medicineapp/";
         File newdir = new File(dir);
         newdir.mkdirs();
-        String file = dir + "report_img.jpg";
+        String file = dir + "prescription_img.jpg";
         Log.e("imagesss cam11", file);
         File newfile = new File(file);
         try {
@@ -490,7 +490,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                 startCropImageActivity(data.getData());
             } else if (requestCode == REQUEST_IMAGE_CAPTURE) {
                 File croppedImageFile1 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                        + "/medicineapp/" + "report_img.jpg");
+                        + "/medicineapp/" + "prescription_img.jpg");
                 final Uri outputFileUri;
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
                     outputFileUri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", croppedImageFile1);

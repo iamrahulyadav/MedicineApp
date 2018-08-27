@@ -24,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.model.FamilyModel;
 import com.hvantage.medicineapp.util.AppConstants;
+import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
@@ -182,7 +183,7 @@ public class AddFamilyFragment extends Fragment implements View.OnClickListener 
         FirebaseDatabase.getInstance()
                 .getReference(AppConstants.APP_NAME)
                 .child(AppConstants.FIREBASE_KEY.VAULT)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                .child("+91"+ AppPreferences.getMobileNo(context))
                 .child(AppConstants.FIREBASE_KEY.MY_FAMILY)
                 .child(data.getKey())
                 .setValue(model)
@@ -210,7 +211,7 @@ public class AddFamilyFragment extends Fragment implements View.OnClickListener 
         String key = FirebaseDatabase.getInstance()
                 .getReference(AppConstants.APP_NAME)
                 .child(AppConstants.FIREBASE_KEY.VAULT)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                .child("+91"+ AppPreferences.getMobileNo(context))
                 .child(AppConstants.FIREBASE_KEY.MY_FAMILY)
                 .push().getKey();
         FamilyModel model = new FamilyModel(
@@ -228,7 +229,7 @@ public class AddFamilyFragment extends Fragment implements View.OnClickListener 
         FirebaseDatabase.getInstance()
                 .getReference(AppConstants.APP_NAME)
                 .child(AppConstants.FIREBASE_KEY.VAULT)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                .child("+91"+ AppPreferences.getMobileNo(context))
                 .child(AppConstants.FIREBASE_KEY.MY_FAMILY)
                 .child(key)
                 .setValue(model)

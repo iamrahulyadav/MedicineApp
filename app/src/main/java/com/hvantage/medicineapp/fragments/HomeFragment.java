@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -34,17 +35,15 @@ import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
@@ -56,7 +55,6 @@ import com.hvantage.medicineapp.adapter.OfferPagerAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.CategoryData;
 import com.hvantage.medicineapp.model.ProductData;
-import com.hvantage.medicineapp.model.ProductModel;
 import com.hvantage.medicineapp.retrofit.ApiClient;
 import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
@@ -65,6 +63,7 @@ import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.RecyclerItemClickListener;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -95,7 +94,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private CardView btnUpload;
     private ImageView btnVoiceInput;
     private AppCompatAutoCompleteTextView etSearch;
-    private ArrayList<String> list;
+    private ArrayList<ProductData> list;
     private ProgressBar progressBar;
     private FloatingActionMenu floatingActionMenu;
     private ViewPager viewPagerOffers;
@@ -205,14 +204,29 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
         init();
         setFloatingButton();
-        list = new DBHelper(context).getMedicinesSearch();
+        list = new DBHelper(context).getMedicines();
         if (Functions.isConnectingToInternet(context)) {
             new CategoryTask().execute();
             new ProductTask().execute();
         } else {
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
         }
-        setSearchBar();
+        // setSearchBar();
+        if (list != null) {
+            Log.e(TAG, "onCreateView: list >> " + list.size());
+            etSearch.setThreshold(1);
+            PeopleAdapter adapter = new PeopleAdapter(context, R.layout.auto_complete_text, R.id.text1, list);
+            etSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                    ProductData data = list.get(position);
+                    Log.e(TAG, "onDataChange: data >> " + data);
+                    startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", data));
+                    etSearch.setText("");
+                }
+            });
+            etSearch.setAdapter(adapter);
+        }
         return rootView;
     }
 
@@ -233,49 +247,49 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         viewPagerOffers.setAdapter(new OfferPagerAdapter(getActivity(), offerList));
     }
 
-    private void setSearchBar() {
-        if (list != null) {
-            Log.e(TAG, "setSearchBar: list >> " + list.size());
-            ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(context, R.layout.auto_complete_text, list);
-            etSearch.setThreshold(1);
-            etSearch.setAdapter(categoryAdapter);
-            etSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    Log.e(TAG, "onItemClick: text >> " + etSearch.getText().toString());
-                    if (Functions.isConnectingToInternet(context)) {
-                        showProgressDialog();
-                        FirebaseDatabase.getInstance().getReference()
-                                .child(AppConstants.APP_NAME)
-                                .child(AppConstants.FIREBASE_KEY.MEDICINE)
-                                .orderByChild("name")
-                                .equalTo(etSearch.getText().toString())
-                                .addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        hideProgressDialog();
-                                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                                            ProductModel data = postSnapshot.getValue(ProductModel.class);
-                                            Log.e(TAG, "onDataChange: data >> " + data);
-                                            startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", data));
-                                            etSearch.setText("");
-                                            break;
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-                                        hideProgressDialog();
-                                        Log.w(TAG, "onCancelled >> ", databaseError.toException());
-                                    }
-                                });
-                    } else {
-                        Toast.makeText(context, "No internet connection", Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
-        }
-    }
+//    private void setSearchBar() {
+//        if (list != null) {
+//            Log.e(TAG, "setSearchBar: list >> " + list.size());
+//            ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(context, R.layout.auto_complete_text, list);
+//            etSearch.setThreshold(1);
+//            etSearch.setAdapter(categoryAdapter);
+//            etSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                @Override
+//                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                    Log.e(TAG, "onItemClick: text >> " + etSearch.getText().toString());
+//                    if (Functions.isConnectingToInternet(context)) {
+//                        showProgressDialog();
+//                        FirebaseDatabase.getInstance().getReference()
+//                                .child(AppConstants.APP_NAME)
+//                                .child(AppConstants.FIREBASE_KEY.MEDICINE)
+//                                .orderByChild("name")
+//                                .equalTo(etSearch.getText().toString())
+//                                .addValueEventListener(new ValueEventListener() {
+//                                    @Override
+//                                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                                        hideProgressDialog();
+//                                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+//                                            ProductModel data = postSnapshot.getValue(ProductModel.class);
+//                                            Log.e(TAG, "onDataChange: data >> " + data);
+//                                            startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", data));
+//                                            etSearch.setText("");
+//                                            break;
+//                                        }
+//                                    }
+//
+//                                    @Override
+//                                    public void onCancelled(DatabaseError databaseError) {
+//                                        hideProgressDialog();
+//                                        Log.w(TAG, "onCancelled >> ", databaseError.toException());
+//                                    }
+//                                });
+//                    } else {
+//                        Toast.makeText(context, "No internet connection", Toast.LENGTH_LONG).show();
+//                    }
+//                }
+//            });
+//        }
+//    }
 
     private void showProgressDialog() {
         progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
@@ -553,4 +567,98 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             }
         }
     }
+
+    public class PeopleAdapter extends ArrayAdapter<ProductData> {
+
+        Context context;
+        int resource, textViewResourceId;
+        ArrayList<ProductData> items, tempItems, suggestions;
+
+        public PeopleAdapter(Context context, int resource, int textViewResourceId, ArrayList<ProductData> items) {
+            super(context, resource, textViewResourceId, items);
+            this.context = context;
+            this.resource = resource;
+            this.textViewResourceId = textViewResourceId;
+            this.items = items;
+            tempItems = new ArrayList<ProductData>(items); // this makes the difference.
+            suggestions = new ArrayList<ProductData>();
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = convertView;
+            if (convertView == null) {
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.auto_complete_text, parent, false);
+            }
+            ProductData people = items.get(position);
+            if (people != null) {
+                TextView tvName = (TextView) view.findViewById(R.id.tvName);
+                TextView tvPrice = (TextView) view.findViewById(R.id.tvPrice);
+                TextView tvPriceDrop = (TextView) view.findViewById(R.id.tvPriceDrop);
+                ImageView imgThumb = (ImageView) view.findViewById(R.id.imgThumb);
+                if (tvName != null) {
+                    tvName.setText(people.getName());
+                    tvPrice.setText("Rs." + Functions.roundTwoDecimals(Double.parseDouble(people.getPriceDiscount())));
+                    tvPriceDrop.setText("Rs." + Functions.roundTwoDecimals(Double.parseDouble(people.getPriceMrp())));
+                    tvPriceDrop.setPaintFlags(tvPriceDrop.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+
+                    if (!people.getImage().equalsIgnoreCase("")) {
+                        Picasso.with(context)
+                                .load(people.getImage())
+                                .placeholder(R.drawable.no_image_placeholder)
+                                .into(imgThumb);
+                    }
+                }
+            }
+            return view;
+        }
+
+        @Override
+        public Filter getFilter() {
+            return nameFilter;
+        }
+
+        /**
+         * Custom Filter implementation for custom suggestions we provide.
+         */
+        Filter nameFilter = new Filter() {
+            @Override
+            public CharSequence convertResultToString(Object resultValue) {
+                String str = ((ProductData) resultValue).getName();
+                return str;
+            }
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                if (constraint != null) {
+                    suggestions.clear();
+                    for (ProductData people : tempItems) {
+                        if (people.getName().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                            suggestions.add(people);
+                        }
+                    }
+                    FilterResults filterResults = new FilterResults();
+                    filterResults.values = suggestions;
+                    filterResults.count = suggestions.size();
+                    return filterResults;
+                } else {
+                    return new FilterResults();
+                }
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                ArrayList<ProductData> filterList = (ArrayList<ProductData>) results.values;
+                if (results != null && results.count > 0) {
+                    clear();
+                    for (ProductData people : filterList) {
+                        add(people);
+                        notifyDataSetChanged();
+                    }
+                }
+            }
+        };
+    }
+
 }

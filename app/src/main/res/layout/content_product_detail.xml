@@ -46,10 +46,22 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/tvPriceDrop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="Rs.199.00"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                    android:textColor="@color/colorTextHeading"
+                    android:textStyle="bold" />
+
+                <TextView
                     android:id="@+id/tvPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
+                    android:layout_marginLeft="5dp"
+                    android:layout_toRightOf="@id/tvPriceDrop"
                     android:text="Rs.199.00"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:textColor="@color/colorTextHeading"
@@ -92,6 +104,14 @@
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
                 android:src="@drawable/no_image_placeholder" />
+
+            <TextView
+                android:id="@+id/tvDiscount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@color/colorSuccess" />
 
             <TextView
                 android:id="@+id/tvQty3"
@@ -202,6 +222,8 @@
                         android:layout_alignParentEnd="true"
                         android:layout_margin="5dp"
                         android:layout_weight="1"
+                        android:clickable="true"
+                        android:foreground="?attr/selectableItemBackground"
                         app:cardBackgroundColor="@color/colorPrimary"
                         app:cardCornerRadius="3dp"
                         app:cardElevation="1dp">

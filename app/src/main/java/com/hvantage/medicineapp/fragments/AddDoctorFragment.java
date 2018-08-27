@@ -24,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.model.DoctorModel;
 import com.hvantage.medicineapp.util.AppConstants;
+import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
@@ -157,7 +158,7 @@ public class AddDoctorFragment extends Fragment implements View.OnClickListener 
         FirebaseDatabase.getInstance()
                 .getReference(AppConstants.APP_NAME)
                 .child(AppConstants.FIREBASE_KEY.VAULT)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                .child("+91"+ AppPreferences.getMobileNo(context))
                 .child(AppConstants.FIREBASE_KEY.MY_DOCTORS)
                 .child(data.getKey())
                 .setValue(model)
@@ -185,7 +186,7 @@ public class AddDoctorFragment extends Fragment implements View.OnClickListener 
         String key = FirebaseDatabase.getInstance()
                 .getReference(AppConstants.APP_NAME)
                 .child(AppConstants.FIREBASE_KEY.VAULT)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                .child("+91"+ AppPreferences.getMobileNo(context))
                 .child(AppConstants.FIREBASE_KEY.MY_DOCTORS)
                 .push().getKey();
         DoctorModel model = new DoctorModel(
@@ -199,7 +200,7 @@ public class AddDoctorFragment extends Fragment implements View.OnClickListener 
         FirebaseDatabase.getInstance()
                 .getReference(AppConstants.APP_NAME)
                 .child(AppConstants.FIREBASE_KEY.VAULT)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                .child("+91"+ AppPreferences.getMobileNo(context))
                 .child(AppConstants.FIREBASE_KEY.MY_DOCTORS)
                 .child(key)
                 .setValue(model)

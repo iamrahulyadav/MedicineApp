@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -26,6 +25,7 @@ import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.MyDoctorAdapter;
 import com.hvantage.medicineapp.model.DoctorModel;
 import com.hvantage.medicineapp.util.AppConstants;
+import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
@@ -70,7 +70,7 @@ public class MyDoctorsFragment extends Fragment implements View.OnClickListener 
         FirebaseDatabase.getInstance().getReference()
                 .child(AppConstants.APP_NAME)
                 .child(AppConstants.FIREBASE_KEY.VAULT)
-                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
+                .child("+91" + AppPreferences.getMobileNo(context))
                 .child(AppConstants.FIREBASE_KEY.MY_DOCTORS)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
