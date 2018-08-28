@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorActivityBackground">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/cardUpload"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/etTitle"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="15dp"
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/tvUpload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Tap here \nto upload prescription" />
+
+
+            <ImageView
+                android:id="@+id/imgThumb"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop" />
+        </android.support.v7.widget.CardView>
+
+        <EditText
+            android:id="@+id/etTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/btnSubmit"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
+            android:hint="Title (Blood Sample Report etc."
+            android:imeOptions="actionNext"
+            android:inputType="textCapWords"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="@color/colorTextHeading" />
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/btnSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="end"
+            android:layout_margin="10dp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:visibility="visible"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="3dp"
+            app:cardElevation="1dp"
+            app:contentPadding="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Save"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:textColor="@color/colorToolbarTitle"
+                android:textStyle="bold" />
+        </android.support.v7.widget.CardView>
+    </RelativeLayout>
+
+
+</android.support.design.widget.CoordinatorLayout>

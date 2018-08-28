@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,6 +81,8 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private boolean includeEdge = true;
     private String selected_pres_id = "", selected_add_id = "";
     private EditText etNote;
+    private RadioGroup rgOrderType;
+    private String orderType = "1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +104,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             startActivity(new Intent(context, SelectAddressActivity.class));
             finish();
         }
+
 
         Log.e(TAG, "onCreate: addressData >> " + addressData);
         init();
@@ -144,6 +148,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         tvAddress2 = (TextView) findViewById(R.id.tvAddress2);
         tvAddress3 = (TextView) findViewById(R.id.tvAddress3);
         tvAddress4 = (TextView) findViewById(R.id.tvAddress4);
+        rgOrderType = findViewById(R.id.rgOrderType);
         tvChangeAddress = (TextView) findViewById(R.id.tvChangeAddress);
         llPrescription = (LinearLayout) findViewById(R.id.llPrescription);
         llMedicine = (LinearLayout) findViewById(R.id.llMedicine);
@@ -151,6 +156,16 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         llPayMode = (LinearLayout) findViewById(R.id.llPayMode);
         tvCheckout.setOnClickListener(this);
         tvChangeAddress.setOnClickListener(this);
+
+        rgOrderType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                if (rgOrderType.getCheckedRadioButtonId() == R.id.rbDelivery)
+                    orderType = "1";
+                else if (rgOrderType.getCheckedRadioButtonId() == R.id.rbTakeAway)
+                    orderType = "2";
+            }
+        });
     }
 
 
@@ -299,7 +314,8 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
             jsonObject.addProperty("prescription_id", selected_pres_id);
             jsonObject.addProperty("address_id", selected_add_id);
-            jsonObject.addProperty("payment_mode", "");
+            jsonObject.addProperty("order_type", selected_add_id);
+            jsonObject.addProperty("payment_mode", orderType);
             jsonObject.addProperty("note", etNote.getText().toString());
             jsonObject.addProperty("additional_items", "");
 

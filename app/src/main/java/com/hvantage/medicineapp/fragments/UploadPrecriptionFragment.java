@@ -135,7 +135,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 if (items[item].equals("Choose Existing")) {
                     FragmentManager manager = getFragmentManager();
                     FragmentTransaction ft = manager.beginTransaction();
-                    Fragment fragment = new SelectPrescFragment();
+                    Fragment fragment = new MyPrescriptionFragment();
                     Bundle args = new Bundle();
                     args.putParcelableArrayList("data", presList);
                     fragment.setArguments(args);

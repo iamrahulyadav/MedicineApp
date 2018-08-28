@@ -9,7 +9,7 @@ public class AppConstants {
     public class FIREBASE_KEY {
         public static final String USERS = "users";
         public static final String CART = "order_cart";
-        public static final String PRESCRIPTION = "prescription ";
+        public static final String PRESCRIPTION = "prescription";
         public static final String CATEGORY = "category";
         public static final String VAULT = "vault";
         public static final String MY_FAMILY = "my_family";
@@ -39,6 +39,7 @@ public class AppConstants {
         public static final String PRODUCT = "product.php";
         public static final String ORDER = "order.php";
         public static final String ADDRESS = "address.php";
+        public static final String VAULT = "vault.php";
     }
 
     public class METHODS {
@@ -57,6 +58,17 @@ public class AppConstants {
         public static final String GET_DAILY_NEED_PRODUCTS = "get_daily_need_products";
         public static final String UPDATE_FCM_TOKEN = "update_fcm_token";
         public static final String GET_ALL_PRODUCTS = "get_all_products";
+        public static final String ADD_FAMILY_MEMBER = "add_family_member";
+        public static final String UPDATE_FAMILY_MEMBER = "update_family_member";
+        public static final String GET_MY_FAMILY = "get_my_family";
+        public static final String DELETE_FAMILY_MEMBER = "delete_family_member";
+        public static final String GET_MY_DOCTORS = "get_my_doctors";
+        public static final String DELETE_DOCTOR = "delete_doctor";
+        public static final String ADD_DOCTOR = "add_doctor";
+        public static final String UPDATE_DOCTOR = "update_doctor";
+        public static final String ADD_REPORT = "add_report";
+        public static final String GET_MY_REPORTS = "get_my_reports";
+        public static final String DELETE_REPORT = "delete_report";
     }
 
     public class NOTIFICATION_KEY {

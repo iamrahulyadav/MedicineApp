@@ -2,8 +2,8 @@ package com.hvantage.medicineapp.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
@@ -16,18 +16,23 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.model.DoctorModel;
+import com.hvantage.medicineapp.model.DoctorData;
+import com.hvantage.medicineapp.retrofit.ApiClient;
+import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class AddDoctorFragment extends Fragment implements View.OnClickListener {
@@ -40,7 +45,7 @@ public class AddDoctorFragment extends Fragment implements View.OnClickListener 
     private Spinner spinnerGender;
     private EditText etName, etEmail, etPhoneNo, etAddress;
     private CardView btnSubmit;
-    private DoctorModel data = null;
+    private DoctorData data = null;
     private Spinner spinnerSpecialization;
 
     @Nullable
@@ -50,7 +55,7 @@ public class AddDoctorFragment extends Fragment implements View.OnClickListener 
         rootView = inflater.inflate(R.layout.fragment_add_doctor, container, false);
 
         if (getArguments() != null) {
-            data = (DoctorModel) getArguments().getSerializable("data");
+            data = (DoctorData) getArguments().getParcelable("data");
             Log.e(TAG, "onCreateView: data >> " + data);
         }
 
@@ -69,7 +74,7 @@ public class AddDoctorFragment extends Fragment implements View.OnClickListener 
         if (data != null) {
             etName.setText(data.getName());
             etEmail.setText(data.getEmail());
-            etPhoneNo.setText(data.getMobile_no());
+            etPhoneNo.setText(data.getMobileNo());
             etAddress.setText(data.getAddress());
 
             String[] arrayGender = getResources().getStringArray(R.array.gender);
@@ -134,92 +139,137 @@ public class AddDoctorFragment extends Fragment implements View.OnClickListener 
                     Toast.makeText(context, "Enter Address", Toast.LENGTH_SHORT).show();
                 else {
                     if (data == null)
-                        saveData();
+                        new SaveTask().execute();
                     else
-                        updateData();
+                        new UpdateTask().execute();
                 }
                 break;
         }
     }
 
-    private void updateData() {
-        Log.e(TAG, "updateData: ");
-        Log.e(TAG, "updateData: key >> " + data.getKey());
-        showProgressDialog();
-        String key = data.getKey();
-        DoctorModel model = new DoctorModel(
-                key,
-                etName.getText().toString(),
-                etEmail.getText().toString(),
-                etPhoneNo.getText().toString(),
-                String.valueOf(spinnerGender.getSelectedItem()),
-                String.valueOf(spinnerSpecialization.getSelectedItem()),
-                etAddress.getText().toString());
-        FirebaseDatabase.getInstance()
-                .getReference(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.VAULT)
-                .child("+91"+ AppPreferences.getMobileNo(context))
-                .child(AppConstants.FIREBASE_KEY.MY_DOCTORS)
-                .child(data.getKey())
-                .setValue(model)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        hideProgressDialog();
-                        Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
-                        getActivity().onBackPressed();
-                        Log.e(TAG, "DocumentSnapshot successfully written!");
+    class SaveTask extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.ADD_DOCTOR);
+            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
+            jsonObject.addProperty("address", etAddress.getText().toString());
+            jsonObject.addProperty("email", etEmail.getText().toString());
+            jsonObject.addProperty("gender", String.valueOf(spinnerGender.getSelectedItem()));
+            jsonObject.addProperty("mobile_no", etPhoneNo.getText().toString());
+            jsonObject.addProperty("name", etName.getText().toString());
+            jsonObject.addProperty("specialization", String.valueOf(spinnerSpecialization.getSelectedItem()));
+            Log.e(TAG, "SaveTask: Request >> " + jsonObject.toString());
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.vault(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "SaveTask: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            publishProgress("200", "");
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getActivity().getResources().getString(R.string.api_error_msg));
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                hideProgressDialog();
-                Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Error writing document", e);
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    publishProgress("400", getResources().getString(R.string.api_error_msg));
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+            String status = values[0];
+            String msg = values[1];
+            if (status.equalsIgnoreCase("200")) {
+                getActivity().onBackPressed();
+            } else if (status.equalsIgnoreCase("400")) {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }
-        });
+        }
     }
 
-    private void saveData() {
-        Log.e(TAG, "saveData: ");
-        showProgressDialog();
-        String key = FirebaseDatabase.getInstance()
-                .getReference(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.VAULT)
-                .child("+91"+ AppPreferences.getMobileNo(context))
-                .child(AppConstants.FIREBASE_KEY.MY_DOCTORS)
-                .push().getKey();
-        DoctorModel model = new DoctorModel(
-                key,
-                etName.getText().toString(),
-                etEmail.getText().toString(),
-                etPhoneNo.getText().toString(),
-                String.valueOf(spinnerGender.getSelectedItem()),
-                String.valueOf(spinnerSpecialization.getSelectedItem()),
-                etAddress.getText().toString());
-        FirebaseDatabase.getInstance()
-                .getReference(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.VAULT)
-                .child("+91"+ AppPreferences.getMobileNo(context))
-                .child(AppConstants.FIREBASE_KEY.MY_DOCTORS)
-                .child(key)
-                .setValue(model)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        hideProgressDialog();
-                        Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
-                        getActivity().onBackPressed();
-                        Log.e(TAG, "DocumentSnapshot successfully written!");
+    class UpdateTask extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.UPDATE_DOCTOR);
+            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
+            jsonObject.addProperty("doctor_id", data.getDoctorId());
+            jsonObject.addProperty("address", etAddress.getText().toString());
+            jsonObject.addProperty("email", etEmail.getText().toString());
+            jsonObject.addProperty("gender", String.valueOf(spinnerGender.getSelectedItem()));
+            jsonObject.addProperty("mobile_no", etPhoneNo.getText().toString());
+            jsonObject.addProperty("name", etName.getText().toString());
+            jsonObject.addProperty("specialization", String.valueOf(spinnerSpecialization.getSelectedItem()));
+            Log.e(TAG, "UpdateTask: Request >> " + jsonObject.toString());
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.vault(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "UpdateTask: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            publishProgress("200", "");
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getActivity().getResources().getString(R.string.api_error_msg));
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                hideProgressDialog();
-                Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Error writing document", e);
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    publishProgress("400", getResources().getString(R.string.api_error_msg));
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+            String status = values[0];
+            String msg = values[1];
+            if (status.equalsIgnoreCase("200")) {
+                getActivity().onBackPressed();
+            } else if (status.equalsIgnoreCase("400")) {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }
-        });
+        }
     }
 
     private void showProgressDialog() {
@@ -235,5 +285,4 @@ public class AddDoctorFragment extends Fragment implements View.OnClickListener 
         if (progressBar != null)
             progressBar.dismiss();
     }
-
 }

@@ -19,15 +19,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.adapter.MyFamilyAdapter;
-import com.hvantage.medicineapp.model.FamilyData;
+import com.hvantage.medicineapp.adapter.MyReportAdapter;
+import com.hvantage.medicineapp.model.ReportData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
 import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
@@ -47,15 +43,15 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MyFamilyFragment extends Fragment implements View.OnClickListener {
+public class MyReportsFragment extends Fragment implements View.OnClickListener {
 
-    private static final String TAG = "MyFamilyFragment";
+    private static final String TAG = "MyReportsFragment";
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
     private RecyclerView recylcer_view;
-    private MyFamilyAdapter adapter;
-    private ArrayList<FamilyData> list = new ArrayList<FamilyData>();
+    private MyReportAdapter adapter;
+    private ArrayList<ReportData> list = new ArrayList<ReportData>();
     private ProgressBar progressBar;
     private String data;
     private CardView cardEmptyText;
@@ -65,9 +61,9 @@ public class MyFamilyFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         context = container.getContext();
-        rootView = inflater.inflate(R.layout.fragment_my_family, container, false);
+        rootView = inflater.inflate(R.layout.fragment_my_reports, container, false);
         if (intraction != null) {
-            intraction.actionbarsetTitle("My Family");
+            intraction.actionbarsetTitle("My Reports");
         }
         init();
         setRecyclerView();
@@ -78,41 +74,6 @@ public class MyFamilyFragment extends Fragment implements View.OnClickListener {
         return rootView;
     }
 
-    private void getData() {
-        showProgressDialog();
-        FirebaseDatabase.getInstance().getReference()
-                .child(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.VAULT)
-                .child("+91" + AppPreferences.getMobileNo(context))
-                .child(AppConstants.FIREBASE_KEY.MY_FAMILY)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        list.clear();
-                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            FamilyData data = postSnapshot.getValue(FamilyData.class);
-                            Log.e(TAG, "onDataChange: data >> " + data);
-                            list.add(data);
-                        }
-                        adapter.notifyDataSetChanged();
-                        if (adapter.getItemCount() > 0)
-                            cardEmptyText.setVisibility(View.GONE);
-                        else
-                            cardEmptyText.setVisibility(View.VISIBLE);
-                        hideProgressDialog();
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.d(TAG, "loadPost:onCancelled", databaseError.toException());
-                        if (adapter.getItemCount() > 0)
-                            cardEmptyText.setVisibility(View.GONE);
-                        else
-                            cardEmptyText.setVisibility(View.VISIBLE);
-                        hideProgressDialog();
-                    }
-                });
-    }
 
     class GetDataTask extends AsyncTask<Void, String, Void> {
         @Override
@@ -124,7 +85,7 @@ public class MyFamilyFragment extends Fragment implements View.OnClickListener {
         @Override
         protected Void doInBackground(Void... voids) {
             JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("method", AppConstants.METHODS.GET_MY_FAMILY);
+            jsonObject.addProperty("method", AppConstants.METHODS.GET_MY_REPORTS);
             jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
             Log.e(TAG, "GetDataTask: Request >> " + jsonObject.toString());
             MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
@@ -141,7 +102,7 @@ public class MyFamilyFragment extends Fragment implements View.OnClickListener {
                             JSONArray jsonArray = jsonObject.getJSONArray("result");
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 Gson gson = new Gson();
-                                FamilyData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), FamilyData.class);
+                                ReportData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), ReportData.class);
                                 Log.e(TAG, "onResponse: data >> " + data);
                                 list.add(data);
                             }
@@ -191,26 +152,26 @@ public class MyFamilyFragment extends Fragment implements View.OnClickListener {
     }
 
     private void setRecyclerView() {
-        adapter = new MyFamilyAdapter(context, list, new MyFamilyAdapter.MyAdapterListener() {
+        adapter = new MyReportAdapter(context, list, new MyReportAdapter.MyAdapterListener() {
             @Override
             public void delete(View v, final int position) {
                 new AlertDialog.Builder(context)
-                        .setMessage("Delete " + list.get(position).getName() + "?")
+                        .setMessage("Delete " + list.get(position).getTitle() + "?")
                         .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 showProgressDialog();
                                 JsonObject jsonObject = new JsonObject();
-                                jsonObject.addProperty("method", AppConstants.METHODS.DELETE_FAMILY_MEMBER);
+                                jsonObject.addProperty("method", AppConstants.METHODS.DELETE_REPORT);
                                 jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
-                                jsonObject.addProperty("family_member_id", list.get(position).getFamilyMemberId());
-                                Log.e(TAG, "GetDataTask: Request >> " + jsonObject.toString());
+                                jsonObject.addProperty("report_id", list.get(position).getReportId());
+                                Log.e(TAG, "DeleteTask: Request >> " + jsonObject.toString());
                                 MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
                                 Call<JsonObject> call = apiService.vault(jsonObject);
                                 call.enqueue(new Callback<JsonObject>() {
                                     @Override
                                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                                        Log.e(TAG, "GetDataTask: Response >> " + response.body().toString());
+                                        Log.e(TAG, "DeleteTask: Response >> " + response.body().toString());
                                         String resp = response.body().toString();
                                         try {
                                             JSONObject jsonObject = new JSONObject(resp);
@@ -250,7 +211,7 @@ public class MyFamilyFragment extends Fragment implements View.OnClickListener {
             public void select(View v, int position) {
                 FragmentManager manager = getFragmentManager();
                 FragmentTransaction ft = manager.beginTransaction();
-                Fragment fragment = new AddFamilyFragment();
+                Fragment fragment = new AddReportFragment();
                 Bundle args = new Bundle();
                 args.putParcelable("data", list.get(position));
                 fragment.setArguments(args);
@@ -287,7 +248,7 @@ public class MyFamilyFragment extends Fragment implements View.OnClickListener {
             case R.id.fabAdd:
                 FragmentManager manager = getFragmentManager();
                 FragmentTransaction ft = manager.beginTransaction();
-                ft.replace(R.id.main_container, new AddFamilyFragment());
+                ft.replace(R.id.main_container, new AddReportFragment());
                 ft.addToBackStack(null);
                 ft.commitAllowingStateLoss();
                 break;

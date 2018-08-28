@@ -75,7 +75,7 @@ public class MyPrescriptionFragment extends Fragment implements View.OnClickList
         return rootView;
     }
 
-    class GetDataTask extends AsyncTask<Void, String, Void> {
+    private class GetDataTask extends AsyncTask<Void, String, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();

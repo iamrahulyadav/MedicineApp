@@ -93,6 +93,11 @@ public class VaultFragment extends Fragment implements View.OnClickListener {
                 ft.addToBackStack(null);
                 ft.commitAllowingStateLoss();
                 break;
+            case R.id.cardReports:
+                ft.replace(R.id.main_container, new MyReportsFragment());
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+                break;
         }
     }
 

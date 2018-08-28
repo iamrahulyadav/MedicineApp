@@ -44,6 +44,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.activity.SelectAddressActivity;
 import com.hvantage.medicineapp.adapter.DialogMultipleChoiceAdapter;
 import com.hvantage.medicineapp.adapter.PreMedicineItemAdapter;
 import com.hvantage.medicineapp.model.DoctorDetails;
@@ -540,7 +541,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
 
         @Override
         protected Void doInBackground(Void... voids) {
-            JsonObject jsonDoctor = new JsonObject();
+            final JsonObject jsonDoctor = new JsonObject();
             jsonDoctor.addProperty("name", etDName.getText().toString());
             jsonDoctor.addProperty("address", etAddress.getText().toString());
             jsonDoctor.addProperty("email", etEmail.getText().toString());
@@ -576,6 +577,8 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                     try {
                         JSONObject jsonObject = new JSONObject(resp);
                         if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            String prescription_id = jsonObject.getJSONArray("result").getJSONObject(0).getString("prescription_id");
+                            AppPreferences.setSelectedPresId(context, prescription_id);
                             publishProgress("200", "");
                         } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
                             String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
@@ -603,7 +606,11 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
             String status = values[0];
             String msg = values[1];
             if (status.equalsIgnoreCase("200")) {
-                getActivity().onBackPressed();
+                if (from == null) {
+                    getActivity().onBackPressed();
+                } else if (from.equalsIgnoreCase("new")) {
+                    startActivity(new Intent(context, SelectAddressActivity.class));
+                } else getActivity().onBackPressed();
             } else if (status.equalsIgnoreCase("400")) {
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }

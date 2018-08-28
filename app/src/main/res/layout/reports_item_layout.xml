@@ -2,6 +2,7 @@
 
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="8dp"
@@ -12,7 +13,6 @@
     app:cardBackgroundColor="@color/colorWhite"
     app:cardCornerRadius="3dp"
     app:cardElevation="1dp"
-    android:id="@+id/item"
     app:contentPadding="8dp">
 
     <RelativeLayout
@@ -21,20 +21,17 @@
 
         <android.support.v7.widget.CardView
             android:id="@+id/cardImg"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="2dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="8dp"
-            app:cardCornerRadius="25dp"
-            app:cardElevation="1dp">
+            app:cardElevation="0dp">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@drawable/avatar_placeholder" />
+                android:src="@drawable/vault_rx"
+                android:tint="@color/colorGray" />
         </android.support.v7.widget.CardView>
 
 
@@ -42,44 +39,15 @@
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@id/cardImg"
             android:singleLine="true"
-            android:text="Personal Care"
+            android:text="Sample Report 1"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="@color/colorTextHeading"
             android:textStyle="bold" />
 
-
-        <TextView
-            android:id="@+id/tvRelation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="3dp"
-            android:layout_toRightOf="@id/tvTitle"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:textColor="@color/colorTextSubHeading" />
-
-        <TextView
-            android:id="@+id/tvBtext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tvTitle"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@id/cardImg"
-            android:text="Blood Group : "
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:textColor="@color/colorTextSubHeading" />
-
-        <TextView
-            android:id="@+id/tvBG"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tvTitle"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@id/tvBtext"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:textColor="@color/colorTextSubHeading" />
 
         <ImageButton
             android:id="@+id/btnDelete"

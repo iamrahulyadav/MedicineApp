@@ -33,7 +33,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.FrameLayout;
@@ -53,6 +52,7 @@ import com.hvantage.medicineapp.adapter.CategoryAdapter;
 import com.hvantage.medicineapp.adapter.DailyNeedProductAdapter;
 import com.hvantage.medicineapp.adapter.OfferPagerAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
+import com.hvantage.medicineapp.model.CartData;
 import com.hvantage.medicineapp.model.CategoryData;
 import com.hvantage.medicineapp.model.ProductData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
@@ -211,20 +211,19 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         } else {
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
         }
-        // setSearchBar();
         if (list != null) {
             Log.e(TAG, "onCreateView: list >> " + list.size());
             etSearch.setThreshold(1);
-            PeopleAdapter adapter = new PeopleAdapter(context, R.layout.auto_complete_text, R.id.text1, list);
-            etSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            SearchBarAdapter adapter = new SearchBarAdapter(context, R.layout.auto_complete_text, R.id.text1, list);
+           /* etSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                    ProductData data = list.get(position);
+                  *//*  ProductData data = list.get(position);
                     Log.e(TAG, "onDataChange: data >> " + data);
                     startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", data));
-                    etSearch.setText("");
+                    etSearch.setText("");*//*
                 }
-            });
+            });*/
             etSearch.setAdapter(adapter);
         }
         return rootView;
@@ -246,50 +245,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer4));
         viewPagerOffers.setAdapter(new OfferPagerAdapter(getActivity(), offerList));
     }
-
-//    private void setSearchBar() {
-//        if (list != null) {
-//            Log.e(TAG, "setSearchBar: list >> " + list.size());
-//            ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(context, R.layout.auto_complete_text, list);
-//            etSearch.setThreshold(1);
-//            etSearch.setAdapter(categoryAdapter);
-//            etSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//                @Override
-//                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                    Log.e(TAG, "onItemClick: text >> " + etSearch.getText().toString());
-//                    if (Functions.isConnectingToInternet(context)) {
-//                        showProgressDialog();
-//                        FirebaseDatabase.getInstance().getReference()
-//                                .child(AppConstants.APP_NAME)
-//                                .child(AppConstants.FIREBASE_KEY.MEDICINE)
-//                                .orderByChild("name")
-//                                .equalTo(etSearch.getText().toString())
-//                                .addValueEventListener(new ValueEventListener() {
-//                                    @Override
-//                                    public void onDataChange(DataSnapshot dataSnapshot) {
-//                                        hideProgressDialog();
-//                                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-//                                            ProductModel data = postSnapshot.getValue(ProductModel.class);
-//                                            Log.e(TAG, "onDataChange: data >> " + data);
-//                                            startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", data));
-//                                            etSearch.setText("");
-//                                            break;
-//                                        }
-//                                    }
-//
-//                                    @Override
-//                                    public void onCancelled(DatabaseError databaseError) {
-//                                        hideProgressDialog();
-//                                        Log.w(TAG, "onCancelled >> ", databaseError.toException());
-//                                    }
-//                                });
-//                    } else {
-//                        Toast.makeText(context, "No internet connection", Toast.LENGTH_LONG).show();
-//                    }
-//                }
-//            });
-//        }
-//    }
 
     private void showProgressDialog() {
         progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
@@ -568,13 +523,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    public class PeopleAdapter extends ArrayAdapter<ProductData> {
+    public class SearchBarAdapter extends ArrayAdapter<ProductData> {
 
         Context context;
         int resource, textViewResourceId;
         ArrayList<ProductData> items, tempItems, suggestions;
 
-        public PeopleAdapter(Context context, int resource, int textViewResourceId, ArrayList<ProductData> items) {
+        public SearchBarAdapter(Context context, int resource, int textViewResourceId, ArrayList<ProductData> items) {
             super(context, resource, textViewResourceId, items);
             this.context = context;
             this.resource = resource;
@@ -585,7 +540,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             View view = convertView;
             if (convertView == null) {
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -596,7 +551,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 TextView tvName = (TextView) view.findViewById(R.id.tvName);
                 TextView tvPrice = (TextView) view.findViewById(R.id.tvPrice);
                 TextView tvPriceDrop = (TextView) view.findViewById(R.id.tvPriceDrop);
+                TextView tvPlus = (TextView) view.findViewById(R.id.tvPlus);
+                TextView tvMinus = (TextView) view.findViewById(R.id.tvMinus);
+                final TextView tvQty = (TextView) view.findViewById(R.id.tvQty);
                 ImageView imgThumb = (ImageView) view.findViewById(R.id.imgThumb);
+                CardView btnAddToCart = (CardView) view.findViewById(R.id.btnAddToCart);
                 if (tvName != null) {
                     tvName.setText(people.getName());
                     tvPrice.setText("Rs." + Functions.roundTwoDecimals(Double.parseDouble(people.getPriceDiscount())));
@@ -610,6 +569,60 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                                 .into(imgThumb);
                     }
                 }
+
+                tvMinus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int qty = Integer.parseInt(tvQty.getText().toString());
+                        if (qty > 1)
+                            qty--;
+                        tvQty.setText(String.valueOf(qty));
+                    }
+                });
+
+                tvPlus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int qty = Integer.parseInt(tvQty.getText().toString());
+                        if (qty < 10)
+                            qty++;
+                        tvQty.setText(String.valueOf(qty));
+                    }
+                });
+
+                tvName.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ProductData data = list.get(position);
+                        Log.e(TAG, "onDataChange: data >> " + data);
+                        startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", data));
+                        etSearch.setText("");
+                    }
+                });
+                btnAddToCart.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
+                            double item_total = Integer.parseInt(tvQty.getText().toString()) * Double.parseDouble(list.get(position).getPriceDiscount());
+                            CartData model = new CartData(
+                                    list.get(position).getProductId(),
+                                    list.get(position).getName(),
+                                    list.get(position).getImage(),
+                                    Integer.parseInt(tvQty.getText().toString()),
+                                    Double.parseDouble(list.get(position).getPriceDiscount()),
+                                    item_total
+                            );
+                            if (new DBHelper(context).addToCart(model)) {
+                                etSearch.setText("");
+                                Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
+                            } else
+                                Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
+                            context.startActivity(new Intent(context, LoginActivity.class));
+                        }
+                    }
+                });
             }
             return view;
         }

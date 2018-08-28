@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?><!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorWhite"
@@ -50,5 +49,163 @@
             android:textColor="@color/colorTextSubHeading"
             android:textStyle="bold" />
     </RelativeLayout>
-</RelativeLayout>
+</RelativeLayout>-->
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    app:cardBackgroundColor="@color/colorWhite"
+    app:cardCornerRadius="2dp"
+    app:cardElevation="1dp"
+    app:contentPadding="5dp">
+
+    <RelativeLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/imgThumb"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/no_image_placeholder" />
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_toRightOf="@id/imgThumb"
+            android:maxLines="2"
+            android:text="abc"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvPriceDrop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvName"
+            android:layout_toRightOf="@id/imgThumb"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:text="Rs. 00"
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Time"
+            android:textColor="@color/colorTextSubHeading" />
+
+        <TextView
+            android:id="@+id/tvPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvName"
+            android:layout_marginLeft="2dp"
+            android:layout_toRightOf="@id/tvPriceDrop"
+            android:maxLines="2"
+            android:padding="3dp"
+            android:text="Rs. 00"
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Time"
+            android:textColor="@color/colorTextHeading"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="85dp"
+            android:layout_height="28dp"
+            android:layout_below="@id/tvPrice"
+            android:layout_marginTop="3dp"
+            android:layout_toRightOf="@id/imgThumb"
+            android:orientation="horizontal"
+            android:weightSum="3.2">
+
+            <TextView
+                android:id="@+id/tvMinus"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@color/colorDivider"
+                android:gravity="center"
+                android:paddingBottom="3dp"
+                android:text="-"
+                android:textAlignment="center"
+                android:textColor="@color/colorTextHeading"
+                android:textStyle="bold" />
+
+            <!-- <View
+                 android:layout_width="1dp"
+                 android:layout_height="match_parent"
+                 android:background="@color/colorPrimary" />
+    -->
+            <TextView
+                android:id="@+id/tvQty"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1.2"
+                android:gravity="center"
+                android:maxLength="2"
+                android:text="1"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Time"
+                android:textColor="@color/colorTextHeading"
+                android:textStyle="bold" />
+
+            <!--  <View
+                  android:layout_width="1dp"
+                  android:layout_height="match_parent"
+                  android:background="@color/colorPrimary" />
+    -->
+
+            <TextView
+                android:id="@+id/tvPlus"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@color/colorDivider"
+                android:gravity="center"
+                android:paddingBottom="3dp"
+                android:text="+"
+                android:textAlignment="center"
+                android:textColor="@color/colorTextHeading"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/btnAddToCart"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/tvPrice"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="2dp"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="1dp">
+
+            <TextView
+                android:id="@+id/tvBtnText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:maxLines="1"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:singleLine="true"
+                android:text="Add To Cart"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@color/colorToolbarTitle"
+                android:textStyle="bold" />
+        </android.support.v7.widget.CardView>
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>
+
+
 

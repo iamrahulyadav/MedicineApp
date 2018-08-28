@@ -24,4 +24,7 @@ public interface MyApiEndpointInterface {
     @POST(AppConstants.ENDPOINT.ADDRESS)
     Call<JsonObject> address(@Body JsonObject jsonObject);
 
+    @POST(AppConstants.ENDPOINT.VAULT)
+    Call<JsonObject> vault(@Body JsonObject jsonObject);
+
 }

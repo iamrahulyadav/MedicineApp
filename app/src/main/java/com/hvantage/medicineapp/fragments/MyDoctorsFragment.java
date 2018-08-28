@@ -1,7 +1,9 @@
 package com.hvantage.medicineapp.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -21,17 +23,28 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.MyDoctorAdapter;
-import com.hvantage.medicineapp.model.DoctorModel;
+import com.hvantage.medicineapp.model.DoctorData;
+import com.hvantage.medicineapp.retrofit.ApiClient;
+import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
-import com.hvantage.medicineapp.util.RecyclerItemClickListener;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class MyDoctorsFragment extends Fragment implements View.OnClickListener {
@@ -42,7 +55,7 @@ public class MyDoctorsFragment extends Fragment implements View.OnClickListener 
     private FragmentIntraction intraction;
     private RecyclerView recylcer_view;
     private MyDoctorAdapter adapter;
-    private ArrayList<DoctorModel> list = new ArrayList<DoctorModel>();
+    private ArrayList<DoctorData> list = new ArrayList<DoctorData>();
     private ProgressBar progressBar;
     private String data;
     private CardView cardEmptyText;
@@ -59,7 +72,7 @@ public class MyDoctorsFragment extends Fragment implements View.OnClickListener 
         init();
         setRecyclerView();
         if (Functions.isConnectingToInternet(context))
-            getData();
+            new GetDataTask().execute();
         else
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
         return rootView;
@@ -77,7 +90,7 @@ public class MyDoctorsFragment extends Fragment implements View.OnClickListener 
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         list.clear();
                         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            DoctorModel data = postSnapshot.getValue(DoctorModel.class);
+                            DoctorData data = postSnapshot.getValue(DoctorData.class);
                             Log.e(TAG, "onDataChange: data >> " + data);
                             list.add(data);
                         }
@@ -101,6 +114,75 @@ public class MyDoctorsFragment extends Fragment implements View.OnClickListener 
                 });
     }
 
+    class GetDataTask extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.GET_MY_DOCTORS);
+            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
+            Log.e(TAG, "GetDataTask: Request >> " + jsonObject.toString());
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.vault(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "GetDataTask: Response >> " + response.body().toString());
+                    list.clear();
+                    String resp = response.body().toString();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            JSONArray jsonArray = jsonObject.getJSONArray("result");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                Gson gson = new Gson();
+                                DoctorData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), DoctorData.class);
+                                Log.e(TAG, "onResponse: data >> " + data);
+                                list.add(data);
+                            }
+                            publishProgress("200", "");
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getActivity().getResources().getString(R.string.api_error_msg));
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    publishProgress("400", getResources().getString(R.string.api_error_msg));
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+            String status = values[0];
+            String msg = values[1];
+            adapter.notifyDataSetChanged();
+            if (adapter.getItemCount() > 0)
+                cardEmptyText.setVisibility(View.GONE);
+            else
+                cardEmptyText.setVisibility(View.VISIBLE);
+            if (status.equalsIgnoreCase("200")) {
+            } else if (status.equalsIgnoreCase("400")) {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
     private void init() {
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
         fabAdd = (FloatingActionButton) rootView.findViewById(R.id.fabAdd);
@@ -109,28 +191,76 @@ public class MyDoctorsFragment extends Fragment implements View.OnClickListener 
     }
 
     private void setRecyclerView() {
-        adapter = new MyDoctorAdapter(context, list);
-        recylcer_view.setLayoutManager(new LinearLayoutManager(context));
-        recylcer_view.setAdapter(adapter);
-        recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
+        adapter = new MyDoctorAdapter(context, list, new MyDoctorAdapter.MyAdapterListener() {
             @Override
-            public void onItemClick(View view, int position) {
+            public void delete(View v, final int position) {
+                new AlertDialog.Builder(context)
+                        .setMessage("Delete Dr. " + list.get(position).getName()+"?")
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                showProgressDialog();
+                                JsonObject jsonObject = new JsonObject();
+                                jsonObject.addProperty("method", AppConstants.METHODS.DELETE_DOCTOR);
+                                jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
+                                jsonObject.addProperty("doctor_id", list.get(position).getDoctorId());
+                                Log.e(TAG, "GetDataTask: Request >> " + jsonObject.toString());
+                                MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+                                Call<JsonObject> call = apiService.vault(jsonObject);
+                                call.enqueue(new Callback<JsonObject>() {
+                                    @Override
+                                    public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                                        Log.e(TAG, "GetDataTask: Response >> " + response.body().toString());
+                                        String resp = response.body().toString();
+                                        try {
+                                            JSONObject jsonObject = new JSONObject(resp);
+                                            if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                                                list.remove(position);
+                                                adapter.notifyDataSetChanged();
+                                            } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                                                String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                                                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+                                            }
+                                            hideProgressDialog();
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                            hideProgressDialog();
+                                            Toast.makeText(context, context.getResources().getString(R.string.api_error_msg), Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<JsonObject> call, Throwable t) {
+                                        Log.e(TAG, "onFailure: " + t.getMessage());
+                                        hideProgressDialog();
+                                        Toast.makeText(context, context.getResources().getString(R.string.api_error_msg), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        }).show();
+            }
+
+            @Override
+            public void select(View v, int position) {
                 FragmentManager manager = getFragmentManager();
                 FragmentTransaction ft = manager.beginTransaction();
                 Fragment fragment = new AddDoctorFragment();
                 Bundle args = new Bundle();
-                args.putSerializable("data", list.get(position));
+                args.putParcelable("data", list.get(position));
                 fragment.setArguments(args);
                 ft.replace(R.id.main_container, fragment);
                 ft.addToBackStack(null);
                 ft.commitAllowingStateLoss();
             }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-
-            }
-        }));
+        });
+        recylcer_view.setLayoutManager(new LinearLayoutManager(context));
+        recylcer_view.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
 
