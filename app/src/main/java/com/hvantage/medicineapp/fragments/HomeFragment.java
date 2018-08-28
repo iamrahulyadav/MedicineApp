@@ -215,15 +215,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             Log.e(TAG, "onCreateView: list >> " + list.size());
             etSearch.setThreshold(1);
             SearchBarAdapter adapter = new SearchBarAdapter(context, R.layout.auto_complete_text, R.id.text1, list);
-           /* etSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                  *//*  ProductData data = list.get(position);
-                    Log.e(TAG, "onDataChange: data >> " + data);
-                    startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", data));
-                    etSearch.setText("");*//*
-                }
-            });*/
+
             etSearch.setAdapter(adapter);
         }
         return rootView;
@@ -566,6 +558,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                         Picasso.with(context)
                                 .load(people.getImage())
                                 .placeholder(R.drawable.no_image_placeholder)
+                                .resize(60, 60)
                                 .into(imgThumb);
                     }
                 }

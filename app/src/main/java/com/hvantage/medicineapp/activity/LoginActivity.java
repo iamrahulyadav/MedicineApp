@@ -111,7 +111,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 startActivity(new Intent(context, SignupActivity.class));
                 break;
             case R.id.btnEnter:
-                startActivity(new Intent(context, MainActivity.class));
+                startActivity(new Intent(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                 break;
         }
     }
