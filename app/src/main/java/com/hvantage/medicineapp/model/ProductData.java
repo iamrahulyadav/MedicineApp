@@ -258,4 +258,27 @@ public class ProductData implements Parcelable {
             return new ProductData[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "ProductData{" +
+                "categoryName='" + categoryName + '\'' +
+                ", subCategoryName='" + subCategoryName + '\'' +
+                ", shortDescription='" + shortDescription + '\'' +
+                ", longDescription='" + longDescription + '\'' +
+                ", image='" + image + '\'' +
+                ", productId='" + productId + '\'' +
+                ", manufacturer='" + manufacturer + '\'' +
+                ", name='" + name + '\'' +
+                ", power='" + power + '\'' +
+                ", prescriptionRequired=" + prescriptionRequired +
+                ", priceMrp='" + priceMrp + '\'' +
+                ", priceDiscount='" + priceDiscount + '\'' +
+                ", discountPercentage='" + discountPercentage + '\'' +
+                ", discountText='" + discountText + '\'' +
+                ", productType='" + productType + '\'' +
+                ", packagingContain='" + packagingContain + '\'' +
+                ", totalAvailable=" + totalAvailable +
+                '}';
+    }
 }

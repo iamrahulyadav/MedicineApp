@@ -131,7 +131,8 @@ public class DailyNeedProductAdapter extends RecyclerView.Adapter<DailyNeedProdu
                                 data.getImage(),
                                 Integer.parseInt(holder.tvQty.getText().toString()),
                                 Double.parseDouble(data.getPriceDiscount()),
-                                item_total
+                                item_total,
+                                data.getPrescriptionRequired()
                         );
                         if (new DBHelper(context).addToCart(model))
                             Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();

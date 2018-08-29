@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.AddPrescActivity">
+    tools:context=".activity.SelectPrescActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -28,14 +28,14 @@
                 android:gravity="center"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:text="Add Prescription"
+                android:text="Select Prescription"
                 android:textColor="@color/colorToolbarTitle" />
 
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_add_presc" />
+    <include layout="@layout/content_select_presc" />
 
 
 </android.support.design.widget.CoordinatorLayout>

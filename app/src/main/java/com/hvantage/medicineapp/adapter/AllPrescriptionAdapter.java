@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.model.ProductData;
 import com.hvantage.medicineapp.util.fastscrollbars.FastScrollRecyclerViewInterface;
 
 import java.util.ArrayList;
@@ -19,10 +20,10 @@ public class AllPrescriptionAdapter extends RecyclerView.Adapter<AllPrescription
     private static final String TAG = "CategoryAdapter";
     private final HashMap<String, Integer> mapIndex;
     Context context;
-    ArrayList<String> arrayList;
+    ArrayList<ProductData> arrayList;
 
 
-    public AllPrescriptionAdapter(Context context, ArrayList<String> arrayList, HashMap<String, Integer> mapIndex) {
+    public AllPrescriptionAdapter(Context context, ArrayList<ProductData> arrayList, HashMap<String, Integer> mapIndex) {
         this.context = context;
         this.arrayList = arrayList;
         this.mapIndex = mapIndex;
@@ -38,16 +39,16 @@ public class AllPrescriptionAdapter extends RecyclerView.Adapter<AllPrescription
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final String data = arrayList.get(position);
+        final ProductData data = arrayList.get(position);
         Log.e(TAG, position + " data : " + data);
-        holder.tvTitle.setText(data);
+        holder.tvTitle.setText(data.getName());
         if (position == 0) {
             holder.tvStickyHeader.setVisibility(View.VISIBLE);
-            holder.tvStickyHeader.setText(data.charAt(0) + "");
+            holder.tvStickyHeader.setText(data.getName().charAt(0) + "");
         } else if (position > 0) {
-            if (arrayList.get(position).charAt(0) != arrayList.get(position - 1).charAt(0)) {
+            if (arrayList.get(position).getName().charAt(0) != arrayList.get(position - 1).getName().charAt(0)) {
                 holder.tvStickyHeader.setVisibility(View.VISIBLE);
-                holder.tvStickyHeader.setText(data.charAt(0) + "");
+                holder.tvStickyHeader.setText(data.getName().charAt(0) + "");
             } else {
                 holder.tvStickyHeader.setVisibility(View.GONE);
             }

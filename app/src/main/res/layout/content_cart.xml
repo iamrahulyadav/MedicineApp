@@ -9,9 +9,9 @@
     tools:context=".activity.CartActivity"
     tools:showIn="@layout/activity_cart">
 
-    <ScrollView
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginBottom="50dp"
         android:overScrollMode="never"
         android:scrollbars="none">
@@ -192,24 +192,170 @@
 
 
         </LinearLayout>
-    </ScrollView>
+    </android.support.v4.widget.NestedScrollView>
 
     <RelativeLayout
-        android:id="@+id/btnSubmit"
+        android:id="@+id/bottomBar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentBottom="true"
-        android:background="@color/colorPrimary"
-        android:visibility="gone">
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
 
-        <TextView
-            android:layout_width="wrap_content"
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/cardPrescription"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Checkout"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            android:textColor="@color/colorToolbarTitle"
-            android:textStyle="bold" />
+            android:layout_above="@id/btnSubmit"
+            android:layout_margin="6dp"
+            android:visibility="visible"
+            app:cardCornerRadius="3dp"
+            app:cardElevation="2dp"
+            app:contentPadding="8dp">
+
+            <RelativeLayout
+                android:id="@+id/rrPres"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tvText1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Selected Prescription"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                    android:textColor="@color/colorPrimary"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvHideShow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="Hide"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/TextAppearance.Compat.Notification.Time"
+                    android:textColor="@color/colorSuccess"
+                    android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:id="@+id/rContain"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tvHideShow"
+                    android:layout_marginTop="5dp">
+
+                    <ImageView
+                        android:id="@+id/imgThumb"
+                        android:layout_width="60dp"
+                        android:layout_height="80dp"
+                        android:layout_margin="5dp"
+                        android:src="@drawable/no_image_placeholder" />
+
+
+                    <TextView
+                        android:id="@+id/tvTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_toRightOf="@id/imgThumb"
+                        android:maxLines="1"
+                        android:text="ABC "
+                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                        android:textColor="@color/colorTextHeading"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tvTitle"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_toRightOf="@id/imgThumb"
+                        android:text="28 Aug 18"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="@color/colorTextSubHeading"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tvDate"
+                        android:layout_margin="3dp"
+                        android:layout_toRightOf="@id/imgThumb"
+                        android:orientation="horizontal">
+
+                        <android.support.v7.widget.CardView
+                            android:id="@+id/btnChange"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="3dp"
+                            android:layout_weight="1"
+                            android:clickable="true"
+                            android:foreground="?attr/selectableItemBackground"
+                            app:cardBackgroundColor="@color/colorPrimary"
+                            app:cardCornerRadius="2dp"
+                            app:cardElevation="1dp">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp"
+                                android:text="Change"
+                                android:textAlignment="center"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorWhite"
+                                android:textStyle="bold" />
+                        </android.support.v7.widget.CardView>
+
+                        <android.support.v7.widget.CardView
+                            android:id="@+id/btnView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="3dp"
+                            android:layout_weight="1"
+                            android:clickable="true"
+                            android:foreground="?attr/selectableItemBackground"
+                            app:cardBackgroundColor="#f4f4f4"
+                            app:cardCornerRadius="2dp"
+                            app:cardElevation="1dp">
+
+                            <TextView
+                                android:id="@+id/tvView"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp"
+                                android:text="View"
+                                android:textAlignment="center"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                                android:textColor="@color/colorPrimary"
+                                android:textStyle="bold" />
+
+                        </android.support.v7.widget.CardView>
+
+
+                    </LinearLayout>
+                </RelativeLayout>
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+        <RelativeLayout
+            android:id="@+id/btnSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorPrimary"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Checkout"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:textColor="@color/colorToolbarTitle"
+                android:textStyle="bold" />
+        </RelativeLayout>
     </RelativeLayout>
 
 </RelativeLayout>

@@ -17,16 +17,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.adapter.AllPrescriptionAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
-import com.hvantage.medicineapp.model.ProductModel;
-import com.hvantage.medicineapp.util.AppConstants;
+import com.hvantage.medicineapp.model.ProductData;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
@@ -40,7 +35,7 @@ import java.util.LinkedHashMap;
 
 public class AllPrescriptionFragment extends Fragment implements View.OnClickListener {
 
-    private static final String TAG = "BrowseCategoryFragment";
+    private static final String TAG = "AllPrescriptionFragment";
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
@@ -60,9 +55,9 @@ public class AllPrescriptionFragment extends Fragment implements View.OnClickLis
             intraction.actionbarsetTitle("All Prescriptions");
         }
         init();
-        ArrayList<String> list = new DBHelper(context).getMedicinesAll();
+        ArrayList<ProductData> list = new DBHelper(context).getMedicinesAll();
         Log.e(TAG, "onCreateView: list >> " + list);
-        setRecyclerView(list);
+        if (list != null) setRecyclerView(list);
         return rootView;
     }
 
@@ -70,7 +65,7 @@ public class AllPrescriptionFragment extends Fragment implements View.OnClickLis
         cardEmptyText = (CardView) rootView.findViewById(R.id.cardEmptyText);
     }
 
-    private void setRecyclerView(final ArrayList<String> list) {
+    private void setRecyclerView(final ArrayList<ProductData> list) {
         HashMap<String, Integer> mapIndex = calculateIndexesForName(list);
         Log.e(TAG, "setRecyclerView: mapIndex >> " + mapIndex);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
@@ -87,12 +82,14 @@ public class AllPrescriptionFragment extends Fragment implements View.OnClickLis
             @Override
             public void onItemClick(View view, int position) {
                 if (Functions.isConnectingToInternet(context)) {
-                    showProgressDialog();
+                    context.startActivity(new Intent(context, ProductDetailActivity.class)
+                            .putExtra("medicine_data", list.get(position)));
+                   /* showProgressDialog();
                     FirebaseDatabase.getInstance().getReference()
                             .child(AppConstants.APP_NAME)
                             .child(AppConstants.FIREBASE_KEY.MEDICINE)
                             .orderByChild("name")
-                            .equalTo(list.get(position))
+                            .equalTo(list.get(position).getName())
                             .addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -112,7 +109,7 @@ public class AllPrescriptionFragment extends Fragment implements View.OnClickLis
                                     hideProgressDialog();
                                     Log.w(TAG, "onCancelled >> ", databaseError.toException());
                                 }
-                            });
+                            });*/
                 } else {
                     Toast.makeText(context, "No internet connection", Toast.LENGTH_LONG).show();
                 }
@@ -127,10 +124,10 @@ public class AllPrescriptionFragment extends Fragment implements View.OnClickLis
 
     }
 
-    private HashMap<String, Integer> calculateIndexesForName(ArrayList<String> items) {
+    private HashMap<String, Integer> calculateIndexesForName(ArrayList<ProductData> items) {
         HashMap<String, Integer> mapIndex = new LinkedHashMap<String, Integer>();
         for (int i = 0; i < items.size(); i++) {
-            String name = items.get(i);
+            String name = items.get(i).getName();
             String index = name.substring(0, 1);
             index = index.toUpperCase();
 

@@ -603,7 +603,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                                     list.get(position).getImage(),
                                     Integer.parseInt(tvQty.getText().toString()),
                                     Double.parseDouble(list.get(position).getPriceDiscount()),
-                                    item_total
+                                    item_total,
+                                    list.get(position).getPrescriptionRequired()
                             );
                             if (new DBHelper(context).addToCart(model)) {
                                 etSearch.setText("");

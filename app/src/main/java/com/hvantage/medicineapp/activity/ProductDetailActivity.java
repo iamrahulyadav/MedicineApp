@@ -185,7 +185,8 @@ public class ProductDetailActivity extends AppCompatActivity implements View.OnC
                             data.getImage(),
                             Integer.parseInt(tvQty.getText().toString()),
                             Double.parseDouble(data.getPriceDiscount()),
-                            item_total
+                            item_total,
+                            data.getPrescriptionRequired()
                     );
                     if (new DBHelper(context).addToCart(model))
                         Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();

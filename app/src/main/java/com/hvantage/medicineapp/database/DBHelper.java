@@ -52,6 +52,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String KEY_ITEM_PRICE = "item_price";
     private static final String KEY_ITEM_TOTAL_PRICE = "item_total_price";
     private static final String KEY_ITEM_IMG = "item_img";
+    private static final String KEY_ITEM_PRE_REQUIRED = "item_pre_required";
 
     //tables
     private static final String TABLE_MEDICINE = "medicine";
@@ -90,7 +91,8 @@ public class DBHelper extends SQLiteOpenHelper {
             + KEY_ITEM_QTY + " INTEGER, "
             + KEY_ITEM_PRICE + " REAL, "
             + KEY_ITEM_TOTAL_PRICE + " REAL, "
-            + KEY_ITEM_IMG + " TEXT "
+            + KEY_ITEM_IMG + " TEXT, "
+            + KEY_ITEM_PRE_REQUIRED + " TEXT "
             + ")";
 
 
@@ -196,21 +198,41 @@ public class DBHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    public ArrayList<String> getMedicinesAll() {
+    public ArrayList<ProductData> getMedicinesAll() {
         SQLiteDatabase db = this.getReadableDatabase();
-        ArrayList<String> list = null;
-//        String query = "SELECT * FROM " + TABLE_MEDICINE;
-//        String query = "SELECT * FROM " + TABLE_MEDICINE + " WHERE " + KEY_CATEGORY + "=" + param;
-        String query = "SELECT * FROM medicine where category='Prescription'";
+        ArrayList<ProductData> list = null;
+        String query = "SELECT * FROM " + TABLE_MEDICINE + " where " + KEY_CATEGORY_NAME + "='All Prescriptions'";
         Cursor cursor = db.rawQuery(query, null);
         if (cursor == null) {
             return list;
         }
         if (cursor.moveToFirst()) {
-            list = new ArrayList<String>();
+            list = new ArrayList<ProductData>();
+            do {
+                ProductData d = new ProductData();
+                d.setProductId(cursor.getString(cursor.getColumnIndex(KEY_PRODUCT_ID)));
+                d.setCategoryName(cursor.getString(cursor.getColumnIndex(KEY_CATEGORY_NAME)));
+                d.setSubCategoryName(cursor.getString(cursor.getColumnIndex(KEY_SUB_CATEGORY_NAME)));
+                d.setShortDescription(cursor.getString(cursor.getColumnIndex(KEY_SHORT_DESCRIPTION)));
+                d.setLongDescription(cursor.getString(cursor.getColumnIndex(KEY_LONG_DESCRIPTION)));
+                d.setImage(cursor.getString(cursor.getColumnIndex(KEY_IMAGE)));
+                d.setManufacturer(cursor.getString(cursor.getColumnIndex(KEY_MANUFACTURER)));
+                d.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                d.setPower(cursor.getString(cursor.getColumnIndex(KEY_POWER)));
+                d.setPriceMrp(cursor.getString(cursor.getColumnIndex(KEY_PRICE_MRP)));
+                d.setPriceDiscount(cursor.getString(cursor.getColumnIndex(KEY_PRICE_DISCOUNT)));
+                d.setDiscountPercentage(cursor.getString(cursor.getColumnIndex(KEY_DISCOUNT_PERCENTAGE)));
+                d.setDiscountText(cursor.getString(cursor.getColumnIndex(KEY_DISCOUNT_TEXT)));
+                d.setProductType(cursor.getString(cursor.getColumnIndex(KEY_PRODUCT_TYPE)));
+                d.setPackagingContain(cursor.getString(cursor.getColumnIndex(KEY_PACKAGING_CONTAIN)));
+                d.setPrescriptionRequired(Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(KEY_PRESCRIPTION_REQUIRED))));
+                d.setTotalAvailable(Integer.parseInt(cursor.getString(cursor.getColumnIndex(KEY_TOTAL_AVAILABLE))));
+                list.add(d);
+            } while (cursor.moveToNext());
+            /*list = new ArrayList<String>();
             do {
                 list.add(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-            } while (cursor.moveToNext());
+            } while (cursor.moveToNext());*/
         }
         return list;
     }
@@ -234,6 +256,7 @@ public class DBHelper extends SQLiteOpenHelper {
             values.put(KEY_ITEM_PRICE, modal.getItem_price());
             values.put(KEY_ITEM_TOTAL_PRICE, modal.getItem_total_price());
             values.put(KEY_ITEM_IMG, modal.getImage());
+            values.put(KEY_ITEM_PRE_REQUIRED, "" + modal.isIs_prescription_required());
             if (db.update(TABLE_CART, values, KEY_ITEM_ID + "=" + modal.getItem_id(), null) > 0) {
                 isInserted = true;
                 Log.e("addToCart : ", "Updated");
@@ -280,12 +303,12 @@ public class DBHelper extends SQLiteOpenHelper {
                 d.setItem_price(cursor.getDouble(cursor.getColumnIndex(KEY_ITEM_PRICE)));
                 d.setQty(cursor.getInt(cursor.getColumnIndex(KEY_ITEM_QTY)));
                 d.setItem_total_price(cursor.getDouble(cursor.getColumnIndex(KEY_ITEM_TOTAL_PRICE)));
+                d.setIs_prescription_required(Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(KEY_ITEM_PRE_REQUIRED))));
                 list.add(d);
             } while (cursor.moveToNext());
         }
         return list;
     }
-
 
     public boolean updateCartItem(CartData modal) {
         SQLiteDatabase db = this.getWritableDatabase();

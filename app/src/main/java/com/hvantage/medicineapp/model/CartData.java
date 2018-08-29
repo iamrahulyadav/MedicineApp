@@ -9,17 +9,19 @@ public class CartData implements Serializable {
     String image = "";
     int qty = 0;
     double item_price = 0.0, item_total_price = 0.0;
+    boolean is_prescription_required = false;
 
     public CartData() {
     }
 
-    public CartData(String item_id, String item, String image, int qty, double item_price, double item_total_price) {
+    public CartData(String item_id, String item, String image, int qty, double item_price, double item_total_price, boolean is_prescription_required) {
         this.item_id = item_id;
         this.item = item;
         this.image = image;
         this.qty = qty;
         this.item_price = item_price;
         this.item_total_price = item_total_price;
+        this.is_prescription_required = is_prescription_required;
     }
 
     public String getItem_id() {
@@ -78,6 +80,14 @@ public class CartData implements Serializable {
         this.item_total_price = item_total_price;
     }
 
+    public boolean isIs_prescription_required() {
+        return is_prescription_required;
+    }
+
+    public void setIs_prescription_required(boolean is_prescription_required) {
+        this.is_prescription_required = is_prescription_required;
+    }
+
     @Override
     public String toString() {
         return "CartData{" +
@@ -88,6 +98,7 @@ public class CartData implements Serializable {
                 ", qty=" + qty +
                 ", item_price=" + item_price +
                 ", item_total_price=" + item_total_price +
+                ", is_prescription_required=" + is_prescription_required +
                 '}';
     }
 }

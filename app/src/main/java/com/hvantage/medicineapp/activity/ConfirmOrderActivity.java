@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -29,19 +28,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.adapter.CartItemAdapter;
-import com.hvantage.medicineapp.adapter.UploadedPreAdapter;
+import com.hvantage.medicineapp.adapter.ConfirmOrderItemAdapter;
+import com.hvantage.medicineapp.adapter.ConfirmOrderPrescAdapter;
+import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.model.AddressData;
 import com.hvantage.medicineapp.model.CartData;
 import com.hvantage.medicineapp.model.CartModel;
 import com.hvantage.medicineapp.model.OrderData;
+import com.hvantage.medicineapp.model.PrescriptionData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
 import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.Functions;
-import com.hvantage.medicineapp.util.GridSpacingItemDecoration;
 import com.hvantage.medicineapp.util.ProgressBar;
 
 import org.json.JSONException;
@@ -69,12 +69,11 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private TextView tvChangeAddress;
     private Map<String, String> timestamp;
     private Double taxes = 0.0;
-    private Double delivery_fee = 0.0;
+    private Double delivery_fee = 30.0;
     private String payment_mode = "Cash On Delivery";
     private RecyclerView recylcer_view;
-    private UploadedPreAdapter adapterPres;
-    private ArrayList<CartData> cartList = new ArrayList<CartData>();
-    private CartItemAdapter adapterCart;
+    private ConfirmOrderPrescAdapter adapterPres;
+    private ConfirmOrderItemAdapter adapterCart;
     private double total = 0;
     private RecyclerView recylcer_view_items;
     private int spacing = 30, spanCount = 3;
@@ -83,6 +82,9 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private EditText etNote;
     private RadioGroup rgOrderType;
     private String orderType = "1";
+    private ArrayList<CartData> cartList = new ArrayList<CartData>();
+    private double payable_amt = 0.0, total_amt = 0.0;
+    private ArrayList<PrescriptionData> prescList = new ArrayList<PrescriptionData>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,21 +110,39 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
 
         Log.e(TAG, "onCreate: addressData >> " + addressData);
         init();
-        setRecyclerView();
-        setRecyclerViewCart();
+        if (CartActivity.selectedPresc != null) {
+            prescList.add(CartActivity.selectedPresc);
+            Log.e(TAG, "onCreate: prescList >> " + prescList);
+            setRecyclerView();
+            llPrescription.setVisibility(View.VISIBLE);
+        } else
+            llPrescription.setVisibility(View.GONE);
+
+
         if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
+            cartList = new DBHelper(context).getCartData();
+            if (cartList != null) {
+                if (cartList.size() > 0) {
+                    Log.e(TAG, "onCreate: cartList >> " + cartList);
+                    llMedicine.setVisibility(View.VISIBLE);
+                    setRecyclerViewCart();
+                    for (int i = 0; i < cartList.size(); i++) {
+                        payable_amt = Functions.roundTwoDecimals(payable_amt + cartList.get(i).getItem_total_price());
+                    }
+                    payable_amt = payable_amt + delivery_fee;
+                    total_amt = payable_amt;
+                    tvPayableAmt.setText("Rs. " + payable_amt + "");
+                    tvTotalPrice.setText("Rs. " + total_amt + "");
+                } else llMedicine.setVisibility(View.GONE);
+            } else llMedicine.setVisibility(View.GONE);
+
             if (AppPreferences.getOrderType(context) == AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION) {
-                llPrescription.setVisibility(View.VISIBLE);
-                llMedicine.setVisibility(View.VISIBLE);
                 llPayMode.setVisibility(View.GONE);
                 llAmount.setVisibility(View.GONE);
-                //getCartData();
             } else {
-                llPrescription.setVisibility(View.GONE);
                 llPayMode.setVisibility(View.VISIBLE);
-                llMedicine.setVisibility(View.VISIBLE);
                 llAmount.setVisibility(View.VISIBLE);
-                // getCartData();
+
             }
 
             if (addressData != null) {
@@ -140,6 +160,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void init() {
+        llPrescription = (LinearLayout) findViewById(R.id.llPrescription);
         etNote = (EditText) findViewById(R.id.etNote);
         tvTotalPrice = (TextView) findViewById(R.id.tvTotalPrice);
         tvPayableAmt = (TextView) findViewById(R.id.tvPayableAmt);
@@ -150,13 +171,11 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         tvAddress4 = (TextView) findViewById(R.id.tvAddress4);
         rgOrderType = findViewById(R.id.rgOrderType);
         tvChangeAddress = (TextView) findViewById(R.id.tvChangeAddress);
-        llPrescription = (LinearLayout) findViewById(R.id.llPrescription);
         llMedicine = (LinearLayout) findViewById(R.id.llMedicine);
         llAmount = (LinearLayout) findViewById(R.id.llAmount);
         llPayMode = (LinearLayout) findViewById(R.id.llPayMode);
         tvCheckout.setOnClickListener(this);
         tvChangeAddress.setOnClickListener(this);
-
         rgOrderType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
@@ -171,16 +190,15 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
 
     private void setRecyclerView() {
         recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
-        adapterPres = new UploadedPreAdapter(context, UploadPrecriptionFragment.presList);
-        recylcer_view.setLayoutManager(new GridLayoutManager(context, spanCount));
-        recylcer_view.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
+        adapterPres = new ConfirmOrderPrescAdapter(context, prescList, null);
+        recylcer_view.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view.setAdapter(adapterPres);
         adapterPres.notifyDataSetChanged();
     }
 
     private void setRecyclerViewCart() {
         recylcer_view_items = (RecyclerView) findViewById(R.id.recylcer_view_items);
-        adapterCart = new CartItemAdapter(context, cartList);
+        adapterCart = new ConfirmOrderItemAdapter(context, cartList);
         recylcer_view_items.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view_items.setAdapter(adapterCart);
         adapterCart.notifyDataSetChanged();
@@ -222,7 +240,6 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             case R.id.tvChangeAddress:
                 startActivity(new Intent(context, SelectAddressActivity.class));
                 break;
-
         }
     }
 

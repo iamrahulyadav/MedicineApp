@@ -128,12 +128,16 @@
             android:label=""
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".activity.SelectPrescActivity"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".activity.AddAddressActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.AddPrescActivity"
-            android:label="@string/title_activity_add_presc"
+            android:label=""
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
