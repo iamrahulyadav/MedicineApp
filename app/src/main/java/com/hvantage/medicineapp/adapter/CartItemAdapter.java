@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.activity.MainActivity;
 import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.CartData;
 import com.hvantage.medicineapp.util.Functions;
@@ -106,6 +107,7 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
                     public void onClick(DialogInterface dialog, int which) {
                         if (new DBHelper(context).deleteCartItem(data.getItem_id()) > 0) {
                             remove(position);
+                            MainActivity.setupBadge();
                         }
                     }
                 })

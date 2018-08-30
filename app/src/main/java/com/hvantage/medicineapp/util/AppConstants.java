@@ -69,6 +69,7 @@ public class AppConstants {
         public static final String ADD_REPORT = "add_report";
         public static final String GET_MY_REPORTS = "get_my_reports";
         public static final String DELETE_REPORT = "delete_report";
+        public static final String PLACE_ORDER_WITHOUT_PRESCRIPTION = "place_order_without_prescription";
     }
 
     public class NOTIFICATION_KEY {

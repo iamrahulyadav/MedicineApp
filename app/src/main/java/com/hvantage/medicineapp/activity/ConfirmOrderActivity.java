@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,23 +18,14 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.ConfirmOrderItemAdapter;
 import com.hvantage.medicineapp.adapter.ConfirmOrderPrescAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
-import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.model.AddressData;
 import com.hvantage.medicineapp.model.CartData;
-import com.hvantage.medicineapp.model.CartModel;
-import com.hvantage.medicineapp.model.OrderData;
 import com.hvantage.medicineapp.model.PrescriptionData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
 import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
@@ -48,7 +38,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -67,7 +56,6 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private AddressData addressData;
     private TextView tvAddress1, tvAddress2, tvAddress3, tvAddress4;
     private TextView tvChangeAddress;
-    private Map<String, String> timestamp;
     private Double taxes = 0.0;
     private Double delivery_fee = 30.0;
     private String payment_mode = "Cash On Delivery";
@@ -94,32 +82,32 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        timestamp = ServerValue.TIMESTAMP;
         selected_pres_id = AppPreferences.getSelectedPresId(context);
         selected_add_id = AppPreferences.getSelectedAddId(context);
         Log.e(TAG, "onCreate: selected_pres_id >> " + selected_pres_id);
         Log.e(TAG, "onCreate: selected_add_id >> " + selected_add_id);
-
-        if (getIntent().hasExtra("data"))
-            addressData = (AddressData) getIntent().getParcelableExtra("data");
-        else {
-            startActivity(new Intent(context, SelectAddressActivity.class));
-            finish();
-        }
-
-
-        Log.e(TAG, "onCreate: addressData >> " + addressData);
-        init();
-        if (CartActivity.selectedPresc != null) {
-            prescList.add(CartActivity.selectedPresc);
-            Log.e(TAG, "onCreate: prescList >> " + prescList);
-            setRecyclerView();
-            llPrescription.setVisibility(View.VISIBLE);
-        } else
-            llPrescription.setVisibility(View.GONE);
-
-
         if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
+            if (getIntent().hasExtra("data"))
+                addressData = (AddressData) getIntent().getParcelableExtra("data");
+            else {
+                startActivity(new Intent(context, SelectAddressActivity.class));
+                finish();
+            }
+
+
+            Log.e(TAG, "onCreate: addressData >> " + addressData);
+            init();
+            if (CartActivity.selectedPresc != null) {
+                prescList.add(CartActivity.selectedPresc);
+                Log.e(TAG, "onCreate: prescList >> " + prescList);
+                setRecyclerView();
+                llPrescription.setVisibility(View.VISIBLE);
+                llAmount.setVisibility(View.GONE);
+            } else {
+                llPrescription.setVisibility(View.GONE);
+                llAmount.setVisibility(View.VISIBLE);
+            }
+
             cartList = new DBHelper(context).getCartData();
             if (cartList != null) {
                 if (cartList.size() > 0) {
@@ -138,11 +126,8 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
 
             if (AppPreferences.getOrderType(context) == AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION) {
                 llPayMode.setVisibility(View.GONE);
-                llAmount.setVisibility(View.GONE);
             } else {
                 llPayMode.setVisibility(View.VISIBLE);
-                llAmount.setVisibility(View.VISIBLE);
-
             }
 
             if (addressData != null) {
@@ -155,6 +140,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 finish();
             }
         } else {
+            Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(context, LoginActivity.class));
         }
     }
@@ -231,9 +217,13 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tvCheckout:
-                if (Functions.isConnectingToInternet(context))
-                    new OrderTask().execute();
-                else {
+                if (Functions.isConnectingToInternet(context)) {
+                    if (AppPreferences.getSelectedPresId(context).equalsIgnoreCase("")) {
+                        new OrderTaskWithout().execute();
+                    } else {
+                        new OrderTask().execute();
+                    }
+                } else {
                     Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
                 }
                 break;
@@ -241,79 +231,6 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 startActivity(new Intent(context, SelectAddressActivity.class));
                 break;
         }
-    }
-
-    private void sendData() {
-        showProgressDialog();
-        String key = FirebaseDatabase.getInstance()
-                .getReference(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.ORDERS)
-                .push().getKey();
-
-        OrderData orderData = new OrderData();
-//        orderData.setDate_time_server(ServerValue.TIMESTAMP);
-        orderData.setDate(Functions.getCurrentDate());
-        orderData.setTime(Functions.getCurrentTime());
-        orderData.setTaxes(String.valueOf(taxes));
-        orderData.setDelivery_fee(String.valueOf(delivery_fee));
-        orderData.setTotal_amount(String.valueOf(total));
-        orderData.setPayable_amount(String.valueOf(total));
-
-        //delivery details
-        orderData.setDelivery_details(addressData);
-        //cart items
-        orderData.setItems(new ArrayList<CartModel>());
-        //presriptions
-        orderData.setPrescriptions(UploadPrecriptionFragment.presList);
-
-        orderData.setKey(key);
-        orderData.setPayment_mode(payment_mode);
-        orderData.setStatus("In-Progress");
-        orderData.setOrder_type(String.valueOf(AppPreferences.getOrderType(context)));
-        orderData.setBy(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber());
-
-        Log.e(TAG, "sendData: orderData >> " + orderData);
-
-        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-                .child(AppConstants.FIREBASE_KEY.ORDERS)
-                .child(key)
-                .setValue(orderData)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        FirebaseDatabase.getInstance().getReference(AppConstants.APP_NAME)
-                                .child(AppConstants.FIREBASE_KEY.CART)
-                                .child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())
-                                .removeValue()
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        hideProgressDialog();
-                                        Toast.makeText(context, "Order Placed", Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(ConfirmOrderActivity.this, MainActivity.class);
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                        startActivity(intent);
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        hideProgressDialog();
-                                        Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-
-
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                hideProgressDialog();
-                Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Error writing document", e);
-            }
-        });
-
     }
 
     class OrderTask extends AsyncTask<Void, String, Void> {
@@ -325,7 +242,6 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
 
         @Override
         protected Void doInBackground(Void... voids) {
-
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("method", AppConstants.METHODS.PLACE_ORDER_WITH_PRESCRIPTION);
             jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
@@ -333,8 +249,86 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             jsonObject.addProperty("address_id", selected_add_id);
             jsonObject.addProperty("order_type", selected_add_id);
             jsonObject.addProperty("payment_mode", orderType);
+            jsonObject.addProperty("payment_type", "cash");
             jsonObject.addProperty("note", etNote.getText().toString());
-            jsonObject.addProperty("additional_items", "");
+            jsonObject.add("additional_items", new GsonBuilder().create().toJsonTree(cartList).getAsJsonArray());
+            jsonObject.addProperty("payable_amount", 0);
+            jsonObject.addProperty("cod_charges ", 0);
+            jsonObject.addProperty("gst_tax_amt", 0);
+            jsonObject.addProperty("other_tax_amt", 0);
+            jsonObject.addProperty("total_amount", 0);
+            jsonObject.addProperty("promo_code_applied", "");
+
+            Log.e(TAG, "OrderTask: Request >> " + jsonObject.toString());
+
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.order(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "OrderTask: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            publishProgress("200", "");
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getResources().getString(R.string.api_error_msg));
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    publishProgress("400", getResources().getString(R.string.api_error_msg));
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+            String status = values[0];
+            String msg = values[1];
+            if (status.equalsIgnoreCase("200")) {
+                startActivity(new Intent(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            } else if (status.equalsIgnoreCase("400")) {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    class OrderTaskWithout extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.PLACE_ORDER_WITHOUT_PRESCRIPTION);
+            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
+            jsonObject.addProperty("prescription_id", "0");
+            jsonObject.addProperty("address_id", selected_add_id);
+            jsonObject.addProperty("order_type", selected_add_id);
+            jsonObject.addProperty("payment_mode", orderType);
+            jsonObject.addProperty("payment_type", "cash");
+            jsonObject.addProperty("note", etNote.getText().toString());
+            jsonObject.add("additional_items", new GsonBuilder().create().toJsonTree(cartList).getAsJsonArray());
+            jsonObject.addProperty("payable_amount", payable_amt);
+            jsonObject.addProperty("cod_charges ", delivery_fee);
+            jsonObject.addProperty("gst_tax_amt", 0);
+            jsonObject.addProperty("other_tax_amt", 0);
+            jsonObject.addProperty("total_amount", total_amt);
+            jsonObject.addProperty("promo_code_applied", "");
 
             Log.e(TAG, "OrderTask: Request >> " + jsonObject.toString());
 

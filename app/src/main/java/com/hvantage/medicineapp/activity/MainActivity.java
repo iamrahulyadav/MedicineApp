@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -23,6 +24,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +34,7 @@ import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.business.BusinessLoginActivity;
+import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.fragments.CartFragment;
 import com.hvantage.medicineapp.fragments.HomeFragment;
 import com.hvantage.medicineapp.fragments.MyOrderFragment;
@@ -39,6 +42,7 @@ import com.hvantage.medicineapp.fragments.MyPrescriptionFragment;
 import com.hvantage.medicineapp.fragments.OfferDiscountFragment;
 import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.fragments.VaultFragment;
+import com.hvantage.medicineapp.model.CartData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
 import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
@@ -49,6 +53,8 @@ import com.hvantage.medicineapp.util.Functions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -58,10 +64,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String TAG = "MainActivity";
     private static final int REQUEST_ALL_PERMISSIONS = 100;
     private TextView toolbar_title;
-    private Context context;
+    private static Context context;
     private NavigationView navigationView;
     private TextView tvLogin, tvUsername;
     private String mToken;
+    static Button notifCount;
+    static int mNotifCount = 0;
+    private static TextView textCartItemCount;
+    private static int mCartItemCount = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             tvUsername.setText("Hello, " + AppPreferences.getUserName(context));
         }
     }
+
 
     private boolean checkPermission() {
         if ((ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
@@ -194,7 +206,57 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        final MenuItem menuItem = menu.findItem(R.id.action_cart);
+
+        View actionView = MenuItemCompat.getActionView(menuItem);
+        textCartItemCount = (TextView) actionView.findViewById(R.id.cart_badge);
+
+
+        actionView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onOptionsItemSelected(menuItem);
+            }
+        });
+        setupBadge();
+
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        invalidateOptionsMenu();
+        setupBadge();
+    }
+
+    public static void setupBadge() {
+        if (textCartItemCount != null) {
+            ArrayList<CartData> list = new DBHelper(context).getCartData();
+            if (list != null) {
+                Log.e(TAG, "setupBadge: list.size() >> " + list.size());
+                mCartItemCount = list.size();
+                if (mCartItemCount > 0) {
+                    textCartItemCount.setText(String.valueOf(mCartItemCount));
+                    textCartItemCount.setVisibility(View.VISIBLE);
+                } else
+                    textCartItemCount.setVisibility(View.GONE);
+            } else {
+                mCartItemCount = 0;
+                textCartItemCount.setVisibility(View.GONE);
+            }
+
+         /*   if (mCartItemCount == 0) {
+                if (textCartItemCount.getVisibility() != View.GONE) {
+                    textCartItemCount.setVisibility(View.GONE);
+                }
+            } else {
+                textCartItemCount.setText(String.valueOf(mCartItemCount));
+                if (textCartItemCount.getVisibility() != View.VISIBLE) {
+                    textCartItemCount.setVisibility(View.VISIBLE);
+                }
+            }*/
+        }
     }
 
     @Override

@@ -126,7 +126,7 @@ public class ProductDetailActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        //getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -188,9 +188,10 @@ public class ProductDetailActivity extends AppCompatActivity implements View.OnC
                             item_total,
                             data.getPrescriptionRequired()
                     );
-                    if (new DBHelper(context).addToCart(model))
+                    if (new DBHelper(context).addToCart(model)) {
                         Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
-                    else
+                        MainActivity.setupBadge();
+                    } else
                         Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();

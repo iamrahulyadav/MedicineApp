@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.LoginActivity;
+import com.hvantage.medicineapp.activity.MainActivity;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.CartData;
@@ -134,9 +135,10 @@ public class DailyNeedProductAdapter extends RecyclerView.Adapter<DailyNeedProdu
                                 item_total,
                                 data.getPrescriptionRequired()
                         );
-                        if (new DBHelper(context).addToCart(model))
+                        if (new DBHelper(context).addToCart(model)) {
                             Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
-                        else
+                            MainActivity.setupBadge();
+                        } else
                             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();

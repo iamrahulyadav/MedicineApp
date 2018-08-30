@@ -145,6 +145,7 @@ public class SelectPrescActivity extends AppCompatActivity {
             @Override
             public void placeOrder(View v, int position) {
                 CartActivity.selectedPresc = list.get(position);
+                AppPreferences.setSelectedPresId(context, list.get(position).getPrescription_id());
                 finish();
                 Log.e(TAG, "viewOrder: CartActivity.selectedPresc >> " + CartActivity.selectedPresc);
             }

@@ -46,7 +46,9 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.activity.CartActivity;
 import com.hvantage.medicineapp.activity.LoginActivity;
+import com.hvantage.medicineapp.activity.MainActivity;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.adapter.CategoryAdapter;
 import com.hvantage.medicineapp.adapter.DailyNeedProductAdapter;
@@ -218,6 +220,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
             etSearch.setAdapter(adapter);
         }
+        AppPreferences.setSelectedPresId(context, "");
+        AppPreferences.setSelectedAddId(context, "");
+        CartActivity.selectedPresc = null;
         return rootView;
     }
 
@@ -609,6 +614,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                             if (new DBHelper(context).addToCart(model)) {
                                 etSearch.setText("");
                                 Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
+                                MainActivity.setupBadge();
                             } else
                                 Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
                         } else {
