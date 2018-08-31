@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--<color name="colorPrimary">#0889d4</color>--> <!--by rk-->
-    <color name="colorPrimary">#2E5ECE</color>
-    <color name="colorPrimaryDark">#2E5ECE</color>
-    <color name="colorAccent">#2E5ECE</color>
+    <!--<color name="colorPrimary">#0889d4</color>--><!--by rk-->
+    <!--<color name="colorPrimary">#2E5ECE</color>--><!--by designer-->
+    <color name="colorPrimary">#4089d4</color>
+    <color name="colorPrimaryDark">#4089d4</color>
+    <color name="colorAccent">#4089d4</color>
     <color name="colorWhite">#fff</color>
     <color name="colorBlack">#111</color>
     <color name="colorActivityBackground">#f0f0f0</color>
@@ -14,10 +15,10 @@
     <color name="colorError">#ef4056</color>
     <!--<color name="colorError">#ed3b00</color>-->
     <color name="colorSuccess">#18ca71</color>
-    <color name="colorWarning">#18a6ca</color>
+    <color name="colorWarning">#4089d4</color>
     <color name="colorToolbarTitle">#ceffffff</color>
     <color name="semiTransparent">#d5111111</color>
-    <color name="colorFabRipple">#0a78b7</color>
+    <color name="colorFabRipple">#4089d4</color>
 
     <color name="black_overlay">#66000000</color>
 </resources>
