@@ -63,16 +63,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private static final String TAG = "MainActivity";
     private static final int REQUEST_ALL_PERMISSIONS = 100;
-    private TextView toolbar_title;
+    static Button notifCount;
+    static int mNotifCount = 0;
     private static Context context;
+    private static TextView textCartItemCount;
+    private static int mCartItemCount = 0;
+    private TextView toolbar_title;
     private NavigationView navigationView;
     private TextView tvLogin, tvUsername;
     private String mToken;
-    static Button notifCount;
-    static int mNotifCount = 0;
-    private static TextView textCartItemCount;
-    private static int mCartItemCount = 0;
 
+    public static void setupBadge() {
+        if (textCartItemCount != null) {
+            ArrayList<CartData> list = new DBHelper(context).getCartData();
+            if (list != null) {
+                Log.e(TAG, "setupBadge: list.size() >> " + list.size());
+                mCartItemCount = list.size();
+                if (mCartItemCount > 0) {
+                    textCartItemCount.setText(String.valueOf(mCartItemCount));
+                    textCartItemCount.setVisibility(View.VISIBLE);
+                } else
+                    textCartItemCount.setVisibility(View.GONE);
+            } else {
+                mCartItemCount = 0;
+                textCartItemCount.setVisibility(View.GONE);
+            }
+
+         /*   if (mCartItemCount == 0) {
+                if (textCartItemCount.getVisibility() != View.GONE) {
+                    textCartItemCount.setVisibility(View.GONE);
+                }
+            } else {
+                textCartItemCount.setText(String.valueOf(mCartItemCount));
+                if (textCartItemCount.getVisibility() != View.VISIBLE) {
+                    textCartItemCount.setVisibility(View.VISIBLE);
+                }
+            }*/
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +134,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             tvUsername.setText("Hello, " + AppPreferences.getUserName(context));
         }
     }
-
 
     private boolean checkPermission() {
         if ((ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
@@ -228,35 +255,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onResume();
         invalidateOptionsMenu();
         setupBadge();
-    }
-
-    public static void setupBadge() {
-        if (textCartItemCount != null) {
-            ArrayList<CartData> list = new DBHelper(context).getCartData();
-            if (list != null) {
-                Log.e(TAG, "setupBadge: list.size() >> " + list.size());
-                mCartItemCount = list.size();
-                if (mCartItemCount > 0) {
-                    textCartItemCount.setText(String.valueOf(mCartItemCount));
-                    textCartItemCount.setVisibility(View.VISIBLE);
-                } else
-                    textCartItemCount.setVisibility(View.GONE);
-            } else {
-                mCartItemCount = 0;
-                textCartItemCount.setVisibility(View.GONE);
-            }
-
-         /*   if (mCartItemCount == 0) {
-                if (textCartItemCount.getVisibility() != View.GONE) {
-                    textCartItemCount.setVisibility(View.GONE);
-                }
-            } else {
-                textCartItemCount.setText(String.valueOf(mCartItemCount));
-                if (textCartItemCount.getVisibility() != View.VISIBLE) {
-                    textCartItemCount.setVisibility(View.VISIBLE);
-                }
-            }*/
-        }
     }
 
     @Override

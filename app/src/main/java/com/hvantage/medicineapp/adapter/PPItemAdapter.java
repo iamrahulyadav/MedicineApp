@@ -1,6 +1,5 @@
 package com.hvantage.medicineapp.adapter;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.widget.RecyclerView;
@@ -12,8 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.activity.PrescPreviewActivity;
-import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.model.CartModel;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
@@ -56,7 +53,7 @@ public class PPItemAdapter extends RecyclerView.Adapter<PPItemAdapter.ViewHolder
         holder.tvDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deleteItem(data, position);
+                //deleteItem(data, position);
             }
         });
     }
@@ -73,26 +70,6 @@ public class PPItemAdapter extends RecyclerView.Adapter<PPItemAdapter.ViewHolder
     private void hideProgressDialog() {
         if (progressBar != null)
             progressBar.dismiss();
-    }
-
-    private void deleteItem(final CartModel data, final int position) {
-        new AlertDialog.Builder(context)
-                .setMessage("Remove " + data.getItem())
-                .setPositiveButton("Remove", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        UploadPrecriptionFragment.presList.get(PrescPreviewActivity.position).getItem_list().remove(position);
-                        notifyDataSetChanged();
-//
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                })
-                .show();
     }
 
 

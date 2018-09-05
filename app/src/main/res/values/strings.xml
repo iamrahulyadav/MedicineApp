@@ -19,4 +19,6 @@
     <string name="title_activity_presc_preview">PrescPreviewActivity</string>
     <string name="api_error_msg">Internal server error.</string>
     <string name="title_activity_add_presc">AddPrescActivity</string>
+    <string name="string_next">What\'s next?\n\n1. Our Pharmacist will digitize and approve your ordered prescription.\n\n2. You\'ll be notified on every status of your order vai SMS / Email.</string>
+    <string name="contact_no1">+911122334455</string>
 </resources>

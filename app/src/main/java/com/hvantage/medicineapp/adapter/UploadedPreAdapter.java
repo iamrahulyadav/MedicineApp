@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
@@ -18,7 +17,6 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.activity.PrescPreviewActivity;
 import com.hvantage.medicineapp.model.PrescriptionModel;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.TouchImageView;
@@ -62,10 +60,10 @@ public class UploadedPreAdapter extends RecyclerView.Adapter<UploadedPreAdapter.
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                context.startActivity(
+              /*  context.startActivity(
                         new Intent(context, PrescPreviewActivity.class)
                                 .putExtra("position", position)
-                                .putExtra("key", data.getKey()));
+                                .putExtra("key", data.getKey()));*/
                 //showPreviewDialog(Functions.base64ToBitmap(data.getImage_base64()));
             }
         });

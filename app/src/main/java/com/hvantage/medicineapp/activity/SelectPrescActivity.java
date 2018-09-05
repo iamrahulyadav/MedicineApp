@@ -61,6 +61,47 @@ public class SelectPrescActivity extends AppCompatActivity {
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
     }
 
+    private void init() {
+        recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
+        cardEmptyText = (CardView) findViewById(R.id.cardEmptyText);
+        setRecyclerView();
+    }
+
+    private void setRecyclerView() {
+        recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
+        adapter = new AllUploadedPreAdapter(context, list, new AllUploadedPreAdapter.MyAdapterListener() {
+            @Override
+            public void viewOrder(View v, int position) {
+
+            }
+
+            @Override
+            public void placeOrder(View v, int position) {
+                CartActivity.selectedPresc = list.get(position);
+                AppPreferences.setSelectedPresId(context, list.get(position).getPrescription_id());
+                finish();
+                Log.e(TAG, "viewOrder: CartActivity.selectedPresc >> " + CartActivity.selectedPresc);
+            }
+        });
+        recylcer_view.setLayoutManager(new LinearLayoutManager(context));
+        recylcer_view.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
+
+    private void showProgressDialog() {
+        progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                // TODO Auto-generated method stub
+            }
+        });
+    }
+
+    private void hideProgressDialog() {
+        if (progressBar != null)
+            progressBar.dismiss();
+    }
+
     private class GetDataTask extends AsyncTask<Void, String, Void> {
         @Override
         protected void onPreExecute() {
@@ -125,48 +166,6 @@ public class SelectPrescActivity extends AppCompatActivity {
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-
-    private void init() {
-        recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
-        cardEmptyText = (CardView) findViewById(R.id.cardEmptyText);
-        setRecyclerView();
-    }
-
-    private void setRecyclerView() {
-        recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
-        adapter = new AllUploadedPreAdapter(context, list, new AllUploadedPreAdapter.MyAdapterListener() {
-            @Override
-            public void viewOrder(View v, int position) {
-
-            }
-
-            @Override
-            public void placeOrder(View v, int position) {
-                CartActivity.selectedPresc = list.get(position);
-                AppPreferences.setSelectedPresId(context, list.get(position).getPrescription_id());
-                finish();
-                Log.e(TAG, "viewOrder: CartActivity.selectedPresc >> " + CartActivity.selectedPresc);
-            }
-        });
-        recylcer_view.setLayoutManager(new LinearLayoutManager(context));
-        recylcer_view.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-    }
-
-    private void showProgressDialog() {
-        progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                // TODO Auto-generated method stub
-            }
-        });
-    }
-
-    private void hideProgressDialog() {
-        if (progressBar != null)
-            progressBar.dismiss();
     }
 
 }

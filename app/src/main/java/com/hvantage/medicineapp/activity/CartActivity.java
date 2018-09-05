@@ -34,6 +34,7 @@ import java.util.ArrayList;
 
 public class CartActivity extends AppCompatActivity {
     private static final String TAG = "CartActivity";
+    public static PrescriptionData selectedPresc = null;
     private Context context;
     private ArrayList<CartData> list = new ArrayList<CartData>();
     private RecyclerView recylcer_view;
@@ -45,7 +46,6 @@ public class CartActivity extends AppCompatActivity {
     private LinearLayout llAmount;
     private CardView cardPrescription;
     private boolean prescription_required = false;
-    public static PrescriptionData selectedPresc = null;
     private ImageView imgThumb;
     private TextView tvTitle, tvDate, tvHideShow;
     private CardView btnChange, btnView;

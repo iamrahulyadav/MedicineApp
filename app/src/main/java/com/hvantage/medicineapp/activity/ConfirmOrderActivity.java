@@ -5,11 +5,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -94,7 +97,6 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 finish();
             }
 
-
             Log.e(TAG, "onCreate: addressData >> " + addressData);
             init();
             if (CartActivity.selectedPresc != null) {
@@ -103,9 +105,11 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 setRecyclerView();
                 llPrescription.setVisibility(View.VISIBLE);
                 llAmount.setVisibility(View.GONE);
+                llPayMode.setVisibility(View.GONE);
             } else {
                 llPrescription.setVisibility(View.GONE);
                 llAmount.setVisibility(View.VISIBLE);
+                llPayMode.setVisibility(View.VISIBLE);
             }
 
             cartList = new DBHelper(context).getCartData();
@@ -121,14 +125,22 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                     total_amt = payable_amt;
                     tvPayableAmt.setText("Rs. " + payable_amt + "");
                     tvTotalPrice.setText("Rs. " + total_amt + "");
-                } else llMedicine.setVisibility(View.GONE);
-            } else llMedicine.setVisibility(View.GONE);
+                } else {
+                    llMedicine.setVisibility(View.GONE);
+                    llAmount.setVisibility(View.GONE);
+                    llPayMode.setVisibility(View.GONE);
+                }
+            } else {
+                llMedicine.setVisibility(View.GONE);
+                llAmount.setVisibility(View.GONE);
+                llPayMode.setVisibility(View.GONE);
+            }
 
-            if (AppPreferences.getOrderType(context) == AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION) {
+           /* if (AppPreferences.getOrderType(context) == AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION) {
                 llPayMode.setVisibility(View.GONE);
             } else {
                 llPayMode.setVisibility(View.VISIBLE);
-            }
+            }*/
 
             if (addressData != null) {
                 tvAddress1.setText(addressData.getName() + ", +91" + addressData.getContactNo());
@@ -217,7 +229,8 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tvCheckout:
-                if (Functions.isConnectingToInternet(context)) {
+                dialogOrderSent();
+               /* if (Functions.isConnectingToInternet(context)) {
                     if (AppPreferences.getSelectedPresId(context).equalsIgnoreCase("")) {
                         new OrderTaskWithout().execute();
                     } else {
@@ -225,7 +238,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                     }
                 } else {
                     Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
-                }
+                }*/
                 break;
             case R.id.tvChangeAddress:
                 startActivity(new Intent(context, SelectAddressActivity.class));
@@ -374,5 +387,26 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             }
         }
     }
+
+    private void dialogOrderSent() {
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setCancelable(false);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_order_sent, null);
+        AppCompatButton btnSubmit = dialogView.findViewById(R.id.btnSubmit);
+        dialog.setView(dialogView);
+        final AlertDialog alertDialog = dialog.create();
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(context, MainActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                                Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                                Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        });
+        alertDialog.show();
+    }
+
 
 }

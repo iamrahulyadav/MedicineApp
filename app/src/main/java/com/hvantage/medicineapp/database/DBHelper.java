@@ -201,7 +201,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public ArrayList<ProductData> getMedicinesAll() {
         SQLiteDatabase db = this.getReadableDatabase();
         ArrayList<ProductData> list = null;
-        String query = "SELECT * FROM " + TABLE_MEDICINE + " where " + KEY_CATEGORY_NAME + "='All Prescriptions'";
+        String query = "SELECT * FROM " + TABLE_MEDICINE + " where " + KEY_CATEGORY_NAME + "='Prescriptions (A-Z)'";
         Cursor cursor = db.rawQuery(query, null);
         if (cursor == null) {
             return list;

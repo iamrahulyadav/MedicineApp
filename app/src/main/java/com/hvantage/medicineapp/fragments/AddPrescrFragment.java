@@ -428,18 +428,22 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
     }
 
     private void selectImage() {
-        final CharSequence[] items = {"Camera", "Gallery"};
+        final CharSequence[] items = {"Take Photo", "Choose From Gallery", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Select Image");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Camera")) {
+                if (items[item].equals("Take Photo")) {
                     cameraIntent();
-                } else if (items[item].equals("Gallery")) {
+                } else if (items[item].equals("Choose From Gallery")) {
                     galleryIntent();
+                } else {
+                    getActivity().onBackPressed();
                 }
             }
         });
+        builder.setCancelable(false);
         builder.show();
     }
 
