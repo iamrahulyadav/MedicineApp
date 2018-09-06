@@ -21,4 +21,5 @@
     <string name="title_activity_add_presc">AddPrescActivity</string>
     <string name="string_next">What\'s next?\n\n1. Our Pharmacist will digitize and approve your ordered prescription.\n\n2. You\'ll be notified on every status of your order vai SMS / Email.</string>
     <string name="contact_no1">+911122334455</string>
+    <string name="presc_guide">\t1. Don’t crop out any part of the image.\n2. Avoid blurred image.\n3. Include details of doctor and patient + clinic visit date.\n4. Medicines will be dispensed as per prescription.</string>
 </resources>
