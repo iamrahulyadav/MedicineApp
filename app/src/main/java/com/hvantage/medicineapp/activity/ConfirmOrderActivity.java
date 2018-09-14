@@ -1,21 +1,33 @@
 package com.hvantage.medicineapp.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -24,18 +36,20 @@ import android.widget.Toast;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.adapter.ConfirmOrderItemAdapter;
+import com.hvantage.medicineapp.adapter.CartItemAdapter;
 import com.hvantage.medicineapp.adapter.ConfirmOrderPrescAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.AddressData;
 import com.hvantage.medicineapp.model.CartData;
 import com.hvantage.medicineapp.model.PrescriptionData;
+import com.hvantage.medicineapp.model.ProductData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
 import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,7 +66,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     //    ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
     private Context context;
     private ProgressBar progressBar;
-    private TextView tvTotalPrice, tvPayableAmt;
+    private TextView tvTotalPrice, tvPayableAmt, tvDeliveryFee;
     private TextView tvCheckout;
     private LinearLayout llPrescription, llMedicine, llAmount;
     private LinearLayout llPayMode;
@@ -60,11 +74,11 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private TextView tvAddress1, tvAddress2, tvAddress3, tvAddress4;
     private TextView tvChangeAddress;
     private Double taxes = 0.0;
-    private Double delivery_fee = 30.0;
+    private Double delivery_fee = 10.0;
     private String payment_mode = "Cash On Delivery";
     private RecyclerView recylcer_view;
     private ConfirmOrderPrescAdapter adapterPres;
-    private ConfirmOrderItemAdapter adapterCart;
+    private CartItemAdapter adapterCart;
     private double total = 0;
     private RecyclerView recylcer_view_items;
     private int spacing = 30, spanCount = 3;
@@ -74,8 +88,57 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private RadioGroup rgOrderType;
     private String orderType = "1";
     private ArrayList<CartData> cartList = new ArrayList<CartData>();
-    private double payable_amt = 0.0, total_amt = 0.0;
+    private double payable_amt = 0.0, subtotal_amt = 0.0;
     private ArrayList<PrescriptionData> prescList = new ArrayList<PrescriptionData>();
+    private ArrayList<ProductData> list = new ArrayList<ProductData>();
+    private AppCompatAutoCompleteTextView etSearch;
+    private SearchBarAdapter adapter;
+    private boolean prescription_required = false;
+
+    class CartUpdateReciever extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.e(TAG, "onReceive:");
+            if (cartList != null) {
+                cartList.clear();
+                payable_amt = 0;
+                subtotal_amt = 0;
+                cartList = new DBHelper(context).getCartData();
+                if (cartList.size() > 0) {
+                    Log.e(TAG, "onCreate: cartList >> " + cartList);
+                    llMedicine.setVisibility(View.VISIBLE);
+                    setRecyclerViewCart();
+                    for (int i = 0; i < cartList.size(); i++) {
+                        subtotal_amt = Functions.roundTwoDecimals(subtotal_amt + cartList.get(i).getItem_total_price());
+                        if (prescription_required == false)
+                            if (cartList.get(i).isIs_prescription_required() == true) {
+                                prescription_required = true;
+                            }
+                    }
+                    payable_amt = subtotal_amt + delivery_fee;
+                    tvTotalPrice.setText("Rs. " + subtotal_amt + "");
+                    tvDeliveryFee.setText("Rs. " + delivery_fee + "");
+                    tvPayableAmt.setText("Rs. " + payable_amt + "");
+                } else {
+                    llMedicine.setVisibility(View.GONE);
+                    llAmount.setVisibility(View.GONE);
+                    llPayMode.setVisibility(View.GONE);
+                }
+            } else {
+                llMedicine.setVisibility(View.GONE);
+                llAmount.setVisibility(View.GONE);
+                llPayMode.setVisibility(View.GONE);
+            }
+
+            Log.e(TAG, "onReceive: CartActivity.selectedPresc  >> " + CartActivity.selectedPresc);
+            Log.e(TAG, "onReceive: AppPreferences.getSelectedPresId(context) >> " + AppPreferences.getSelectedPresId(context));
+            if (CartActivity.selectedPresc == null && AppPreferences.getSelectedPresId(context).equalsIgnoreCase("")) {
+                llAmount.setVisibility(View.VISIBLE);
+                llPayMode.setVisibility(View.GONE);
+                llPrescription.setVisibility(View.GONE);
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +148,8 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        LocalBroadcastManager.getInstance(context).registerReceiver(new CartUpdateReciever(), new IntentFilter("cart_update"));
+
         selected_pres_id = AppPreferences.getSelectedPresId(context);
         selected_add_id = AppPreferences.getSelectedAddId(context);
         Log.e(TAG, "onCreate: selected_pres_id >> " + selected_pres_id);
@@ -98,19 +163,10 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             }
 
             Log.e(TAG, "onCreate: addressData >> " + addressData);
+            list = new DBHelper(context).getMedicines();
+            Log.e(TAG, "onCreate: list >> " + list);
             init();
-            if (CartActivity.selectedPresc != null) {
-                prescList.add(CartActivity.selectedPresc);
-                Log.e(TAG, "onCreate: prescList >> " + prescList);
-                setRecyclerView();
-                llPrescription.setVisibility(View.VISIBLE);
-                llAmount.setVisibility(View.GONE);
-                llPayMode.setVisibility(View.GONE);
-            } else {
-                llPrescription.setVisibility(View.GONE);
-                llAmount.setVisibility(View.VISIBLE);
-                llPayMode.setVisibility(View.VISIBLE);
-            }
+
 
             cartList = new DBHelper(context).getCartData();
             if (cartList != null) {
@@ -119,12 +175,12 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                     llMedicine.setVisibility(View.VISIBLE);
                     setRecyclerViewCart();
                     for (int i = 0; i < cartList.size(); i++) {
-                        payable_amt = Functions.roundTwoDecimals(payable_amt + cartList.get(i).getItem_total_price());
+                        subtotal_amt = Functions.roundTwoDecimals(subtotal_amt + cartList.get(i).getItem_total_price());
                     }
-                    payable_amt = payable_amt + delivery_fee;
-                    total_amt = payable_amt;
+                    payable_amt = subtotal_amt + delivery_fee;
+                    tvTotalPrice.setText("Rs. " + subtotal_amt + "");
+                    tvDeliveryFee.setText("Rs. " + delivery_fee + "");
                     tvPayableAmt.setText("Rs. " + payable_amt + "");
-                    tvTotalPrice.setText("Rs. " + total_amt + "");
                 } else {
                     llMedicine.setVisibility(View.GONE);
                     llAmount.setVisibility(View.GONE);
@@ -153,15 +209,19 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             }
         } else {
             Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(context, LoginActivity.class));
+            startActivity(new Intent(context, SignupActivity.class));
         }
     }
 
     private void init() {
+        recylcer_view_items = (RecyclerView) findViewById(R.id.recylcer_view_items);
+        recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
+        etSearch = (AppCompatAutoCompleteTextView) findViewById(R.id.etSearch);
         llPrescription = (LinearLayout) findViewById(R.id.llPrescription);
         etNote = (EditText) findViewById(R.id.etNote);
         tvTotalPrice = (TextView) findViewById(R.id.tvTotalPrice);
         tvPayableAmt = (TextView) findViewById(R.id.tvPayableAmt);
+        tvDeliveryFee = (TextView) findViewById(R.id.tvDeliveryFee);
         tvCheckout = (TextView) findViewById(R.id.tvCheckout);
         tvAddress1 = (TextView) findViewById(R.id.tvAddress1);
         tvAddress2 = (TextView) findViewById(R.id.tvAddress2);
@@ -183,11 +243,37 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                     orderType = "2";
             }
         });
+        if (list != null) {
+            Log.e(TAG, "onCreateView: list >> " + list.size());
+            etSearch.setThreshold(1);
+            adapter = new SearchBarAdapter(context, R.layout.auto_complete_text, list);
+            etSearch.setAdapter(adapter);
+        }
+        ((NestedScrollView) findViewById(R.id.touch_outside)).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                Functions.hideSoftKeyboard(context, view);
+                return false;
+            }
+        });
+        recylcer_view_items.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                Functions.hideSoftKeyboard(context, view);
+                return false;
+            }
+        });
+        recylcer_view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                Functions.hideSoftKeyboard(context, view);
+                return false;
+            }
+        });
     }
 
 
     private void setRecyclerView() {
-        recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
         adapterPres = new ConfirmOrderPrescAdapter(context, prescList, null);
         recylcer_view.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view.setAdapter(adapterPres);
@@ -195,8 +281,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void setRecyclerViewCart() {
-        recylcer_view_items = (RecyclerView) findViewById(R.id.recylcer_view_items);
-        adapterCart = new ConfirmOrderItemAdapter(context, cartList);
+        adapterCart = new CartItemAdapter(context, cartList);
         recylcer_view_items.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view_items.setAdapter(adapterCart);
         adapterCart.notifyDataSetChanged();
@@ -229,20 +314,77 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tvCheckout:
-                dialogOrderSent();
-               /* if (Functions.isConnectingToInternet(context)) {
-                    if (AppPreferences.getSelectedPresId(context).equalsIgnoreCase("")) {
+                if (Functions.isConnectingToInternet(context)) {
+                    if (prescription_required == true && AppPreferences.getSelectedPresId(context).equalsIgnoreCase("") && CartActivity.selectedPresc == null) {
+                        showUploadRxDialog();
+                    } else if (AppPreferences.getSelectedPresId(context).equalsIgnoreCase("")) {
                         new OrderTaskWithout().execute();
                     } else {
                         new OrderTask().execute();
                     }
                 } else {
                     Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
-                }*/
+                }
                 break;
             case R.id.tvChangeAddress:
                 startActivity(new Intent(context, SelectAddressActivity.class));
                 break;
+        }
+    }
+
+    private void showUploadRxDialog() {
+        new AlertDialog.Builder(context)
+                .setTitle("Upload Your Prescription")
+                .setMessage("One or more items in your cart requires a valid prescription with doctor's name and drug detail clearly visible.")
+                .setPositiveButton("Upload", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        startActivity(new Intent(context, AddPrescActivity.class));
+                    }
+                })
+                .setNegativeButton("Choose Existing", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        startActivity(new Intent(context, SelectPrescActivity.class));
+                    }
+                })
+                .show();
+    }
+
+    private void dialogOrderSent() {
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setCancelable(false);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_order_sent, null);
+        AppCompatButton btnSubmit = dialogView.findViewById(R.id.btnSubmit);
+        dialog.setView(dialogView);
+        final AlertDialog alertDialog = dialog.create();
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(context, MainActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                                Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                                Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            }
+        });
+        alertDialog.show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (CartActivity.selectedPresc != null) {
+            prescList.add(CartActivity.selectedPresc);
+            Log.e(TAG, "onCreate: prescList >> " + prescList);
+            setRecyclerView();
+            llPrescription.setVisibility(View.VISIBLE);
+            llAmount.setVisibility(View.GONE);
+            llPayMode.setVisibility(View.GONE);
+        } else {
+            llPrescription.setVisibility(View.GONE);
+            llAmount.setVisibility(View.VISIBLE);
+            llPayMode.setVisibility(View.VISIBLE);
         }
     }
 
@@ -310,7 +452,9 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             String status = values[0];
             String msg = values[1];
             if (status.equalsIgnoreCase("200")) {
-                startActivity(new Intent(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                dialogOrderSent();
+
+//                startActivity(new Intent(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
             } else if (status.equalsIgnoreCase("400")) {
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }
@@ -340,7 +484,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             jsonObject.addProperty("cod_charges ", delivery_fee);
             jsonObject.addProperty("gst_tax_amt", 0);
             jsonObject.addProperty("other_tax_amt", 0);
-            jsonObject.addProperty("total_amount", total_amt);
+            jsonObject.addProperty("total_amount", subtotal_amt);
             jsonObject.addProperty("promo_code_applied", "");
 
             Log.e(TAG, "OrderTask: Request >> " + jsonObject.toString());
@@ -381,31 +525,165 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             String status = values[0];
             String msg = values[1];
             if (status.equalsIgnoreCase("200")) {
-                startActivity(new Intent(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                dialogOrderSent();
+                //startActivity(new Intent(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
             } else if (status.equalsIgnoreCase("400")) {
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private void dialogOrderSent() {
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setCancelable(false);
-        LayoutInflater inflater = this.getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.dialog_order_sent, null);
-        AppCompatButton btnSubmit = dialogView.findViewById(R.id.btnSubmit);
-        dialog.setView(dialogView);
-        final AlertDialog alertDialog = dialog.create();
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
+    public class SearchBarAdapter extends ArrayAdapter<ProductData> {
+
+        Context context;
+        int resource;
+        ArrayList<ProductData> items, tempItems, suggestions;
+        /**
+         * Custom Filter implementation for custom suggestions we provide.
+         */
+        Filter nameFilter = new Filter() {
             @Override
-            public void onClick(View view) {
-                startActivity(new Intent(context, MainActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                                Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                                Intent.FLAG_ACTIVITY_CLEAR_TOP));
+            public CharSequence convertResultToString(Object resultValue) {
+                String str = ((ProductData) resultValue).getName();
+                return str;
             }
-        });
-        alertDialog.show();
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                if (constraint != null) {
+                    suggestions.clear();
+                    for (ProductData people : tempItems) {
+                        if (people.getName().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                            suggestions.add(people);
+                        }
+                    }
+                    FilterResults filterResults = new FilterResults();
+                    filterResults.values = suggestions;
+                    filterResults.count = suggestions.size();
+                    return filterResults;
+                } else {
+                    return new FilterResults();
+                }
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                ArrayList<ProductData> filterList = (ArrayList<ProductData>) results.values;
+                if (results != null && results.count > 0) {
+                    clear();
+                    for (ProductData people : filterList) {
+                        add(people);
+                        notifyDataSetChanged();
+                    }
+                }
+            }
+        };
+
+        public SearchBarAdapter(Context context, int resource, ArrayList<ProductData> items) {
+            super(context, resource, items);
+            this.context = context;
+            this.resource = resource;
+            this.items = items;
+            tempItems = new ArrayList<ProductData>(items); // this makes the difference.
+            suggestions = new ArrayList<ProductData>();
+        }
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            View view = convertView;
+            if (convertView == null) {
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.auto_complete_text, parent, false);
+            }
+            ProductData people = items.get(position);
+            if (people != null) {
+                TextView tvName = (TextView) view.findViewById(R.id.tvName);
+                TextView tvPrice = (TextView) view.findViewById(R.id.tvPrice);
+                TextView tvPriceDrop = (TextView) view.findViewById(R.id.tvPriceDrop);
+                TextView tvPlus = (TextView) view.findViewById(R.id.tvPlus);
+                TextView tvMinus = (TextView) view.findViewById(R.id.tvMinus);
+                final TextView tvQty = (TextView) view.findViewById(R.id.tvQty);
+                ImageView imgThumb = (ImageView) view.findViewById(R.id.imgThumb);
+                CardView btnAddToCart = (CardView) view.findViewById(R.id.btnAddToCart);
+                if (tvName != null) {
+                    tvName.setText(people.getName());
+                    tvPrice.setText("Rs." + Functions.roundTwoDecimals(Double.parseDouble(people.getPriceDiscount())));
+                    tvPriceDrop.setText("Rs." + Functions.roundTwoDecimals(Double.parseDouble(people.getPriceMrp())));
+                    tvPriceDrop.setPaintFlags(tvPriceDrop.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+
+                    if (!people.getImage().equalsIgnoreCase("")) {
+                        Picasso.with(context)
+                                .load(people.getImage())
+                                .placeholder(R.drawable.no_image_placeholder)
+                                .resize(60, 60)
+                                .into(imgThumb);
+                    }
+                }
+
+                tvMinus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int qty = Integer.parseInt(tvQty.getText().toString());
+                        if (qty > 1)
+                            qty--;
+                        tvQty.setText(String.valueOf(qty));
+                    }
+                });
+
+                tvPlus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int qty = Integer.parseInt(tvQty.getText().toString());
+                        if (qty < 10)
+                            qty++;
+                        tvQty.setText(String.valueOf(qty));
+                    }
+                });
+
+                tvName.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ProductData data = list.get(position);
+                        Log.e(TAG, "onDataChange: data >> " + data);
+                        startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", data));
+                        etSearch.setText("");
+                    }
+                });
+                btnAddToCart.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
+                            double item_total = Integer.parseInt(tvQty.getText().toString()) * Double.parseDouble(list.get(position).getPriceDiscount());
+                            CartData model = new CartData(
+                                    list.get(position).getProductId(),
+                                    list.get(position).getName(),
+                                    list.get(position).getImage(),
+                                    Integer.parseInt(tvQty.getText().toString()),
+                                    Double.parseDouble(list.get(position).getPriceDiscount()),
+                                    item_total,
+                                    list.get(position).getPrescriptionRequired()
+                            );
+                            if (new DBHelper(context).addToCart(model)) {
+                                etSearch.setText("");
+                                Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
+                                MainActivity.setupBadge();
+                                LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent("cart_update"));
+                            } else
+                                Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
+                            context.startActivity(new Intent(context, SignupActivity.class));
+                        }
+                    }
+                });
+            }
+            return view;
+        }
+
+        @Override
+        public Filter getFilter() {
+            return nameFilter;
+        }
     }
 
 

@@ -8,6 +8,17 @@ import com.google.gson.annotations.SerializedName;
 
 public class ProductData implements Parcelable {
 
+    public static final Parcelable.Creator<ProductData> CREATOR = new Parcelable.Creator<ProductData>() {
+        @Override
+        public ProductData createFromParcel(Parcel source) {
+            return new ProductData(source);
+        }
+
+        @Override
+        public ProductData[] newArray(int size) {
+            return new ProductData[size];
+        }
+    };
     @SerializedName("category_name")
     @Expose
     private String categoryName;
@@ -60,6 +71,28 @@ public class ProductData implements Parcelable {
     @Expose
     private int totalAvailable;
 
+    public ProductData() {
+    }
+
+    protected ProductData(Parcel in) {
+        this.categoryName = in.readString();
+        this.subCategoryName = in.readString();
+        this.shortDescription = in.readString();
+        this.longDescription = in.readString();
+        this.image = in.readString();
+        this.productId = in.readString();
+        this.manufacturer = in.readString();
+        this.name = in.readString();
+        this.power = in.readString();
+        this.prescriptionRequired = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.priceMrp = in.readString();
+        this.priceDiscount = in.readString();
+        this.discountPercentage = in.readString();
+        this.discountText = in.readString();
+        this.productType = in.readString();
+        this.packagingContain = in.readString();
+        this.totalAvailable = in.readInt();
+    }
 
     public String getCategoryName() {
         return categoryName;
@@ -197,7 +230,6 @@ public class ProductData implements Parcelable {
         this.totalAvailable = totalAvailable;
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -223,41 +255,6 @@ public class ProductData implements Parcelable {
         dest.writeString(this.packagingContain);
         dest.writeInt(this.totalAvailable);
     }
-
-    public ProductData() {
-    }
-
-    protected ProductData(Parcel in) {
-        this.categoryName = in.readString();
-        this.subCategoryName = in.readString();
-        this.shortDescription = in.readString();
-        this.longDescription = in.readString();
-        this.image = in.readString();
-        this.productId = in.readString();
-        this.manufacturer = in.readString();
-        this.name = in.readString();
-        this.power = in.readString();
-        this.prescriptionRequired = (Boolean) in.readValue(Boolean.class.getClassLoader());
-        this.priceMrp = in.readString();
-        this.priceDiscount = in.readString();
-        this.discountPercentage = in.readString();
-        this.discountText = in.readString();
-        this.productType = in.readString();
-        this.packagingContain = in.readString();
-        this.totalAvailable = in.readInt();
-    }
-
-    public static final Parcelable.Creator<ProductData> CREATOR = new Parcelable.Creator<ProductData>() {
-        @Override
-        public ProductData createFromParcel(Parcel source) {
-            return new ProductData(source);
-        }
-
-        @Override
-        public ProductData[] newArray(int size) {
-            return new ProductData[size];
-        }
-    };
 
     @Override
     public String toString() {

@@ -74,76 +74,6 @@ public class MyReportsFragment extends Fragment implements View.OnClickListener 
         return rootView;
     }
 
-
-    class GetDataTask extends AsyncTask<Void, String, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showProgressDialog();
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("method", AppConstants.METHODS.GET_MY_REPORTS);
-            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
-            Log.e(TAG, "GetDataTask: Request >> " + jsonObject.toString());
-            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
-            Call<JsonObject> call = apiService.vault(jsonObject);
-            call.enqueue(new Callback<JsonObject>() {
-                @Override
-                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    Log.e(TAG, "GetDataTask: Response >> " + response.body().toString());
-                    list.clear();
-                    String resp = response.body().toString();
-                    try {
-                        JSONObject jsonObject = new JSONObject(resp);
-                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
-                            JSONArray jsonArray = jsonObject.getJSONArray("result");
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                Gson gson = new Gson();
-                                ReportData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), ReportData.class);
-                                Log.e(TAG, "onResponse: data >> " + data);
-                                list.add(data);
-                            }
-                            publishProgress("200", "");
-                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
-                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
-                            publishProgress("400", msg);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        publishProgress("400", getActivity().getResources().getString(R.string.api_error_msg));
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
-                    publishProgress("400", getResources().getString(R.string.api_error_msg));
-                }
-            });
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-            hideProgressDialog();
-            String status = values[0];
-            String msg = values[1];
-            adapter.notifyDataSetChanged();
-            if (adapter.getItemCount() > 0)
-                cardEmptyText.setVisibility(View.GONE);
-            else
-                cardEmptyText.setVisibility(View.VISIBLE);
-            if (status.equalsIgnoreCase("200")) {
-            } else if (status.equalsIgnoreCase("400")) {
-                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-
     private void init() {
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
         fabAdd = (FloatingActionButton) rootView.findViewById(R.id.fabAdd);
@@ -267,6 +197,74 @@ public class MyReportsFragment extends Fragment implements View.OnClickListener 
     private void hideProgressDialog() {
         if (progressBar != null)
             progressBar.dismiss();
+    }
+
+    class GetDataTask extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.GET_MY_REPORTS);
+            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
+            Log.e(TAG, "GetDataTask: Request >> " + jsonObject.toString());
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.vault(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "GetDataTask: Response >> " + response.body().toString());
+                    list.clear();
+                    String resp = response.body().toString();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            JSONArray jsonArray = jsonObject.getJSONArray("result");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                Gson gson = new Gson();
+                                ReportData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), ReportData.class);
+                                Log.e(TAG, "onResponse: data >> " + data);
+                                list.add(data);
+                            }
+                            publishProgress("200", "");
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getActivity().getResources().getString(R.string.api_error_msg));
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    publishProgress("400", getResources().getString(R.string.api_error_msg));
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+            String status = values[0];
+            String msg = values[1];
+            adapter.notifyDataSetChanged();
+            if (adapter.getItemCount() > 0)
+                cardEmptyText.setVisibility(View.GONE);
+            else
+                cardEmptyText.setVisibility(View.VISIBLE);
+            if (status.equalsIgnoreCase("200")) {
+            } else if (status.equalsIgnoreCase("400")) {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 }

@@ -8,6 +8,17 @@ import com.google.gson.annotations.SerializedName;
 
 public class SubCategoryData implements Parcelable {
 
+    public static final Creator<SubCategoryData> CREATOR = new Creator<SubCategoryData>() {
+        @Override
+        public SubCategoryData createFromParcel(Parcel source) {
+            return new SubCategoryData(source);
+        }
+
+        @Override
+        public SubCategoryData[] newArray(int size) {
+            return new SubCategoryData[size];
+        }
+    };
     @SerializedName("sub_cat_id")
     @Expose
     private String subCatId;
@@ -18,6 +29,14 @@ public class SubCategoryData implements Parcelable {
     @Expose
     private String subCatImage;
 
+    public SubCategoryData() {
+    }
+
+    protected SubCategoryData(Parcel in) {
+        this.subCatId = in.readString();
+        this.subCatName = in.readString();
+        this.subCatImage = in.readString();
+    }
 
     public String getSubCatId() {
         return subCatId;
@@ -54,25 +73,4 @@ public class SubCategoryData implements Parcelable {
         dest.writeString(this.subCatName);
         dest.writeString(this.subCatImage);
     }
-
-    public SubCategoryData() {
-    }
-
-    protected SubCategoryData(Parcel in) {
-        this.subCatId = in.readString();
-        this.subCatName = in.readString();
-        this.subCatImage = in.readString();
-    }
-
-    public static final Creator<SubCategoryData> CREATOR = new Creator<SubCategoryData>() {
-        @Override
-        public SubCategoryData createFromParcel(Parcel source) {
-            return new SubCategoryData(source);
-        }
-
-        @Override
-        public SubCategoryData[] newArray(int size) {
-            return new SubCategoryData[size];
-        }
-    };
 }

@@ -8,6 +8,17 @@ import com.google.gson.annotations.SerializedName;
 
 public class ReportData implements Parcelable {
 
+    public static final Parcelable.Creator<ReportData> CREATOR = new Parcelable.Creator<ReportData>() {
+        @Override
+        public ReportData createFromParcel(Parcel source) {
+            return new ReportData(source);
+        }
+
+        @Override
+        public ReportData[] newArray(int size) {
+            return new ReportData[size];
+        }
+    };
     @SerializedName("report_id")
     @Expose
     private String reportId;
@@ -17,6 +28,15 @@ public class ReportData implements Parcelable {
     @SerializedName("title")
     @Expose
     private String title;
+
+    public ReportData() {
+    }
+
+    protected ReportData(Parcel in) {
+        this.reportId = in.readString();
+        this.image = in.readString();
+        this.title = in.readString();
+    }
 
     public String getReportId() {
         return reportId;
@@ -42,7 +62,6 @@ public class ReportData implements Parcelable {
         this.title = title;
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -54,27 +73,6 @@ public class ReportData implements Parcelable {
         dest.writeString(this.image);
         dest.writeString(this.title);
     }
-
-    public ReportData() {
-    }
-
-    protected ReportData(Parcel in) {
-        this.reportId = in.readString();
-        this.image = in.readString();
-        this.title = in.readString();
-    }
-
-    public static final Parcelable.Creator<ReportData> CREATOR = new Parcelable.Creator<ReportData>() {
-        @Override
-        public ReportData createFromParcel(Parcel source) {
-            return new ReportData(source);
-        }
-
-        @Override
-        public ReportData[] newArray(int size) {
-            return new ReportData[size];
-        }
-    };
 
     @Override
     public String toString() {

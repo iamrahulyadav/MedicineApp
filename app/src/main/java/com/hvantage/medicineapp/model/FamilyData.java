@@ -8,6 +8,17 @@ import com.google.gson.annotations.SerializedName;
 
 public class FamilyData implements Parcelable {
 
+    public static final Parcelable.Creator<FamilyData> CREATOR = new Parcelable.Creator<FamilyData>() {
+        @Override
+        public FamilyData createFromParcel(Parcel source) {
+            return new FamilyData(source);
+        }
+
+        @Override
+        public FamilyData[] newArray(int size) {
+            return new FamilyData[size];
+        }
+    };
     @SerializedName("family_member_id")
     @Expose
     private String familyMemberId;
@@ -41,6 +52,23 @@ public class FamilyData implements Parcelable {
     @SerializedName("weight")
     @Expose
     private String weight;
+
+    public FamilyData() {
+    }
+
+    protected FamilyData(Parcel in) {
+        this.familyMemberId = in.readString();
+        this.bloodGroup = in.readString();
+        this.email = in.readString();
+        this.gender = in.readString();
+        this.height = in.readString();
+        this.image = in.readString();
+        this.knownAllergies = in.readString();
+        this.mobileNo = in.readString();
+        this.name = in.readString();
+        this.relation = in.readString();
+        this.weight = in.readString();
+    }
 
     public String getFamilyMemberId() {
         return familyMemberId;
@@ -130,7 +158,6 @@ public class FamilyData implements Parcelable {
         this.weight = weight;
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -150,35 +177,6 @@ public class FamilyData implements Parcelable {
         dest.writeString(this.relation);
         dest.writeString(this.weight);
     }
-
-    public FamilyData() {
-    }
-
-    protected FamilyData(Parcel in) {
-        this.familyMemberId = in.readString();
-        this.bloodGroup = in.readString();
-        this.email = in.readString();
-        this.gender = in.readString();
-        this.height = in.readString();
-        this.image = in.readString();
-        this.knownAllergies = in.readString();
-        this.mobileNo = in.readString();
-        this.name = in.readString();
-        this.relation = in.readString();
-        this.weight = in.readString();
-    }
-
-    public static final Parcelable.Creator<FamilyData> CREATOR = new Parcelable.Creator<FamilyData>() {
-        @Override
-        public FamilyData createFromParcel(Parcel source) {
-            return new FamilyData(source);
-        }
-
-        @Override
-        public FamilyData[] newArray(int size) {
-            return new FamilyData[size];
-        }
-    };
 
     @Override
     public String toString() {

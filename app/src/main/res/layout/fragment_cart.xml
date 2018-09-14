@@ -5,9 +5,10 @@
     android:layout_height="match_parent"
     android:background="@color/colorWhite">
 
-<android.support.v7.widget.RecyclerView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <LinearLayout
         android:id="@+id/llEmptyData"
         android:layout_width="wrap_content"
@@ -18,10 +19,10 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:layout_margin="30dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_margin="30dp"
             android:text="There are no medicine in your cart, add some medicines."
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"

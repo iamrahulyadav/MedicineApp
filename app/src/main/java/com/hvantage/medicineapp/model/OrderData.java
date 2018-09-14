@@ -15,6 +15,14 @@ public class OrderData implements Serializable {
     private String payable_amount;
     private String date;
     private String time;
+    private String order_type;
+    private String payment_mode;
+    private String status;
+    private String by;
+    private String key;
+
+    public OrderData() {
+    }
 
     public String getOrder_type() {
         return order_type;
@@ -24,8 +32,6 @@ public class OrderData implements Serializable {
         this.order_type = order_type;
     }
 
-    private String order_type;
-
     public String getPayment_mode() {
         return payment_mode;
     }
@@ -33,8 +39,6 @@ public class OrderData implements Serializable {
     public void setPayment_mode(String payment_mode) {
         this.payment_mode = payment_mode;
     }
-
-    private String payment_mode;
 
     public String getStatus() {
         return status;
@@ -44,8 +48,6 @@ public class OrderData implements Serializable {
         this.status = status;
     }
 
-    private String status;
-
     public String getBy() {
         return by;
     }
@@ -54,19 +56,12 @@ public class OrderData implements Serializable {
         this.by = by;
     }
 
-    private String by;
-
     public String getKey() {
         return key;
     }
 
     public void setKey(String key) {
         this.key = key;
-    }
-
-    private String key;
-
-    public OrderData() {
     }
 
     public AddressData getDelivery_details() {

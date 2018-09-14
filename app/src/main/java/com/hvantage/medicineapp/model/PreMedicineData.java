@@ -21,6 +21,9 @@ public class PreMedicineData {
     @SerializedName("quantity")
     @Expose
     private String quantity = "";
+    @SerializedName("doses_id")
+    @Expose
+    private String doses_id = "";
 
     public String getDoses_id() {
         return doses_id;
@@ -29,10 +32,6 @@ public class PreMedicineData {
     public void setDoses_id(String doses_id) {
         this.doses_id = doses_id;
     }
-
-    @SerializedName("doses_id")
-    @Expose
-    private String doses_id = "";
 
     public String getType() {
         return type;

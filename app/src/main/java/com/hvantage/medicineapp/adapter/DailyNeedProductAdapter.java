@@ -17,9 +17,9 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.activity.LoginActivity;
 import com.hvantage.medicineapp.activity.MainActivity;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
+import com.hvantage.medicineapp.activity.SignupActivity;
 import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.CartData;
 import com.hvantage.medicineapp.model.ProductData;
@@ -142,7 +142,7 @@ public class DailyNeedProductAdapter extends RecyclerView.Adapter<DailyNeedProdu
                             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
-                        context.startActivity(new Intent(context, LoginActivity.class));
+                        context.startActivity(new Intent(context, SignupActivity.class));
                     }
                 }
             });

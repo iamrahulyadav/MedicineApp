@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         tvLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(context, LoginActivity.class));
+                startActivity(new Intent(context, SignupActivity.class));
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                 drawer.closeDrawer(GravityCompat.START);
             }
@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
                     startActivity(new Intent(context, CartActivity.class));
                 } else {
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    startActivity(new Intent(MainActivity.this, SignupActivity.class));
                 }
                 break;
         }
@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     ft.addToBackStack(null);
                     ft.commitAllowingStateLoss();
                 } else {
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    startActivity(new Intent(MainActivity.this, SignupActivity.class));
                 }
 
                 break;
@@ -349,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         AppPreferences.clearPreference(context);
-                        startActivity(new Intent(context, LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                        startActivity(new Intent(context, SignupActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {

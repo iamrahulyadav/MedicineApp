@@ -66,7 +66,6 @@ public class SelectPrescAdapter extends RecyclerView.Adapter<SelectPrescAdapter.
     }
 
 
-
     private void showProgressDialog() {
         progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
             @Override
@@ -80,7 +79,6 @@ public class SelectPrescAdapter extends RecyclerView.Adapter<SelectPrescAdapter.
         if (progressBar != null)
             progressBar.dismiss();
     }
-
 
 
     @Override

@@ -69,8 +69,8 @@
                         android:layout_weight="1"
                         android:background="@color/colorDivider"
                         android:gravity="center"
-                        android:text="-"
                         android:paddingBottom="3dp"
+                        android:text="-"
                         android:textAlignment="center"
                         android:textColor="@color/colorTextHeading"
                         android:textStyle="bold" />
@@ -108,8 +108,8 @@
                         android:layout_weight="1"
                         android:background="@color/colorDivider"
                         android:gravity="center"
-                        android:text="+"
                         android:paddingBottom="3dp"
+                        android:text="+"
                         android:textAlignment="center"
                         android:textColor="@color/colorTextHeading"
                         android:textStyle="bold" />

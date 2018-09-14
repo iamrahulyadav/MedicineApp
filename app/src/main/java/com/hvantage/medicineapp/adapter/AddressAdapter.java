@@ -1,6 +1,5 @@
 package com.hvantage.medicineapp.adapter;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.widget.CardView;
@@ -10,31 +9,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.model.AddressData;
-import com.hvantage.medicineapp.retrofit.ApiClient;
-import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
-import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.ProgressBar;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.ViewHolder> {
 
     private static final String TAG = "UploadedPreAdapter";
-    private MyAdapterListener listener;
     Context context;
     ArrayList<AddressData> arrayList;
+    private MyAdapterListener listener;
     private ProgressBar progressBar;
 
     public AddressAdapter(Context context, ArrayList<AddressData> arrayList, MyAdapterListener listener) {
@@ -77,8 +64,6 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.ViewHold
     }
 
 
-
-
     private void showProgressDialog() {
         progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
             @Override
@@ -105,6 +90,12 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.ViewHold
         notifyItemRangeChanged(position, arrayList.size());
     }
 
+    public interface MyAdapterListener {
+        void delete(View v, int position);
+
+        void select(View v, int position);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvPhoneNo, tvAddress, tvLandmark, tvCity, tvPincode, tvDelete;
         CardView item;
@@ -120,12 +111,6 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.ViewHold
             tvDelete = (TextView) itemView.findViewById(R.id.tvDelete);
             item = (CardView) itemView.findViewById(R.id.item);
         }
-    }
-
-    public interface MyAdapterListener {
-        void delete(View v, int position);
-
-        void select(View v, int position);
     }
 
 

@@ -39,6 +39,4 @@
     <include layout="@layout/content_business" />
 
 
-
-
 </android.support.design.widget.CoordinatorLayout>

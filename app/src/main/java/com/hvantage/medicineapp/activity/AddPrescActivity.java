@@ -391,7 +391,7 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
             progressBar.dismiss();
     }
 
-    private void selectImage() {
+  /*  private void selectImage() {
         final CharSequence[] items = {"Camera", "Gallery"};
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -404,6 +404,26 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
                 }
             }
         });
+        builder.show();
+    }*/
+
+    private void selectImage() {
+        final CharSequence[] items = {"Take Photo", "Choose From Gallery", "Cancel"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Select Image");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals("Take Photo")) {
+                    cameraIntent();
+                } else if (items[item].equals("Choose From Gallery")) {
+                    galleryIntent();
+                } else {
+                    onBackPressed();
+                }
+            }
+        });
+        builder.setCancelable(false);
         builder.show();
     }
 
@@ -544,8 +564,11 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
                     try {
                         JSONObject jsonObject = new JSONObject(resp);
                         if (jsonObject.getString("status").equalsIgnoreCase("200")) {
-                            String prescription_id = jsonObject.getJSONArray("result").getJSONObject(0).getString("prescription_id");
-                            AppPreferences.setSelectedPresId(context, prescription_id);
+                            JSONObject jsonObject1 = jsonObject.getJSONArray("result").getJSONObject(0);
+                            PrescriptionData newData = new Gson().fromJson(String.valueOf(jsonObject1), PrescriptionData.class);
+                            CartActivity.selectedPresc = newData;
+                            AppPreferences.setSelectedPresId(context, newData.getPrescription_id());
+                            Log.e(TAG, "onResponse: newData >> " + newData);
                             publishProgress("200", "");
                         } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
                             String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
@@ -574,8 +597,6 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
             String msg = values[1];
             if (status.equalsIgnoreCase("200")) {
                 if (from == null) {
-                    CartActivity.selectedPresc = new Gson().fromJson(jsonObject, PrescriptionData.class);
-                    Log.e(TAG, "onProgressUpdate: CartActivity.selectedPresc >> " + CartActivity.selectedPresc);
                     onBackPressed();
                 } else if (from.equalsIgnoreCase("new")) {
                     startActivity(new Intent(context, SelectAddressActivity.class));
@@ -611,6 +632,4 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
             hideProgressDialog();
         }
     }
-
-
 }

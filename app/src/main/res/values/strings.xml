@@ -8,7 +8,7 @@
     <string name="title_activity_main">Medicine App</string>
     <string name="search_box_hint">Search here for any priscription medicine</string>
     <string name="action_cart">Cart</string>
-    <string name="welcome_text">Welcome to Medicine App</string>
+    <string name="welcome_text">We will send you an OTP sms to verify your number.</string>
     <string name="otp_sent_text">We sent an otp to the number</string>
     <string name="agree_text"><![CDATA[I agree to Terms of Use & Privacy Policy]]></string>
     <string name="upload_rx_text">(We only accept valid prescription, with doctor\'s name and registration clearly visible.)</string>
@@ -22,4 +22,11 @@
     <string name="string_next">What\'s next?\n\n1. Our Pharmacist will digitize and approve your ordered prescription.\n\n2. You\'ll be notified on every status of your order vai SMS / Email.</string>
     <string name="contact_no1">+911122334455</string>
     <string name="presc_guide">\t1. Don’t crop out any part of the image.\n2. Avoid blurred image.\n3. Include details of doctor and patient + clinic visit date.\n4. Medicines will be dispensed as per prescription.</string>
+    <string name="call_text_heading">Call +911122334455</string>
+    <string name="call_text_subheading">Get your medicines faster</string>
+    <string name="step1_text">Upload an image of your prescription</string>
+    <string name="step2_text">We verify and prepare your order.</string>
+    <string name="step3_text">Delivery at your home</string>
+    <string name="steps_title">3 Easy steps to order</string>
+    <string name="call_order_no">+911122334455</string>
 </resources>

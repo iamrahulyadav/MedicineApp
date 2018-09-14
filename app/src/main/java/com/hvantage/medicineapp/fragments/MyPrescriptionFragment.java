@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.activity.CartActivity;
 import com.hvantage.medicineapp.activity.SelectAddressActivity;
 import com.hvantage.medicineapp.adapter.AllUploadedPreAdapter;
 import com.hvantage.medicineapp.model.PrescriptionData;
@@ -73,6 +74,91 @@ public class MyPrescriptionFragment extends Fragment implements View.OnClickList
         else
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
         return rootView;
+    }
+
+    private void init() {
+        recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
+        fabAdd = (FloatingActionButton) rootView.findViewById(R.id.fabAdd);
+        cardEmptyText = (CardView) rootView.findViewById(R.id.cardEmptyText);
+        fabAdd.setOnClickListener(this);
+        setRecyclerView();
+
+    }
+
+    private void setRecyclerView() {
+        recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
+        adapter = new AllUploadedPreAdapter(context, list, new AllUploadedPreAdapter.MyAdapterListener() {
+            @Override
+            public void viewOrder(View v, int position) {
+                FragmentManager manager = getFragmentManager();
+                FragmentTransaction ft = manager.beginTransaction();
+                Fragment fragment = new AddPrescrFragment();
+                Bundle args = new Bundle();
+                args.putParcelable("data", list.get(position));
+                args.putString("from", "view");
+                fragment.setArguments(args);
+                ft.replace(R.id.main_container, fragment);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+            }
+
+            @Override
+            public void placeOrder(View v, int position) {
+                AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
+                AppPreferences.setSelectedPresId(context, list.get(position).getPrescription_id());
+                CartActivity.selectedPresc = list.get(position);
+                Log.e(TAG, "viewOrder: CartActivity.selectedPresc >> " + CartActivity.selectedPresc);
+                Intent intent = new Intent(getActivity(), SelectAddressActivity.class);
+                startActivity(intent);
+            }
+        });
+        recylcer_view.setLayoutManager(new LinearLayoutManager(context));
+        recylcer_view.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof FragmentIntraction) {
+            intraction = (FragmentIntraction) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        intraction = null;
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.fabAdd:
+                FragmentManager manager = getFragmentManager();
+                FragmentTransaction ft = manager.beginTransaction();
+                ft.replace(R.id.main_container, new AddPrescrFragment());
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+                break;
+        }
+    }
+
+    private void showProgressDialog() {
+        progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                // TODO Auto-generated method stub
+            }
+        });
+    }
+
+    private void hideProgressDialog() {
+        if (progressBar != null)
+            progressBar.dismiss();
     }
 
     private class GetDataTask extends AsyncTask<Void, String, Void> {
@@ -139,90 +225,6 @@ public class MyPrescriptionFragment extends Fragment implements View.OnClickList
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-
-    private void init() {
-        recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
-        fabAdd = (FloatingActionButton) rootView.findViewById(R.id.fabAdd);
-        cardEmptyText = (CardView) rootView.findViewById(R.id.cardEmptyText);
-        fabAdd.setOnClickListener(this);
-        setRecyclerView();
-
-    }
-
-    private void setRecyclerView() {
-        recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
-        adapter = new AllUploadedPreAdapter(context, list, new AllUploadedPreAdapter.MyAdapterListener() {
-            @Override
-            public void viewOrder(View v, int position) {
-                FragmentManager manager = getFragmentManager();
-                FragmentTransaction ft = manager.beginTransaction();
-                Fragment fragment = new AddPrescrFragment();
-                Bundle args = new Bundle();
-                args.putParcelable("data", list.get(position));
-                args.putString("from", "view");
-                fragment.setArguments(args);
-                ft.replace(R.id.main_container, fragment);
-                ft.addToBackStack(null);
-                ft.commitAllowingStateLoss();
-            }
-
-            @Override
-            public void placeOrder(View v, int position) {
-                AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
-                AppPreferences.setSelectedPresId(context, list.get(position).getPrescription_id());
-                Intent intent = new Intent(getActivity(), SelectAddressActivity.class);
-                startActivity(intent);
-            }
-        });
-        recylcer_view.setLayoutManager(new LinearLayoutManager(context));
-        recylcer_view.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof FragmentIntraction) {
-            intraction = (FragmentIntraction) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        intraction = null;
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.fabAdd:
-                FragmentManager manager = getFragmentManager();
-                FragmentTransaction ft = manager.beginTransaction();
-                ft.replace(R.id.main_container, new AddPrescrFragment());
-                ft.addToBackStack(null);
-                ft.commitAllowingStateLoss();
-                break;
-        }
-    }
-
-    private void showProgressDialog() {
-        progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                // TODO Auto-generated method stub
-            }
-        });
-    }
-
-    private void hideProgressDialog() {
-        if (progressBar != null)
-            progressBar.dismiss();
     }
 
 }

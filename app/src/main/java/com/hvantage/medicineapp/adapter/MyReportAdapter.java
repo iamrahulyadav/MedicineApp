@@ -86,6 +86,12 @@ public class MyReportAdapter extends RecyclerView.Adapter<MyReportAdapter.ViewHo
         return arrayList.size();
     }
 
+    public interface MyAdapterListener {
+        void delete(View v, int position);
+
+        void select(View v, int position);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvTitle, tvRelation, tvBG;
@@ -100,11 +106,5 @@ public class MyReportAdapter extends RecyclerView.Adapter<MyReportAdapter.ViewHo
             btnDelete = (ImageButton) itemView.findViewById(R.id.btnDelete);
             item = (CardView) itemView.findViewById(R.id.item);
         }
-    }
-
-    public interface MyAdapterListener {
-        void delete(View v, int position);
-
-        void select(View v, int position);
     }
 }

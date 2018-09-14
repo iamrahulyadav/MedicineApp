@@ -35,6 +35,8 @@ import java.util.ArrayList;
 public class OrderDetailFragment extends Fragment implements View.OnClickListener {
 
     private static final String TAG = "OrderDetailFragment";
+    TextView tvOrderID, tvDateTime, tvAddress1, tvAddress2, tvAddress3, tvAddress4, tvPayableAmt1;
+    TextView tvTotalPrice, tvPayableAmt, tvStatus, tvPayMode;
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
@@ -92,9 +94,6 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         }
         return rootView;
     }
-
-    TextView tvOrderID, tvDateTime, tvAddress1, tvAddress2, tvAddress3, tvAddress4, tvPayableAmt1;
-    TextView tvTotalPrice, tvPayableAmt, tvStatus, tvPayMode;
 
     private void init() {
         tvOrderID = (TextView) rootView.findViewById(R.id.tvOrderID);

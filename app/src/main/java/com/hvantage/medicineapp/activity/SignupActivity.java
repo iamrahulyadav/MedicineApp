@@ -12,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -23,7 +24,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -38,16 +38,11 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.model.User;
 import com.hvantage.medicineapp.model.UserData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
 import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
@@ -66,10 +61,10 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
     private static final String TAG = "SignupActivity";
     private static final int REQUEST_ALL_PERMISSIONS = 100;
-    EditText etName, etEmail;
+    AppCompatEditText etName, etEmail;
     CardView btnSave;
     private CardView btnSubmit;
-    private EditText etPhoneNo;
+    private AppCompatEditText etPhoneNo;
     private Context context;
     private FirebaseAuth mAuth;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
@@ -77,7 +72,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     private String mVerificationId;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private CardView btnVerify;
-    private EditText etOTP;
+    private AppCompatEditText etOTP;
     private TextView tvOtpText;
     private TextView btnResend;
     private LinearLayout viewMobile;
@@ -87,7 +82,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     private LinearLayout viewProfile;
     private TextView btnSkip;
     private CheckBox checkBox;
-    private EditText etPassword;
+//    private AppCompatEditText etPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,12 +122,12 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                                    PhoneAuthProvider.ForceResendingToken token) {
                 hideProgressDialog();
                 Log.e(TAG, "onCodeSent:" + verificationId);
-                tvOtpText.setText("We have sent an OTP to your number +91" + etPhoneNo.getText().toString() + ".");
+                tvOtpText.setText("We sent an OTP to your number +91" + etPhoneNo.getText().toString() + ".");
                 mVerificationId = verificationId;
                 mResendToken = token;
                 viewMobile.setVisibility(View.GONE);
                 viewVerify.setVisibility(View.VISIBLE);
-                toolbar_title.setText("Verify");
+                toolbar_title.setText("Verify OTP");
             }
         };
 
@@ -153,8 +148,8 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void init() {
-        etPhoneNo = (EditText) findViewById(R.id.etMobNo);
-        etOTP = (EditText) findViewById(R.id.etOTP);
+        etPhoneNo = (AppCompatEditText) findViewById(R.id.etMobNo);
+        etOTP = (AppCompatEditText) findViewById(R.id.etOTP);
         tvOtpText = (TextView) findViewById(R.id.tvOtpText);
         btnSkip = (TextView) findViewById(R.id.btnSkip);
         btnSubmit = (CardView) findViewById(R.id.btnSubmit);
@@ -163,9 +158,9 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         viewMobile = (LinearLayout) findViewById(R.id.viewMobile);
         viewVerify = (LinearLayout) findViewById(R.id.viewVerify);
         viewProfile = (LinearLayout) findViewById(R.id.viewProfile);
-        etName = (EditText) findViewById(R.id.etName);
-        etEmail = (EditText) findViewById(R.id.etEmail);
-        etPassword = (EditText) findViewById(R.id.etPassword);
+        etName = (AppCompatEditText) findViewById(R.id.etName);
+        etEmail = (AppCompatEditText) findViewById(R.id.etEmail);
+//        etPassword = (AppCompatEditText) findViewById(R.id.etPassword);
         checkBox = (CheckBox) findViewById(R.id.checkBox);
         btnSave = (CardView) findViewById(R.id.btnSave);
         btnSave.setOnClickListener(this);
@@ -213,13 +208,13 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                 if (!validatePhoneNumber()) {
                     return;
                 }
-                new CheckMobileNoTask().execute();
+                startPhoneNumberVerification("+91" + etPhoneNo.getText().toString());
+                //new CheckMobileNoTask().execute();
                 break;
             case R.id.btnVerify:
                 String code = etOTP.getText().toString();
                 if (TextUtils.isEmpty(code)) {
-//                    etOTP.setError("Cannot be empty.");
-                    Snackbar.make(findViewById(android.R.id.content), "Enter otp.", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(findViewById(android.R.id.content), "Enter OTP", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
                 verifyPhoneNumberWithCode(mVerificationId, code);
@@ -231,7 +226,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                 saveData();
                 break;
             case R.id.btnSkip:
-                startActivity(new Intent(SignupActivity.this, LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                startActivity(new Intent(SignupActivity.this, SignupActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                 break;
         }
     }
@@ -289,26 +284,8 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                             viewMobile.setVisibility(View.GONE);
                             viewVerify.setVisibility(View.GONE);
                             viewProfile.setVisibility(View.VISIBLE);
-                            FirebaseDatabase.getInstance().getReference().child(AppConstants.APP_NAME).child(AppConstants.FIREBASE_KEY.USERS)
-                                    .child(mAuth.getCurrentUser().getPhoneNumber())
-                                    .addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            hideProgressDialog();
-                                            Log.e(TAG, "onDataChange: dataSnapshot >> " + dataSnapshot.getValue());
+                            hideProgressDialog();
 
-                                            if (dataSnapshot.getValue() != null) {
-                                                User data = dataSnapshot.getValue(User.class);
-                                                etName.setText(data.getName());
-                                                etEmail.setText(data.getEmail());
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                                            hideProgressDialog();
-                                        }
-                                    });
                         } else {
                             hideProgressDialog();
                             // Sign in failed, display a message and update the UI
@@ -316,7 +293,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                                 // The verification code entered was invalid
                                 //Toast.makeText(context, "Invalid code.", Toast.LENGTH_SHORT).show();
-                                Snackbar.make(findViewById(android.R.id.content), "Invalid code.", Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(findViewById(android.R.id.content), "Incorrect OTP", Snackbar.LENGTH_SHORT).show();
                             }
                         }
                     }
@@ -335,13 +312,14 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 
     private void saveData() {
         if (TextUtils.isEmpty(etName.getText().toString()))
-            Snackbar.make(findViewById(android.R.id.content), "Enter First Name", Snackbar.LENGTH_SHORT).show();
-        else if (TextUtils.isEmpty(etEmail.getText().toString()))
+            Snackbar.make(findViewById(android.R.id.content), "Enter Your Name", Snackbar.LENGTH_SHORT).show();
+        /*else if (TextUtils.isEmpty(etEmail.getText().toString()))
             Snackbar.make(findViewById(android.R.id.content), "Enter Email", Snackbar.LENGTH_SHORT).show();
         else if (!Functions.isEmailValid(etEmail))
             Snackbar.make(findViewById(android.R.id.content), "Invalid Email", Snackbar.LENGTH_SHORT).show();
         else if (TextUtils.isEmpty(etPassword.getText().toString()))
             Snackbar.make(findViewById(android.R.id.content), "Enter Password", Snackbar.LENGTH_SHORT).show();
+        */
         else {
             new SignupTask().execute();
         }
@@ -437,13 +415,13 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         @Override
         protected Void doInBackground(Void... voids) {
             JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("method", AppConstants.METHODS.USER_SIGNUP);
+//            jsonObject.addProperty("method", AppConstants.METHODS.USER_SIGNUP);
+            jsonObject.addProperty("method", AppConstants.METHODS.USER_OTP_LOGIN);
             jsonObject.addProperty("phone_no", etPhoneNo.getText().toString());
             jsonObject.addProperty("name", etName.getText().toString());
             jsonObject.addProperty("email", etEmail.getText().toString());
-            jsonObject.addProperty("password", etPassword.getText().toString());
+//            jsonObject.addProperty("password", etPassword.getText().toString());
             jsonObject.addProperty("fcm_token", FirebaseInstanceId.getInstance().getToken());
-
 
             Log.e(TAG, "SignupTask: Request >> " + jsonObject.toString());
 

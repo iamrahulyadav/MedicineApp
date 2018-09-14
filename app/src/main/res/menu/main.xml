@@ -6,7 +6,7 @@
         android:icon="@drawable/action_cart_light"
         android:title="Cart"
         app:actionLayout="@layout/custom_action_item_layout"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
     <!-- <item
         android:id="@+id/action_cart"
         android:orderInCategory="100"

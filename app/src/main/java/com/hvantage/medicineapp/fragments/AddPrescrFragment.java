@@ -39,11 +39,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.activity.CartActivity;
 import com.hvantage.medicineapp.activity.SelectAddressActivity;
 import com.hvantage.medicineapp.adapter.DialogMultipleChoiceAdapter;
 import com.hvantage.medicineapp.adapter.PreMedicineItemAdapter;
@@ -581,8 +583,11 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                     try {
                         JSONObject jsonObject = new JSONObject(resp);
                         if (jsonObject.getString("status").equalsIgnoreCase("200")) {
-                            String prescription_id = jsonObject.getJSONArray("result").getJSONObject(0).getString("prescription_id");
-                            AppPreferences.setSelectedPresId(context, prescription_id);
+                            JSONObject jsonObject1 = jsonObject.getJSONArray("result").getJSONObject(0);
+                            PrescriptionData newData = new Gson().fromJson(String.valueOf(jsonObject1), PrescriptionData.class);
+                            CartActivity.selectedPresc = newData;
+                            AppPreferences.setSelectedPresId(context, newData.getPrescription_id());
+                            Log.e(TAG, "onResponse: newData >> " + newData);
                             publishProgress("200", "");
                         } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
                             String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");

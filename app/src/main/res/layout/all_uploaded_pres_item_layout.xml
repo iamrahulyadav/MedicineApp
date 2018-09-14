@@ -16,23 +16,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/imgThumb"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginRight="5dp"
+            android:src="@drawable/action_upload_rx" />
+
+        <android.support.v7.widget.AppCompatTextView
             android:id="@+id/tvDeases"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/imgThumb"
             android:singleLine="true"
             android:text="Test"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="@color/colorTextHeading"
             android:textStyle="bold" />
 
-        <TextView
+        <android.support.v7.widget.AppCompatTextView
             android:id="@+id/tvDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvDeases"
+            android:layout_toRightOf="@id/imgThumb"
             android:text="July 26, 18"
-            android:textAppearance="@style/TextAppearance.Compat.Notification.Time"
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Info"
             android:textColor="@color/colorTextSubHeading" />
 
         <LinearLayout
@@ -52,7 +61,7 @@
                 app:cardCornerRadius="2dp"
                 app:cardElevation="1dp">
 
-                <TextView
+                <android.support.v7.widget.AppCompatTextView
                     android:id="@+id/tvOrder"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -64,29 +73,29 @@
                     android:textStyle="bold" />
             </android.support.v7.widget.CardView>
 
-            <android.support.v7.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_margin="3dp"
-                android:clickable="true"
-                android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#f4f4f4"
-                app:cardCornerRadius="2dp"
-                app:cardElevation="1dp">
+            <!-- <android.support.v7.widget.CardView
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_alignParentEnd="true"
+                 android:layout_margin="3dp"
+                 android:clickable="true"
+                 android:foreground="?attr/selectableItemBackground"
+                 app:cardBackgroundColor="#f4f4f4"
+                 app:cardCornerRadius="2dp"
+                 app:cardElevation="1dp">
 
-                <TextView
-                    android:id="@+id/tvView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="View"
-                    android:textAlignment="center"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                    android:textColor="@color/colorPrimary"
-                    android:textStyle="bold" />
+                 <android.support.v7.widget.AppCompatTextView
+                     android:id="@+id/tvView"
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:padding="5dp"
+                     android:text="View"
+                     android:textAlignment="center"
+                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                     android:textColor="@color/colorPrimary"
+                     android:textStyle="bold" />
 
-            </android.support.v7.widget.CardView>
+             </android.support.v7.widget.CardView>-->
 
 
         </LinearLayout>

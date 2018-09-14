@@ -76,7 +76,7 @@ public class CartActivity extends AppCompatActivity {
             }
         } else {
             Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(context, LoginActivity.class));
+            startActivity(new Intent(context, SignupActivity.class));
             finish();
         }
     }
@@ -85,13 +85,12 @@ public class CartActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (prescription_required == true && selectedPresc != null) {
-            prescription_required = false;
             cardPrescription.setVisibility(View.VISIBLE);
             if (!selectedPresc.getImage().equalsIgnoreCase("")) {
-                if (!selectedPresc.getDiagnosisDetails().equalsIgnoreCase(""))
-                    tvTitle.setText(selectedPresc.getDiagnosisDetails());
+                if (!selectedPresc.getPrescription_title().equalsIgnoreCase(""))
+                    tvTitle.setText(selectedPresc.getPrescription_title());
                 else
-                    tvTitle.setText("No Details");
+                    tvTitle.setText("Rx_NO_NAME");
                 if (selectedPresc.getDate() != null)
                     tvDate.setText(selectedPresc.getDate());
                 else
@@ -143,7 +142,7 @@ public class CartActivity extends AppCompatActivity {
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (prescription_required) {
+                if (selectedPresc == null) {
                     showAlertDialog();
                 } else {
                     AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITHOUT_PRESCRIPTION);
@@ -165,6 +164,12 @@ public class CartActivity extends AppCompatActivity {
         });
 
         btnChange.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showAlertDialog();
+            }
+        });
+        btnView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showAlertDialog();

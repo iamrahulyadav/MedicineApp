@@ -8,6 +8,17 @@ import com.google.gson.annotations.SerializedName;
 
 public class DoctorDetails implements Parcelable {
 
+    public static final Parcelable.Creator<DoctorDetails> CREATOR = new Parcelable.Creator<DoctorDetails>() {
+        @Override
+        public DoctorDetails createFromParcel(Parcel source) {
+            return new DoctorDetails(source);
+        }
+
+        @Override
+        public DoctorDetails[] newArray(int size) {
+            return new DoctorDetails[size];
+        }
+    };
     @SerializedName("name")
     @Expose
     private String name;
@@ -20,6 +31,15 @@ public class DoctorDetails implements Parcelable {
     @SerializedName("email")
     @Expose
     private String email;
+
+    public DoctorDetails() {
+    }
+
+    protected DoctorDetails(Parcel in) {
+        this.name = in.readString();
+        this.address = in.readString();
+        this.phoneNo = in.readString();
+    }
 
     public String getEmail() {
         return email;
@@ -53,7 +73,6 @@ public class DoctorDetails implements Parcelable {
         this.phoneNo = phoneNo;
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -65,27 +84,6 @@ public class DoctorDetails implements Parcelable {
         dest.writeString(this.address);
         dest.writeString(this.phoneNo);
     }
-
-    public DoctorDetails() {
-    }
-
-    protected DoctorDetails(Parcel in) {
-        this.name = in.readString();
-        this.address = in.readString();
-        this.phoneNo = in.readString();
-    }
-
-    public static final Parcelable.Creator<DoctorDetails> CREATOR = new Parcelable.Creator<DoctorDetails>() {
-        @Override
-        public DoctorDetails createFromParcel(Parcel source) {
-            return new DoctorDetails(source);
-        }
-
-        @Override
-        public DoctorDetails[] newArray(int size) {
-            return new DoctorDetails[size];
-        }
-    };
 
     @Override
     public String toString() {

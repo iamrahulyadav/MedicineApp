@@ -3,6 +3,7 @@ package com.hvantage.medicineapp.fragments;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.activity.SelectPrescActivity;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.ProgressBar;
 
@@ -126,6 +128,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 ft.commitAllowingStateLoss();
                 break;
             case R.id.btnChoose:
+//                startActivity(new Intent(context, SelectPrescActivity.class));
                 fragment = new MyPrescriptionFragment();
                 args = new Bundle();
                 fragment.setArguments(args);

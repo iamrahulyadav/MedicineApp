@@ -3,6 +3,8 @@ package com.hvantage.medicineapp.adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -70,6 +72,7 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
                     data1.setQty(qty);
                     data1.setItem_total_price(item_total);
                     new DBHelper(context).updateCartItem(data1);
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent("cart_update"));
                 }
             }
         });
@@ -87,6 +90,7 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
                     data1.setQty(qty);
                     data1.setItem_total_price(item_total);
                     new DBHelper(context).updateCartItem(data1);
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent("cart_update"));
                 }
             }
         });

@@ -4,6 +4,11 @@ public class DoseData {
     String dose_id, dose;
     boolean isSelected = false;
 
+    public DoseData(String dose_id, String dose) {
+        this.dose_id = dose_id;
+        this.dose = dose;
+    }
+
     public boolean isSelected() {
         return isSelected;
     }
@@ -25,11 +30,6 @@ public class DoseData {
     }
 
     public void setDose(String dose) {
-        this.dose = dose;
-    }
-
-    public DoseData(String dose_id, String dose) {
-        this.dose_id = dose_id;
         this.dose = dose;
     }
 }

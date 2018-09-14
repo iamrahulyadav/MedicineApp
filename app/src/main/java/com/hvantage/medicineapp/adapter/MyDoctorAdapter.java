@@ -64,6 +64,12 @@ public class MyDoctorAdapter extends RecyclerView.Adapter<MyDoctorAdapter.ViewHo
         return arrayList.size();
     }
 
+    public interface MyAdapterListener {
+        void delete(View v, int position);
+
+        void select(View v, int position);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvTitle, tvBG;
@@ -78,11 +84,5 @@ public class MyDoctorAdapter extends RecyclerView.Adapter<MyDoctorAdapter.ViewHo
             item = (CardView) itemView.findViewById(R.id.item);
 
         }
-    }
-
-    public interface MyAdapterListener {
-        void delete(View v, int position);
-
-        void select(View v, int position);
     }
 }

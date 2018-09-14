@@ -8,6 +8,17 @@ import com.google.gson.annotations.SerializedName;
 
 public class CategoryData implements Parcelable {
 
+    public static final Parcelable.Creator<CategoryData> CREATOR = new Parcelable.Creator<CategoryData>() {
+        @Override
+        public CategoryData createFromParcel(Parcel source) {
+            return new CategoryData(source);
+        }
+
+        @Override
+        public CategoryData[] newArray(int size) {
+            return new CategoryData[size];
+        }
+    };
     @SerializedName("cat_id")
     @Expose
     private String catId;
@@ -17,6 +28,15 @@ public class CategoryData implements Parcelable {
     @SerializedName("cat_image")
     @Expose
     private String catImage;
+
+    public CategoryData() {
+    }
+
+    protected CategoryData(Parcel in) {
+        this.catId = in.readString();
+        this.catName = in.readString();
+        this.catImage = in.readString();
+    }
 
     public String getCatId() {
         return catId;
@@ -42,7 +62,6 @@ public class CategoryData implements Parcelable {
         this.catImage = catImage;
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -54,25 +73,4 @@ public class CategoryData implements Parcelable {
         dest.writeString(this.catName);
         dest.writeString(this.catImage);
     }
-
-    public CategoryData() {
-    }
-
-    protected CategoryData(Parcel in) {
-        this.catId = in.readString();
-        this.catName = in.readString();
-        this.catImage = in.readString();
-    }
-
-    public static final Parcelable.Creator<CategoryData> CREATOR = new Parcelable.Creator<CategoryData>() {
-        @Override
-        public CategoryData createFromParcel(Parcel source) {
-            return new CategoryData(source);
-        }
-
-        @Override
-        public CategoryData[] newArray(int size) {
-            return new CategoryData[size];
-        }
-    };
 }

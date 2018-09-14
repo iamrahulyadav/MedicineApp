@@ -8,6 +8,17 @@ import com.google.gson.annotations.SerializedName;
 
 public class PatientDetails implements Parcelable {
 
+    public static final Parcelable.Creator<PatientDetails> CREATOR = new Parcelable.Creator<PatientDetails>() {
+        @Override
+        public PatientDetails createFromParcel(Parcel source) {
+            return new PatientDetails(source);
+        }
+
+        @Override
+        public PatientDetails[] newArray(int size) {
+            return new PatientDetails[size];
+        }
+    };
     @SerializedName("name")
     @Expose
     private String name;
@@ -20,6 +31,16 @@ public class PatientDetails implements Parcelable {
     @SerializedName("gender")
     @Expose
     private String gender;
+
+    public PatientDetails() {
+    }
+
+    protected PatientDetails(Parcel in) {
+        this.name = in.readString();
+        this.age = in.readString();
+        this.weight = in.readString();
+        this.gender = in.readString();
+    }
 
     public String getName() {
         return name;
@@ -53,7 +74,6 @@ public class PatientDetails implements Parcelable {
         this.gender = gender;
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -66,28 +86,6 @@ public class PatientDetails implements Parcelable {
         dest.writeString(this.weight);
         dest.writeString(this.gender);
     }
-
-    public PatientDetails() {
-    }
-
-    protected PatientDetails(Parcel in) {
-        this.name = in.readString();
-        this.age = in.readString();
-        this.weight = in.readString();
-        this.gender = in.readString();
-    }
-
-    public static final Parcelable.Creator<PatientDetails> CREATOR = new Parcelable.Creator<PatientDetails>() {
-        @Override
-        public PatientDetails createFromParcel(Parcel source) {
-            return new PatientDetails(source);
-        }
-
-        @Override
-        public PatientDetails[] newArray(int size) {
-            return new PatientDetails[size];
-        }
-    };
 
     @Override
     public String toString() {

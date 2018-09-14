@@ -118,7 +118,7 @@ public class WelcomeActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void loadHome() {
-        startActivity(new Intent(this, LoginActivity.class));
+        startActivity(new Intent(this, SignupActivity.class));
         finish();
     }
 

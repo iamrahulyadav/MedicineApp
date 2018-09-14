@@ -16,8 +16,8 @@
     <ProgressBar
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_margin="20dp"
         android:layout_below="@id/image"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_margin="20dp" />
 
 </RelativeLayout>

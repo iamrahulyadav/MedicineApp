@@ -195,7 +195,7 @@ public class ProductDetailActivity extends AppCompatActivity implements View.OnC
                         Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
-                    context.startActivity(new Intent(context, LoginActivity.class));
+                    context.startActivity(new Intent(context, SignupActivity.class));
                 }
                 break;
         }

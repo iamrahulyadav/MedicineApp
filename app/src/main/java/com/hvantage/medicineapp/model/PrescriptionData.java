@@ -10,9 +10,24 @@ import java.util.ArrayList;
 
 public class PrescriptionData implements Parcelable {
 
+    public static final Parcelable.Creator<PrescriptionData> CREATOR = new Parcelable.Creator<PrescriptionData>() {
+        @Override
+        public PrescriptionData createFromParcel(Parcel source) {
+            return new PrescriptionData(source);
+        }
+
+        @Override
+        public PrescriptionData[] newArray(int size) {
+            return new PrescriptionData[size];
+        }
+    };
+
     @SerializedName("prescription_id")
     @Expose
     private String prescription_id;
+    @SerializedName("prescription_title")
+    @Expose
+    private String prescription_title;
     @SerializedName("date")
     @Expose
     private String date;
@@ -35,6 +50,21 @@ public class PrescriptionData implements Parcelable {
     @Expose
     private String notes;
 
+    public PrescriptionData() {
+    }
+
+    protected PrescriptionData(Parcel in) {
+        this.prescription_id = in.readString();
+        this.prescription_title = in.readString();
+        this.date = in.readString();
+        this.image = in.readString();
+        this.doctorDetails = in.readParcelable(DoctorDetails.class.getClassLoader());
+        this.patientDetails = in.readParcelable(PatientDetails.class.getClassLoader());
+        this.medicineDetails = new ArrayList<PreMedicineData>();
+        in.readList(this.medicineDetails, PreMedicineData.class.getClassLoader());
+        this.diagnosisDetails = in.readString();
+        this.notes = in.readString();
+    }
 
     public String getPrescription_id() {
         return prescription_id;
@@ -42,6 +72,14 @@ public class PrescriptionData implements Parcelable {
 
     public void setPrescription_id(String prescription_id) {
         this.prescription_id = prescription_id;
+    }
+
+    public String getPrescription_title() {
+        return prescription_title;
+    }
+
+    public void setPrescription_title(String prescription_title) {
+        this.prescription_title = prescription_title;
     }
 
     public String getNotes() {
@@ -100,7 +138,6 @@ public class PrescriptionData implements Parcelable {
         this.diagnosisDetails = diagnosisDetails;
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -109,6 +146,7 @@ public class PrescriptionData implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.prescription_id);
+        dest.writeString(this.prescription_title);
         dest.writeString(this.date);
         dest.writeString(this.image);
         dest.writeParcelable(this.doctorDetails, flags);
@@ -118,37 +156,11 @@ public class PrescriptionData implements Parcelable {
         dest.writeString(this.notes);
     }
 
-    public PrescriptionData() {
-    }
-
-    protected PrescriptionData(Parcel in) {
-        this.prescription_id = in.readString();
-        this.date = in.readString();
-        this.image = in.readString();
-        this.doctorDetails = in.readParcelable(DoctorDetails.class.getClassLoader());
-        this.patientDetails = in.readParcelable(PatientDetails.class.getClassLoader());
-        this.medicineDetails = new ArrayList<PreMedicineData>();
-        in.readList(this.medicineDetails, PreMedicineData.class.getClassLoader());
-        this.diagnosisDetails = in.readString();
-        this.notes = in.readString();
-    }
-
-    public static final Parcelable.Creator<PrescriptionData> CREATOR = new Parcelable.Creator<PrescriptionData>() {
-        @Override
-        public PrescriptionData createFromParcel(Parcel source) {
-            return new PrescriptionData(source);
-        }
-
-        @Override
-        public PrescriptionData[] newArray(int size) {
-            return new PrescriptionData[size];
-        }
-    };
-
     @Override
     public String toString() {
         return "PrescriptionData{" +
                 "prescription_id='" + prescription_id + '\'' +
+                "prescription_title='" + prescription_title + '\'' +
                 ", date='" + date + '\'' +
                 ", image='" + image + '\'' +
                 ", doctorDetails=" + doctorDetails +

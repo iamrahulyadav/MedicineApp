@@ -54,8 +54,8 @@ public class MyOrderFragment extends Fragment implements View.OnClickListener {
         }
         init();
         setRecyclerView();
-        if (Functions.isConnectingToInternet(context)){}
-        else
+        if (Functions.isConnectingToInternet(context)) {
+        } else
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
         return rootView;
     }

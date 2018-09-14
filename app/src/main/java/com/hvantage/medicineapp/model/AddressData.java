@@ -8,6 +8,17 @@ import com.google.gson.annotations.SerializedName;
 
 public class AddressData implements Parcelable {
 
+    public static final Parcelable.Creator<AddressData> CREATOR = new Parcelable.Creator<AddressData>() {
+        @Override
+        public AddressData createFromParcel(Parcel source) {
+            return new AddressData(source);
+        }
+
+        @Override
+        public AddressData[] newArray(int size) {
+            return new AddressData[size];
+        }
+    };
     @SerializedName("address")
     @Expose
     private String address;
@@ -35,6 +46,21 @@ public class AddressData implements Parcelable {
     @SerializedName("state")
     @Expose
     private String state;
+
+    public AddressData() {
+    }
+
+    protected AddressData(Parcel in) {
+        this.address = in.readString();
+        this.city = in.readString();
+        this.contactNo = in.readString();
+        this.isDefault = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.addressId = in.readString();
+        this.landmark = in.readString();
+        this.name = in.readString();
+        this.pincode = in.readString();
+        this.state = in.readString();
+    }
 
     public String getAddress() {
         return address;
@@ -123,7 +149,6 @@ public class AddressData implements Parcelable {
                 '}';
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -141,31 +166,4 @@ public class AddressData implements Parcelable {
         dest.writeString(this.pincode);
         dest.writeString(this.state);
     }
-
-    public AddressData() {
-    }
-
-    protected AddressData(Parcel in) {
-        this.address = in.readString();
-        this.city = in.readString();
-        this.contactNo = in.readString();
-        this.isDefault = (Boolean) in.readValue(Boolean.class.getClassLoader());
-        this.addressId = in.readString();
-        this.landmark = in.readString();
-        this.name = in.readString();
-        this.pincode = in.readString();
-        this.state = in.readString();
-    }
-
-    public static final Parcelable.Creator<AddressData> CREATOR = new Parcelable.Creator<AddressData>() {
-        @Override
-        public AddressData createFromParcel(Parcel source) {
-            return new AddressData(source);
-        }
-
-        @Override
-        public AddressData[] newArray(int size) {
-            return new AddressData[size];
-        }
-    };
 }

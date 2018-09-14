@@ -5,6 +5,27 @@ import java.io.Serializable;
 public class AddressModel implements Serializable {
 
     String name;
+    String contact_no;
+    String key;
+    String pincode;
+    String address;
+    String landmark;
+    String city;
+    String state;
+    boolean is_default;
+    public AddressModel(String name, String contact_no, String key, String pincode, String address, String landmark, String city, String state, boolean is_default) {
+        this.name = name;
+        this.contact_no = contact_no;
+        this.key = key;
+        this.pincode = pincode;
+        this.address = address;
+        this.landmark = landmark;
+        this.city = city;
+        this.state = state;
+        this.is_default = is_default;
+    }
+    public AddressModel() {
+    }
 
     public String getName() {
         return name;
@@ -20,31 +41,6 @@ public class AddressModel implements Serializable {
 
     public void setContact_no(String contact_no) {
         this.contact_no = contact_no;
-    }
-
-
-    String contact_no;
-    String key;
-    String pincode;
-    String address;
-    String landmark;
-    String city;
-    String state;
-    boolean is_default;
-
-    public AddressModel(String name, String contact_no, String key, String pincode, String address, String landmark, String city, String state, boolean is_default) {
-        this.name = name;
-        this.contact_no = contact_no;
-        this.key = key;
-        this.pincode = pincode;
-        this.address = address;
-        this.landmark = landmark;
-        this.city = city;
-        this.state = state;
-        this.is_default = is_default;
-    }
-
-    public AddressModel() {
     }
 
     public String getKey() {

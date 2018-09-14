@@ -108,6 +108,45 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
         adapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof FragmentIntraction) {
+            intraction = (FragmentIntraction) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        intraction = null;
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnUpload:
+                break;
+        }
+    }
+
+    private void showProgressDialog() {
+        progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                // TODO Auto-generated method stub
+            }
+        });
+    }
+
+    private void hideProgressDialog() {
+        if (progressBar != null)
+            progressBar.dismiss();
+    }
+
     class CategoryTask extends AsyncTask<Void, String, Void> {
         @Override
         protected void onPreExecute() {
@@ -172,46 +211,6 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }
         }
-    }
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof FragmentIntraction) {
-            intraction = (FragmentIntraction) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        intraction = null;
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btnUpload:
-                break;
-        }
-    }
-
-    private void showProgressDialog() {
-        progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                // TODO Auto-generated method stub
-            }
-        });
-    }
-
-    private void hideProgressDialog() {
-        if (progressBar != null)
-            progressBar.dismiss();
     }
 
 }

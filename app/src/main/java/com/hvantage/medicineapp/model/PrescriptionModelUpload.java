@@ -4,11 +4,46 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class PrescriptionModelUpload implements Parcelable {
+    public static final Parcelable.Creator<com.hvantage.medicineapp.model.PrescriptionModel> CREATOR = new Parcelable.Creator<com.hvantage.medicineapp.model.PrescriptionModel>() {
+        @Override
+        public com.hvantage.medicineapp.model.PrescriptionModel createFromParcel(Parcel source) {
+            return new com.hvantage.medicineapp.model.PrescriptionModel(source);
+        }
+
+        @Override
+        public com.hvantage.medicineapp.model.PrescriptionModel[] newArray(int size) {
+            return new com.hvantage.medicineapp.model.PrescriptionModel[size];
+        }
+    };
     String key;
     String image_base64;
     String title = "";
     String description = "";
     String date_time = "";
+
+    public PrescriptionModelUpload(String key, String image_base64) {
+        this.key = key;
+        this.image_base64 = image_base64;
+    }
+
+    public PrescriptionModelUpload(String key, String image_base64, String title, String description, String date_time) {
+        this.key = key;
+        this.image_base64 = image_base64;
+        this.title = title;
+        this.description = description;
+        this.date_time = date_time;
+    }
+
+    public PrescriptionModelUpload() {
+    }
+
+    protected PrescriptionModelUpload(Parcel in) {
+        this.key = in.readString();
+        this.image_base64 = in.readString();
+        this.title = in.readString();
+        this.description = in.readString();
+        this.date_time = in.readString();
+    }
 
     public String getTitle() {
         return title;
@@ -32,23 +67,6 @@ public class PrescriptionModelUpload implements Parcelable {
 
     public void setDate_time(String date_time) {
         this.date_time = date_time;
-    }
-
-
-    public PrescriptionModelUpload(String key, String image_base64) {
-        this.key = key;
-        this.image_base64 = image_base64;
-    }
-
-    public PrescriptionModelUpload(String key, String image_base64, String title, String description, String date_time) {
-        this.key = key;
-        this.image_base64 = image_base64;
-        this.title = title;
-        this.description = description;
-        this.date_time = date_time;
-    }
-
-    public PrescriptionModelUpload() {
     }
 
     public String getKey() {
@@ -75,7 +93,6 @@ public class PrescriptionModelUpload implements Parcelable {
                 '}';
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -89,24 +106,4 @@ public class PrescriptionModelUpload implements Parcelable {
         dest.writeString(this.description);
         dest.writeString(this.date_time);
     }
-
-    protected PrescriptionModelUpload(Parcel in) {
-        this.key = in.readString();
-        this.image_base64 = in.readString();
-        this.title = in.readString();
-        this.description = in.readString();
-        this.date_time = in.readString();
-    }
-
-    public static final Parcelable.Creator<com.hvantage.medicineapp.model.PrescriptionModel> CREATOR = new Parcelable.Creator<com.hvantage.medicineapp.model.PrescriptionModel>() {
-        @Override
-        public com.hvantage.medicineapp.model.PrescriptionModel createFromParcel(Parcel source) {
-            return new com.hvantage.medicineapp.model.PrescriptionModel(source);
-        }
-
-        @Override
-        public com.hvantage.medicineapp.model.PrescriptionModel[] newArray(int size) {
-            return new com.hvantage.medicineapp.model.PrescriptionModel[size];
-        }
-    };
 }

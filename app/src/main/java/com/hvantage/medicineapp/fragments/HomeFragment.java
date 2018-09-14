@@ -23,6 +23,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -37,7 +38,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ScrollView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,9 +48,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.CartActivity;
-import com.hvantage.medicineapp.activity.LoginActivity;
 import com.hvantage.medicineapp.activity.MainActivity;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
+import com.hvantage.medicineapp.activity.SignupActivity;
 import com.hvantage.medicineapp.adapter.CategoryAdapter;
 import com.hvantage.medicineapp.adapter.DailyNeedProductAdapter;
 import com.hvantage.medicineapp.adapter.OfferPagerAdapter;
@@ -83,7 +84,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class HomeFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "HomeFragment";
-    private static final int REQUEST_ALL_PERMISSIONS = 100, REQ_CODE_SPEECH_INPUT = 101;
+    private static final int REQUEST_ALL_PERMISSIONS = 100, REQUEST_CALL_PERMISSION = 101, REQ_CODE_SPEECH_INPUT = 101;
     ArrayList<CategoryData> catList = new ArrayList<CategoryData>();
     ArrayList<ProductData> productList = new ArrayList<ProductData>();
     ArrayList<Bitmap> offerList = new ArrayList<Bitmap>();
@@ -100,10 +101,314 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private ProgressBar progressBar;
     private FloatingActionMenu floatingActionMenu;
     private ViewPager viewPagerOffers;
+    private LinearLayout dots_layout;
+    private ImageView[] dots;
 
     private void setFloatingButton() {
         new FloatingButton().showFloatingButton(rootView, context);
         new FloatingButton().setFloatingButtonControls(rootView);
+    }
+
+    private void createCustomAnimation() {
+        AnimatorSet set = new AnimatorSet();
+        ObjectAnimator scaleOutX = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleX", 1.0f, 0.2f);
+        ObjectAnimator scaleOutY = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleY", 1.0f, 0.2f);
+        ObjectAnimator scaleInX = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleX", 0.2f, 1.0f);
+        ObjectAnimator scaleInY = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleY", 0.2f, 1.0f);
+
+        scaleOutX.setDuration(50);
+        scaleOutY.setDuration(50);
+
+        scaleInX.setDuration(150);
+        scaleInY.setDuration(150);
+
+        scaleInX.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                floatingActionMenu.getMenuIconView().setImageResource(floatingActionMenu.isOpened()
+                        ? R.drawable.fab_back : R.drawable.fab_plus);
+            }
+        });
+
+        set.play(scaleOutX).with(scaleOutY);
+        set.play(scaleInX).with(scaleInY).after(scaleOutX);
+        set.setInterpolator(new OvershootInterpolator(2));
+
+        floatingActionMenu.setIconToggleAnimatorSet(set);
+
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        context = container.getContext();
+        rootView = inflater.inflate(R.layout.fragment_home, container, false);
+        if (intraction != null) {
+            intraction.actionbarsetTitle(getResources().getString(R.string.app_name));
+        }
+        init();
+        setFloatingButton();
+        list = new DBHelper(context).getMedicines();
+        if (Functions.isConnectingToInternet(context)) {
+            new CategoryTask().execute();
+            new ProductTask().execute();
+        } else {
+            Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
+        }
+        if (list != null) {
+            Log.e(TAG, "onCreateView: list >> " + list.size());
+            etSearch.setThreshold(1);
+            SearchBarAdapter adapter = new SearchBarAdapter(context, R.layout.auto_complete_text, list);
+
+            etSearch.setAdapter(adapter);
+        }
+        AppPreferences.setSelectedPresId(context, "");
+        AppPreferences.setSelectedAddId(context, "");
+        CartActivity.selectedPresc = null;
+        return rootView;
+    }
+
+    private void setProductAdapter() {
+        recylcer_view_daily = (RecyclerView) rootView.findViewById(R.id.recylcer_view_daily);
+        productAdapter = new DailyNeedProductAdapter(context, productList);
+        recylcer_view_daily.setLayoutManager(new LinearLayoutManager(context));
+        recylcer_view_daily.setAdapter(productAdapter);
+        productAdapter.notifyDataSetChanged();
+
+    }
+
+    private void setOffers() {
+        viewPagerOffers = (ViewPager) rootView.findViewById(R.id.viewPagerOffers);
+        dots_layout = (LinearLayout) rootView.findViewById(R.id.dotslayout);
+        offerList.clear();
+        offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer1));
+        offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer3));
+        offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer4));
+        viewPagerOffers.setAdapter(new OfferPagerAdapter(getActivity(), offerList));
+        createDots(0);
+        viewPagerOffers.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                createDots(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
+
+    private void createDots(int current_position) {
+        if (dots_layout != null) {
+            dots_layout.removeAllViews();
+            dots = new ImageView[offerList.size()];
+            for (int i = 0; i < offerList.size(); i++) {
+                dots[i] = new ImageView(context);
+                if (i == current_position) {
+                    dots[i].setImageDrawable(ContextCompat.getDrawable(context, R.drawable.active_dots));
+                } else {
+                    dots[i].setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_dots));
+                }
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.setMargins(4, 0, 4, 0);
+
+                dots_layout.addView(dots[i], params);
+            }
+        }
+    }
+
+    private void showProgressDialog() {
+        progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                // TODO Auto-generated method stub
+            }
+        });
+    }
+
+    private void hideProgressDialog() {
+        if (progressBar != null)
+            progressBar.dismiss();
+    }
+
+    private void init() {
+        etSearch = (AppCompatAutoCompleteTextView) rootView.findViewById(R.id.etSearch);
+        btnUpload = (CardView) rootView.findViewById(R.id.btnUpload);
+        btnVoiceInput = (ImageView) rootView.findViewById(R.id.btnVoiceInput);
+        btnUpload.setOnClickListener(this);
+        btnVoiceInput.setOnClickListener(this);
+        ((NestedScrollView) rootView.findViewById(R.id.container)).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                Functions.hideSoftKeyboard(context, view);
+                return false;
+            }
+        });
+        ((CardView) rootView.findViewById(R.id.fabCall)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkCallPermission())
+                    Functions.callOrder(context);
+                else {
+                    /*Toast.makeText(context, "Call Permission Denied!", Toast.LENGTH_SHORT).show();*/
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{
+                                    Manifest.permission.CALL_PHONE
+                            },
+                            REQUEST_CALL_PERMISSION);
+                }
+            }
+        });
+        setOffers();
+        setCategoryAdapter();
+        setProductAdapter();
+    }
+
+    private void setCategoryAdapter() {
+        recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
+        categoryAdapter = new CategoryAdapter(context, catList);
+        recylcer_view.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+        recylcer_view.setAdapter(categoryAdapter);
+        recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                if (position == 0) {
+                    AllPrescriptionFragment fragment = new AllPrescriptionFragment();
+                    FragmentManager manager = getFragmentManager();
+                    FragmentTransaction ft = manager.beginTransaction();
+                    ft.replace(R.id.main_container, fragment);
+                    ft.addToBackStack(null);
+                    ft.commitAllowingStateLoss();
+                } else {
+                    BrowseCategoryFragment fragment = new BrowseCategoryFragment();
+                    Bundle args = new Bundle();
+                    args.putParcelable("data", catList.get(position));
+                    fragment.setArguments(args);
+                    FragmentManager manager = getFragmentManager();
+                    FragmentTransaction ft = manager.beginTransaction();
+                    ft.replace(R.id.main_container, fragment);
+                    ft.addToBackStack(null);
+                    ft.commitAllowingStateLoss();
+                }
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        }));
+        categoryAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof FragmentIntraction) {
+            intraction = (FragmentIntraction) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        intraction = null;
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnUpload:
+                if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
+                    FragmentManager manager = getFragmentManager();
+                    FragmentTransaction ft = manager.beginTransaction();
+                    ft.replace(R.id.main_container, new UploadPrecriptionFragment());
+                    ft.addToBackStack(null);
+                    ft.commitAllowingStateLoss();
+                } else {
+                    startActivity(new Intent(context, SignupActivity.class));
+                }
+                break;
+            case R.id.btnVoiceInput:
+                promptSpeechInput();
+                break;
+        }
+    }
+
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak Now");
+        try {
+            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(getActivity(), getString(R.string.speech_not_supported), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean checkPermission() {
+        if ((ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                && (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
+            if ((ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                    && (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE))) {
+            } else {
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.CAMERA,
+                        },
+                        REQUEST_ALL_PERMISSIONS);
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private boolean checkCallPermission() {
+        if ((ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED)) {
+            if ((ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.CALL_PHONE))) {
+                Functions.callOrder(context);
+            } else {
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{
+                                Manifest.permission.CALL_PHONE
+                        },
+                        REQUEST_CALL_PERMISSION);
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQ_CODE_SPEECH_INPUT: {
+                if (resultCode == RESULT_OK && null != data) {
+                    ArrayList<String> result = data
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    etSearch.setText(result.get(0));
+                }
+                break;
+            }
+        }
     }
 
     public class FloatingButton {
@@ -165,114 +470,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 }
             });
         }
-    }
-
-    private void createCustomAnimation() {
-        AnimatorSet set = new AnimatorSet();
-        ObjectAnimator scaleOutX = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleX", 1.0f, 0.2f);
-        ObjectAnimator scaleOutY = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleY", 1.0f, 0.2f);
-        ObjectAnimator scaleInX = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleX", 0.2f, 1.0f);
-        ObjectAnimator scaleInY = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleY", 0.2f, 1.0f);
-
-        scaleOutX.setDuration(50);
-        scaleOutY.setDuration(50);
-
-        scaleInX.setDuration(150);
-        scaleInY.setDuration(150);
-
-        scaleInX.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                floatingActionMenu.getMenuIconView().setImageResource(floatingActionMenu.isOpened()
-                        ? R.drawable.fab_back : R.drawable.fab_plus);
-            }
-        });
-
-        set.play(scaleOutX).with(scaleOutY);
-        set.play(scaleInX).with(scaleInY).after(scaleOutX);
-        set.setInterpolator(new OvershootInterpolator(2));
-
-        floatingActionMenu.setIconToggleAnimatorSet(set);
-
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        context = container.getContext();
-        rootView = inflater.inflate(R.layout.fragment_home, container, false);
-        if (intraction != null) {
-            intraction.actionbarsetTitle(getResources().getString(R.string.app_name));
-        }
-        init();
-        setFloatingButton();
-        list = new DBHelper(context).getMedicines();
-        if (Functions.isConnectingToInternet(context)) {
-            new CategoryTask().execute();
-            new ProductTask().execute();
-        } else {
-            Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
-        }
-        if (list != null) {
-            Log.e(TAG, "onCreateView: list >> " + list.size());
-            etSearch.setThreshold(1);
-            SearchBarAdapter adapter = new SearchBarAdapter(context, R.layout.auto_complete_text, R.id.text1, list);
-
-            etSearch.setAdapter(adapter);
-        }
-        AppPreferences.setSelectedPresId(context, "");
-        AppPreferences.setSelectedAddId(context, "");
-        CartActivity.selectedPresc = null;
-        return rootView;
-    }
-
-    private void setProductAdapter() {
-        recylcer_view_daily = (RecyclerView) rootView.findViewById(R.id.recylcer_view_daily);
-        productAdapter = new DailyNeedProductAdapter(context, productList);
-        recylcer_view_daily.setLayoutManager(new LinearLayoutManager(context));
-        recylcer_view_daily.setAdapter(productAdapter);
-        productAdapter.notifyDataSetChanged();
-    }
-
-    private void setOffers() {
-        viewPagerOffers = (ViewPager) rootView.findViewById(R.id.viewPagerOffers);
-        offerList.clear();
-        offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer1));
-        offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer3));
-        offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer4));
-        viewPagerOffers.setAdapter(new OfferPagerAdapter(getActivity(), offerList));
-    }
-
-    private void showProgressDialog() {
-        progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                // TODO Auto-generated method stub
-            }
-        });
-    }
-
-    private void hideProgressDialog() {
-        if (progressBar != null)
-            progressBar.dismiss();
-    }
-
-    private void init() {
-        etSearch = (AppCompatAutoCompleteTextView) rootView.findViewById(R.id.etSearch);
-        btnUpload = (CardView) rootView.findViewById(R.id.btnUpload);
-        btnVoiceInput = (ImageView) rootView.findViewById(R.id.btnVoiceInput);
-        btnUpload.setOnClickListener(this);
-        btnVoiceInput.setOnClickListener(this);
-        ((ScrollView) rootView.findViewById(R.id.container)).setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                Functions.hideSoftKeyboard(context, view);
-                return false;
-            }
-        });
-        setOffers();
-        setCategoryAdapter();
-        setProductAdapter();
     }
 
     class ProductTask extends AsyncTask<Void, String, Void> {
@@ -337,43 +534,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-
-    private void setCategoryAdapter() {
-        recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
-        categoryAdapter = new CategoryAdapter(context, catList);
-        recylcer_view.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        recylcer_view.setAdapter(categoryAdapter);
-        recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                if (position == 0) {
-                    AllPrescriptionFragment fragment = new AllPrescriptionFragment();
-                    FragmentManager manager = getFragmentManager();
-                    FragmentTransaction ft = manager.beginTransaction();
-                    ft.replace(R.id.main_container, fragment);
-                    ft.addToBackStack(null);
-                    ft.commitAllowingStateLoss();
-                } else {
-                    BrowseCategoryFragment fragment = new BrowseCategoryFragment();
-                    Bundle args = new Bundle();
-                    args.putParcelable("data", catList.get(position));
-                    fragment.setArguments(args);
-                    FragmentManager manager = getFragmentManager();
-                    FragmentTransaction ft = manager.beginTransaction();
-                    ft.replace(R.id.main_container, fragment);
-                    ft.addToBackStack(null);
-                    ft.commitAllowingStateLoss();
-                }
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-
-            }
-        }));
-        categoryAdapter.notifyDataSetChanged();
-    }
-
     class CategoryTask extends AsyncTask<Void, String, Void> {
         @Override
         protected void onPreExecute() {
@@ -434,103 +594,56 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof FragmentIntraction) {
-            intraction = (FragmentIntraction) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        intraction = null;
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btnUpload:
-                if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
-                    FragmentManager manager = getFragmentManager();
-                    FragmentTransaction ft = manager.beginTransaction();
-                    ft.replace(R.id.main_container, new UploadPrecriptionFragment());
-                    ft.addToBackStack(null);
-                    ft.commitAllowingStateLoss();
-                } else {
-                    startActivity(new Intent(context, LoginActivity.class));
-                }
-                break;
-            case R.id.btnVoiceInput:
-                promptSpeechInput();
-                break;
-        }
-    }
-
-    private void promptSpeechInput() {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak Now");
-        try {
-            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
-        } catch (ActivityNotFoundException a) {
-            Toast.makeText(getActivity(), getString(R.string.speech_not_supported), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private boolean checkPermission() {
-        if ((ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-                && (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-                && (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
-            if ((ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE))
-                    && (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE))) {
-            } else {
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                Manifest.permission.READ_EXTERNAL_STORAGE,
-                                Manifest.permission.CAMERA,
-                        },
-                        REQUEST_ALL_PERMISSIONS);
-            }
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQ_CODE_SPEECH_INPUT: {
-                if (resultCode == RESULT_OK && null != data) {
-                    ArrayList<String> result = data
-                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    etSearch.setText(result.get(0));
-                }
-                break;
-            }
-        }
-    }
-
     public class SearchBarAdapter extends ArrayAdapter<ProductData> {
 
         Context context;
-        int resource, textViewResourceId;
+        int resource;
         ArrayList<ProductData> items, tempItems, suggestions;
+        /**
+         * Custom Filter implementation for custom suggestions we provide.
+         */
+        Filter nameFilter = new Filter() {
+            @Override
+            public CharSequence convertResultToString(Object resultValue) {
+                String str = ((ProductData) resultValue).getName();
+                return str;
+            }
 
-        public SearchBarAdapter(Context context, int resource, int textViewResourceId, ArrayList<ProductData> items) {
-            super(context, resource, textViewResourceId, items);
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                if (constraint != null) {
+                    suggestions.clear();
+                    for (ProductData people : tempItems) {
+                        if (people.getName().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                            suggestions.add(people);
+                        }
+                    }
+                    FilterResults filterResults = new FilterResults();
+                    filterResults.values = suggestions;
+                    filterResults.count = suggestions.size();
+                    return filterResults;
+                } else {
+                    return new FilterResults();
+                }
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                ArrayList<ProductData> filterList = (ArrayList<ProductData>) results.values;
+                if (results != null && results.count > 0) {
+                    clear();
+                    for (ProductData people : filterList) {
+                        add(people);
+                        notifyDataSetChanged();
+                    }
+                }
+            }
+        };
+
+        public SearchBarAdapter(Context context, int resource, ArrayList<ProductData> items) {
+            super(context, resource, items);
             this.context = context;
             this.resource = resource;
-            this.textViewResourceId = textViewResourceId;
             this.items = items;
             tempItems = new ArrayList<ProductData>(items); // this makes the difference.
             suggestions = new ArrayList<ProductData>();
@@ -619,7 +732,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                                 Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
-                            context.startActivity(new Intent(context, LoginActivity.class));
+                            context.startActivity(new Intent(context, SignupActivity.class));
                         }
                     }
                 });
@@ -631,47 +744,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         public Filter getFilter() {
             return nameFilter;
         }
-
-        /**
-         * Custom Filter implementation for custom suggestions we provide.
-         */
-        Filter nameFilter = new Filter() {
-            @Override
-            public CharSequence convertResultToString(Object resultValue) {
-                String str = ((ProductData) resultValue).getName();
-                return str;
-            }
-
-            @Override
-            protected FilterResults performFiltering(CharSequence constraint) {
-                if (constraint != null) {
-                    suggestions.clear();
-                    for (ProductData people : tempItems) {
-                        if (people.getName().toLowerCase().contains(constraint.toString().toLowerCase())) {
-                            suggestions.add(people);
-                        }
-                    }
-                    FilterResults filterResults = new FilterResults();
-                    filterResults.values = suggestions;
-                    filterResults.count = suggestions.size();
-                    return filterResults;
-                } else {
-                    return new FilterResults();
-                }
-            }
-
-            @Override
-            protected void publishResults(CharSequence constraint, FilterResults results) {
-                ArrayList<ProductData> filterList = (ArrayList<ProductData>) results.values;
-                if (results != null && results.count > 0) {
-                    clear();
-                    for (ProductData people : filterList) {
-                        add(people);
-                        notifyDataSetChanged();
-                    }
-                }
-            }
-        };
     }
 
 }

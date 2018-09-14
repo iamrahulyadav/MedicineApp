@@ -8,6 +8,17 @@ import com.google.gson.annotations.SerializedName;
 
 public class DoctorData implements Parcelable {
 
+    public static final Parcelable.Creator<DoctorData> CREATOR = new Parcelable.Creator<DoctorData>() {
+        @Override
+        public DoctorData createFromParcel(Parcel source) {
+            return new DoctorData(source);
+        }
+
+        @Override
+        public DoctorData[] newArray(int size) {
+            return new DoctorData[size];
+        }
+    };
     @SerializedName("doctor_id")
     @Expose
     private String doctorId;
@@ -29,6 +40,19 @@ public class DoctorData implements Parcelable {
     @SerializedName("specialization")
     @Expose
     private String specialization;
+
+    public DoctorData() {
+    }
+
+    protected DoctorData(Parcel in) {
+        this.doctorId = in.readString();
+        this.address = in.readString();
+        this.email = in.readString();
+        this.gender = in.readString();
+        this.mobileNo = in.readString();
+        this.name = in.readString();
+        this.specialization = in.readString();
+    }
 
     public String getDoctorId() {
         return doctorId;
@@ -86,7 +110,6 @@ public class DoctorData implements Parcelable {
         this.specialization = specialization;
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -102,31 +125,6 @@ public class DoctorData implements Parcelable {
         dest.writeString(this.name);
         dest.writeString(this.specialization);
     }
-
-    public DoctorData() {
-    }
-
-    protected DoctorData(Parcel in) {
-        this.doctorId = in.readString();
-        this.address = in.readString();
-        this.email = in.readString();
-        this.gender = in.readString();
-        this.mobileNo = in.readString();
-        this.name = in.readString();
-        this.specialization = in.readString();
-    }
-
-    public static final Parcelable.Creator<DoctorData> CREATOR = new Parcelable.Creator<DoctorData>() {
-        @Override
-        public DoctorData createFromParcel(Parcel source) {
-            return new DoctorData(source);
-        }
-
-        @Override
-        public DoctorData[] newArray(int size) {
-            return new DoctorData[size];
-        }
-    };
 
     @Override
     public String toString() {

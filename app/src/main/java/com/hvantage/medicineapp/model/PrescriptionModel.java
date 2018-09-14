@@ -6,11 +6,48 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 
 public class PrescriptionModel implements Parcelable {
+    public static final Parcelable.Creator<PrescriptionModel> CREATOR = new Parcelable.Creator<PrescriptionModel>() {
+        @Override
+        public PrescriptionModel createFromParcel(Parcel source) {
+            return new PrescriptionModel(source);
+        }
+
+        @Override
+        public PrescriptionModel[] newArray(int size) {
+            return new PrescriptionModel[size];
+        }
+    };
     String key;
     String image_base64;
     String title = "";
     String description = "";
     String date_time = "";
+    ArrayList<CartModel> item_list = new ArrayList<CartModel>();
+
+    public PrescriptionModel(String key, String image_base64) {
+        this.key = key;
+        this.image_base64 = image_base64;
+    }
+
+
+    public PrescriptionModel(String key, String image_base64, String title, String description, String date_time) {
+        this.key = key;
+        this.image_base64 = image_base64;
+        this.title = title;
+        this.description = description;
+        this.date_time = date_time;
+    }
+
+    public PrescriptionModel() {
+    }
+
+    protected PrescriptionModel(Parcel in) {
+        this.key = in.readString();
+        this.image_base64 = in.readString();
+        this.title = in.readString();
+        this.description = in.readString();
+        this.date_time = in.readString();
+    }
 
     public ArrayList<CartModel> getItem_list() {
         return item_list;
@@ -19,9 +56,6 @@ public class PrescriptionModel implements Parcelable {
     public void setItem_list(ArrayList<CartModel> item_list) {
         this.item_list = item_list;
     }
-
-    ArrayList<CartModel> item_list = new ArrayList<CartModel>();
-
 
     public String getTitle() {
         return title;
@@ -45,23 +79,6 @@ public class PrescriptionModel implements Parcelable {
 
     public void setDate_time(String date_time) {
         this.date_time = date_time;
-    }
-
-
-    public PrescriptionModel(String key, String image_base64) {
-        this.key = key;
-        this.image_base64 = image_base64;
-    }
-
-    public PrescriptionModel(String key, String image_base64, String title, String description, String date_time) {
-        this.key = key;
-        this.image_base64 = image_base64;
-        this.title = title;
-        this.description = description;
-        this.date_time = date_time;
-    }
-
-    public PrescriptionModel() {
     }
 
     public String getKey() {
@@ -88,7 +105,6 @@ public class PrescriptionModel implements Parcelable {
                 '}';
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -102,24 +118,4 @@ public class PrescriptionModel implements Parcelable {
         dest.writeString(this.description);
         dest.writeString(this.date_time);
     }
-
-    protected PrescriptionModel(Parcel in) {
-        this.key = in.readString();
-        this.image_base64 = in.readString();
-        this.title = in.readString();
-        this.description = in.readString();
-        this.date_time = in.readString();
-    }
-
-    public static final Parcelable.Creator<PrescriptionModel> CREATOR = new Parcelable.Creator<PrescriptionModel>() {
-        @Override
-        public PrescriptionModel createFromParcel(Parcel source) {
-            return new PrescriptionModel(source);
-        }
-
-        @Override
-        public PrescriptionModel[] newArray(int size) {
-            return new PrescriptionModel[size];
-        }
-    };
 }

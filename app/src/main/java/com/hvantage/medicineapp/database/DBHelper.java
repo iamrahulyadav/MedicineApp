@@ -248,7 +248,6 @@ public class DBHelper extends SQLiteOpenHelper {
         boolean isInserted = false;
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        Log.d(TAG, "addToCart: modal >> " + modal.toString());
         Cursor c = db.rawQuery("SELECT * FROM " + TABLE_CART + " WHERE " + KEY_ITEM_ID + "=" + modal.getItem_id(), null);
         if (c.moveToFirst()) {
             values.put(KEY_ITEM_NAME, modal.getItem());
@@ -256,7 +255,9 @@ public class DBHelper extends SQLiteOpenHelper {
             values.put(KEY_ITEM_PRICE, modal.getItem_price());
             values.put(KEY_ITEM_TOTAL_PRICE, modal.getItem_total_price());
             values.put(KEY_ITEM_IMG, modal.getImage());
-            values.put(KEY_ITEM_PRE_REQUIRED, "" + modal.isIs_prescription_required());
+            values.put(KEY_ITEM_PRE_REQUIRED, String.valueOf(modal.isIs_prescription_required()));
+            Log.d(TAG, "addToCart: values >> " + values);
+
             if (db.update(TABLE_CART, values, KEY_ITEM_ID + "=" + modal.getItem_id(), null) > 0) {
                 isInserted = true;
                 Log.e("addToCart : ", "Updated");
@@ -271,6 +272,8 @@ public class DBHelper extends SQLiteOpenHelper {
             values.put(KEY_ITEM_PRICE, modal.getItem_price());
             values.put(KEY_ITEM_TOTAL_PRICE, modal.getItem_total_price());
             values.put(KEY_ITEM_IMG, modal.getImage());
+            values.put(KEY_ITEM_PRE_REQUIRED, String.valueOf(modal.isIs_prescription_required()));
+            Log.d(TAG, "addToCart: values >> " + values);
             boolean bb = db.insert(TABLE_CART, null, values) > 0;
             if (bb) {
                 isInserted = true;

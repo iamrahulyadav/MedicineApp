@@ -70,6 +70,7 @@ public class AppConstants {
         public static final String GET_MY_REPORTS = "get_my_reports";
         public static final String DELETE_REPORT = "delete_report";
         public static final String PLACE_ORDER_WITHOUT_PRESCRIPTION = "place_order_without_prescription";
+        public static final String USER_OTP_LOGIN = "user_otp_login";
     }
 
     public class NOTIFICATION_KEY {

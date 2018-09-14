@@ -18,8 +18,8 @@
         android:id="@+id/recylcer_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:overScrollMode="never"
         android:layout_marginRight="3dp"
+        android:overScrollMode="never"
         android:visibility="visible" />
 
 

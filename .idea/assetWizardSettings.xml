@@ -23,7 +23,6 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="paddingPercent" value="50" />
                                                 <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
@@ -35,10 +34,10 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="$USER_HOME$/Downloads/image.png" />
-                                      <entry key="outputName" value="no_image_ph" />
+                                      <entry key="imageAsset" value="C:\Users\RK\Desktop\steps\steps_arrow.png" />
+                                      <entry key="outputName" value="steps_arrow" />
                                       <entry key="theme" value="CUSTOM" />
-                                      <entry key="themeColor" value="606060" />
+                                      <entry key="themeColor" value="535353" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -66,7 +65,7 @@
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
                                       <entry key="backgroundColor" value="2e5ece" />
-                                      <entry key="foregroundImage" value="$USER_HOME$/Downloads/send.png" />
+                                      <entry key="foregroundImage" value="C:\Users\RK\Downloads\send.png" />
                                     </map>
                                   </option>
                                 </PersistentState>

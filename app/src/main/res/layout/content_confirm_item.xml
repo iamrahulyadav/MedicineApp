@@ -16,9 +16,12 @@
 
 
         <android.support.v4.widget.NestedScrollView
+            android:id="@+id/touch_outside"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="50dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:overScrollMode="never"
             android:scrollbars="none">
 
@@ -29,6 +32,37 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/llSearchBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp">
+
+                    <android.support.v7.widget.AppCompatAutoCompleteTextView
+                        android:id="@+id/etSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:drawableLeft="@drawable/action_search_dark"
+                        android:drawablePadding="5dp"
+                        android:fontFamily="@font/quicksand"
+                        android:hint="Search here for more items (ex. Himalaya Body Care)"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1"
+                        android:scrollbars="none"
+                        android:singleLine="true"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.8dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/colorDivider" />
 
                 <LinearLayout
                     android:id="@+id/llPrescription"
@@ -83,6 +117,7 @@
                         android:textColor="@color/colorTextHeading"
                         android:textStyle="italic" />
                 </LinearLayout>
+
 
                 <LinearLayout
                     android:id="@+id/llMedicine"
@@ -208,6 +243,7 @@
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tvDeliveryFee"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="0.4"
@@ -295,7 +331,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp">
+                    android:layout_marginTop="10dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -376,7 +412,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:visibility="gone">
+                    android:visibility="visible">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -398,20 +434,37 @@
                             style="@style/Base.Widget.AppCompat.CompoundButton.CheckBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:checked="true"
                             android:text="Cash On Delivery"
                             android:textAppearance="@style/TextAppearance.AppCompat.Small"
                             android:textColor="@color/colorTextHeading"
                             android:textStyle="bold" />
 
-                        <RadioButton
-                            style="@style/Base.Widget.AppCompat.CompoundButton.CheckBox"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawableLeft="@drawable/paytm"
-                            android:text=""
-                            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                            android:textColor="@color/colorTextHeading"
-                            android:textStyle="bold" />
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <RadioButton
+                                android:id="@+id/rbPaytm"
+                                style="@style/Base.Widget.AppCompat.CompoundButton.CheckBox"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawableLeft="@drawable/paytm"
+                                android:enabled="false"
+                                android:text=""
+                                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                                android:textColor="@color/colorTextHeading"
+                                android:textStyle="bold" />
+
+                            <android.support.v7.widget.AppCompatTextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/rbPaytm"
+                                android:layout_marginLeft="40dp"
+                                android:text="(Coming Soon)"
+                                android:textAppearance="@style/TextAppearance.Compat.Notification.Time"
+                                android:textColor="@color/colorTextSubHeading" />
+                        </RelativeLayout>
 
                         <RadioButton
                             style="@style/Base.Widget.AppCompat.CompoundButton.CheckBox"
@@ -421,7 +474,8 @@
                             android:text=""
                             android:textAppearance="@style/TextAppearance.AppCompat.Small"
                             android:textColor="@color/colorTextHeading"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            android:visibility="gone" />
                     </RadioGroup>
 
                 </LinearLayout>

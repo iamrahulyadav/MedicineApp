@@ -7,6 +7,15 @@ public class CartModel implements Serializable {
     int qty_no = 1;
     String item;
     String image = "";
+    String qty;
+    String item_price = "0", item_total_price = "0";
+
+    public CartModel(String key, int qty_no) {
+        this.key = key;
+        this.qty_no = qty_no;
+    }
+    public CartModel() {
+    }
 
     public String getImage() {
         return image;
@@ -15,9 +24,6 @@ public class CartModel implements Serializable {
     public void setImage(String image) {
         this.image = image;
     }
-
-    String qty;
-    String item_price = "0", item_total_price = "0";
 
     public String getItem() {
         return item;
@@ -49,14 +55,6 @@ public class CartModel implements Serializable {
 
     public void setItem_total_price(String item_total_price) {
         this.item_total_price = item_total_price;
-    }
-
-    public CartModel(String key, int qty_no) {
-        this.key = key;
-        this.qty_no = qty_no;
-    }
-
-    public CartModel() {
     }
 
     public String getKey() {
