@@ -18,6 +18,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,10 +29,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,7 +53,8 @@ import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.CartActivity;
 import com.hvantage.medicineapp.activity.SelectAddressActivity;
 import com.hvantage.medicineapp.adapter.DialogMultipleChoiceAdapter;
-import com.hvantage.medicineapp.adapter.PreMedicineItemAdapter;
+import com.hvantage.medicineapp.adapter.PreMedicineItemAdapterEditable;
+import com.hvantage.medicineapp.adapter.PreMedicineItemAdapterMain;
 import com.hvantage.medicineapp.model.DoctorDetails;
 import com.hvantage.medicineapp.model.DoseData;
 import com.hvantage.medicineapp.model.PatientDetails;
@@ -86,33 +92,45 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
     private static final int REQUEST_IMAGE_CAPTURE = REQUEST_STORAGE + 1;
     private static final int REQUEST_LOAD_IMAGE = REQUEST_IMAGE_CAPTURE + 1;
     private static final String TAG = "AddPrescrFragment";
-    ArrayList<PreMedicineData> medList = new ArrayList<PreMedicineData>();
-    EditText etDName, etAddress, etEmail, etPhoneNo, etPName, etAge,
-            etWeight, etDiagnosis, etNote, etMedType, etMedName,
-            etMedDescription, etMedQty, etMedDoses;
-    RadioGroup rgGender;
+    private ArrayList<PreMedicineData> medListMain;
+    private ArrayList<PreMedicineData> medListEditable;
+    EditText etDName1, etAddress1, etEmail1, etPhoneNo1, etPName1, etAge1,
+            etWeight1, etDiagnosis1, etMedType1, etMedName1, etMedManufacturer1,
+            etMedDescription1, etMedQty1, etMedDoses1;
+    RadioGroup rgGender1;
     List<DoseData> dosesList = new ArrayList<DoseData>();
     String selectedDosesId = "";
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
     private ProgressBar progressBar;
-    private CardView btnSubmit, btnAdd, btnCancel;
+    private AppCompatButton btnAdd1, btnCancel1;
     private PrescriptionData data = null;
-    private ImageView imgArrow;
+    private ImageView imgArrow, imgArrow1;
     private String image_base64;
-    private TextView tvAdd;
-    private RecyclerView recylcer_view;
-    private PreMedicineItemAdapter adapter;
+    private TextView tvAdd1, tvAdd2, tvAdd3;
+    private RecyclerView recylcer_view_editable, recylcer_view_main;
+    private PreMedicineItemAdapterEditable adapter_editable;
+    private PreMedicineItemAdapterMain adapter_main;
     private CoordinatorLayout coordinatorLayout;
-    private View bottomSheet;
+    private View bottomsheet_bottom;
     private BottomSheetBehavior<View> behavior;
-    private NestedScrollView layout_add_med, layout_main;
+    private NestedScrollView layout_add_med1, layout_main1;
     private TouchImageView imgThumb;
-    private TextView tvUpload;
     private byte[] byteArray;
     private boolean isExpand = false;
     private String from;
+    private CardView cardDoctor1, cardPatient1, cardMedicines1;
+    private AppCompatTextView tvTabDoctor1, tvTabPatient1, tvTabMedicine1;
+    private LinearLayout bsAction, bsAction1;
+    private AppCompatButton btnOrderCall, btnOrderWithDetail;
+
+    private LinearLayout bottomSheetTop;
+    private boolean isEdit = false;
+    private int last_edit_position = 0;
+    private AppCompatButton btnAllNext, btnAllPrev, btnContinueOrder, btnAddPD, btnOrderNow;
+    private Spinner spinnerType1;
+    private View bottomsheet_top;
 
     @Nullable
     @Override
@@ -133,22 +151,15 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                 intraction.actionbarsetTitle("Prescription Details");
         }
 
+
         init();
-        setRecyclerView();
+        //setRecyclerViewEditable();
+        //setRecyclerViewMain();
         setBottomBar();
         if (!Functions.isConnectingToInternet(context))
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
         if (data != null) {
             if (!data.getImage().equalsIgnoreCase("")) {
-               /* Picasso.with(context)
-                        .load(data.getImage())
-                        .into(imgThumb);*/
-                /*Glide.with(getContext()).load(data.getImage()).asBitmap().into(new SimpleTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        imgThumb.setImageBitmap(resource);
-                    }
-                });*/
                 imgThumb.setImageResource(R.drawable.no_image_ph);
                 showProgressDialog();
                 Glide.with(getActivity()).load(data.getImage())
@@ -160,7 +171,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                             @Override
                             public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
                                 hideProgressDialog();
-                                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "Image Error", Toast.LENGTH_SHORT).show();
                                 return false;
                             }
 
@@ -171,120 +182,307 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                             }
                         })
                         .into(imgThumb);
-
-
             }
-            bottomSheet.setVisibility(View.VISIBLE);
-            tvUpload.setVisibility(View.VISIBLE);
-            tvUpload.setText("Prescription is loading...");
-            tvUpload.setClickable(false);
+            bottomsheet_bottom.setVisibility(View.VISIBLE);
+            bsAction.setVisibility(View.VISIBLE);
             DoctorDetails doctorData = data.getDoctorDetails();
-            etDName.setText(doctorData.getName());
-            etEmail.setText(doctorData.getEmail());
-            etPhoneNo.setText(doctorData.getPhoneNo());
-            etAddress.setText(doctorData.getAddress());
+            etDName1.setText(doctorData.getName());
+            etEmail1.setText(doctorData.getEmail());
+            etPhoneNo1.setText(doctorData.getPhoneNo());
+            etAddress1.setText(doctorData.getAddress());
+
             PatientDetails patientData = data.getPatientDetails();
-            etPName.setText(patientData.getName());
-            etAge.setText(patientData.getAge());
-            etWeight.setText(patientData.getWeight());
-            if (patientData.getGender().equalsIgnoreCase("Male"))
-                ((RadioButton) rootView.findViewById(R.id.rbMale)).setChecked(true);
-            else if (patientData.getGender().equalsIgnoreCase("Female"))
-                ((RadioButton) rootView.findViewById(R.id.rbfemale)).setChecked(true);
+            etPName1.setText(patientData.getName());
+            etAge1.setText(patientData.getAge());
+            etWeight1.setText(patientData.getWeight());
+            if (patientData.getGender() != null)
+                if (patientData.getGender().equalsIgnoreCase("Male"))
+                    ((RadioButton) rootView.findViewById(R.id.rbMale1)).setChecked(true);
+                else if (patientData.getGender().equalsIgnoreCase("Female"))
+                    ((RadioButton) rootView.findViewById(R.id.rbfemale1)).setChecked(true);
 
-            medList = data.getMedicineDetails();
-            Log.e(TAG, "onCreateView: data.getMedicineDetails() >> " + medList);
-            if (medList.contains(null)) {
-                medList.remove(null);
-                Log.e(TAG, "onCreateView: data.getMedicineDetails() >> " + medList.size());
+            etDiagnosis1.setText(data.getDiagnosisDetails());
+            medListMain = data.getMedicineDetails();
+            medListMain.addAll(data.getMedicineDetails());
+            //Log.e(TAG, "onCreateView: medListMain >> " + medListMain);
+            Log.e(TAG, "onCreateView: medListMain.size() >> " + medListMain.size());
+            if (medListMain.contains(null)) {
+                medListMain.remove(null);
+
             }
-            setRecyclerView();
+            setRecyclerViewMain();
 
-        } else
+
+            medListEditable = data.getMedicineDetails();
+            Log.e(TAG, "onCreateView: medListEditable >> " + medListEditable);
+            if (medListEditable.contains(null)) {
+                medListEditable.remove(null);
+                Log.e(TAG, "onCreateView: medListEditable.size() >> " + medListEditable.size());
+            }
+
+            Log.d(TAG, "onCreateView: medListMain >> " + medListMain);
+            Log.d(TAG, "onCreateView: medListEditable >> " + medListEditable);
+            setRecyclerViewEditable();
+        } else {
             selectImage();
+        }
         return rootView;
     }
 
     private void setBottomBar() {
         coordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.main_content);
-        bottomSheet = coordinatorLayout.findViewById(R.id.bottom_sheet);
-        behavior = BottomSheetBehavior.from(bottomSheet);
+        bottomsheet_bottom = coordinatorLayout.findViewById(R.id.bottom_sheet);
+        bottomsheet_top = coordinatorLayout.findViewById(R.id.bottomsheet_top);
+        behavior = BottomSheetBehavior.from(bottomsheet_bottom);
         behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+            public void onStateChanged(@NonNull View bottomsheet_bottom, int newState) {
                 Log.e("onStateChanged", "onStateChanged:" + newState);
                 switch (newState) {
                     case BottomSheetBehavior.STATE_HIDDEN:
                         Log.d(TAG, "onStateChanged: STATE_HIDDEN");
-                        Functions.hideSoftKeyboard(context, bottomSheet);
+                        Functions.hideSoftKeyboard(context, bottomsheet_bottom);
                         break;
                     case BottomSheetBehavior.STATE_EXPANDED:
                         isExpand = true;
                         Log.d(TAG, "onStateChanged: STATE_EXPANDED");
-                        Functions.hideSoftKeyboard(context, bottomSheet);
+                        bsAction.setVisibility(View.GONE);
+                        imgArrow.setVisibility(View.VISIBLE);
+                        Functions.hideSoftKeyboard(context, bottomsheet_bottom);
+                        bottomSheetTop.setVisibility(View.GONE);
+                        imgArrow1.setVisibility(View.GONE);
+                        bsAction1.setVisibility(View.VISIBLE);
+                        bottomsheet_top.setVisibility(View.GONE);
                         break;
                     case BottomSheetBehavior.STATE_COLLAPSED:
                         isExpand = false;
                         Log.d(TAG, "onStateChanged: STATE_COLLAPSED");
-                        Functions.hideSoftKeyboard(context, bottomSheet);
+                        imgArrow.setVisibility(View.GONE);
+                        bsAction.setVisibility(View.VISIBLE);
+                        Functions.hideSoftKeyboard(context, bottomsheet_bottom);
+                        bottomsheet_top.setVisibility(View.VISIBLE);
                         break;
                     case BottomSheetBehavior.STATE_DRAGGING:
                         Log.d(TAG, "onStateChanged: STATE_DRAGGING");
-                        Functions.hideSoftKeyboard(context, bottomSheet);
-
+                        Functions.hideSoftKeyboard(context, bottomsheet_bottom);
                         break;
                     case BottomSheetBehavior.STATE_SETTLING:
                         Log.d(TAG, "onStateChanged: STATE_SETTLING");
-                        Functions.hideSoftKeyboard(context, bottomSheet);
-
+                        Functions.hideSoftKeyboard(context, bottomsheet_bottom);
                         break;
                 }
             }
 
             @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                if (isAdded()) {
-                    animateBottomSheetArrows(slideOffset);
+            public void onSlide(@NonNull View bottomsheet_bottom, float slideOffset) {
+                animateBottomSheetArrows(slideOffset);
+            }
+        });
+        bottomsheet_bottom.setVisibility(View.VISIBLE);
+        bsAction = (LinearLayout) rootView.findViewById(R.id.bsAction);
+        bsAction1 = (LinearLayout) rootView.findViewById(R.id.bsAction1);
+        btnOrderCall = rootView.findViewById(R.id.btnOrderCall);
+        btnOrderWithDetail = rootView.findViewById(R.id.btnOrderWithDetail);
+
+        btnAllNext = (AppCompatButton) rootView.findViewById(R.id.btnAllNext);
+        btnAllPrev = (AppCompatButton) rootView.findViewById(R.id.btnAllPrev);
+        btnContinueOrder = (AppCompatButton) rootView.findViewById(R.id.btnContinueOrder);
+        btnOrderNow = (AppCompatButton) rootView.findViewById(R.id.btnOrderNow);
+
+        bottomSheetTop = (LinearLayout) rootView.findViewById(R.id.bottomSheetTop);
+        btnAddPD = rootView.findViewById(R.id.btnAddPD);
+
+        cardDoctor1 = (CardView) rootView.findViewById(R.id.cardDoctor1);
+        cardPatient1 = (CardView) rootView.findViewById(R.id.cardPatient1);
+        cardMedicines1 = (CardView) rootView.findViewById(R.id.cardMedicines1);
+
+        tvTabDoctor1 = (AppCompatTextView) rootView.findViewById(R.id.tvTabDoctor1);
+        tvTabPatient1 = (AppCompatTextView) rootView.findViewById(R.id.tvTabPatient1);
+        tvTabMedicine1 = (AppCompatTextView) rootView.findViewById(R.id.tvTabMedicine1);
+
+        tvTabDoctor1.setOnClickListener(this);
+        tvTabPatient1.setOnClickListener(this);
+        tvTabMedicine1.setOnClickListener(this);
+
+        btnOrderCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
+                AppPreferences.setSelectedPresId(context, data.getPrescription_id());
+                CartActivity.selectedPresc = data;
+                Log.e(TAG, "viewOrder: CartActivity.selectedPresc >> " + CartActivity.selectedPresc);
+                Intent intent = new Intent(getActivity(), SelectAddressActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        cardDoctor1.setVisibility(View.VISIBLE);
+        cardPatient1.setVisibility(View.GONE);
+        cardMedicines1.setVisibility(View.GONE);
+        btnAllPrev.setVisibility(View.GONE);
+
+        btnAllNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (cardDoctor1.getVisibility() == View.VISIBLE) {
+                    if (TextUtils.isEmpty(etDName1.getText().toString())) {
+                        etDName1.requestFocus();
+                        Toast.makeText(context, "Enter Doctor's Name", Toast.LENGTH_SHORT).show();
+                    } else if (TextUtils.isEmpty(etAddress1.getText().toString())) {
+                        etAddress1.requestFocus();
+                        Toast.makeText(context, "Enter Doctor's Address", Toast.LENGTH_SHORT).show();
+                    } else if (TextUtils.isEmpty(etPhoneNo1.getText().toString())) {
+                        etPhoneNo1.requestFocus();
+                        Toast.makeText(context, "Enter Doctor's Phone", Toast.LENGTH_SHORT).show();
+                    } else {
+                        /*if (data == null) {
+                            if (TextUtils.isEmpty(image_base64))
+                                Toast.makeText(context, "Select Image", Toast.LENGTH_SHORT).show();
+                            else new SaveTask().execute();
+                        } else
+                            new UpdateTask().execute();*/
+                        tvTabDoctor1.setTextColor(getResources().getColor(R.color.colorGray));
+                        tvTabPatient1.setTextColor(getResources().getColor(R.color.colorPrimary));
+                        tvTabMedicine1.setTextColor(getResources().getColor(R.color.colorGray));
+                        cardDoctor1.setVisibility(View.GONE);
+                        cardPatient1.setVisibility(View.VISIBLE);
+                        cardMedicines1.setVisibility(View.GONE);
+                        btnAllPrev.setVisibility(View.VISIBLE);
+                    }
+                } else if (cardPatient1.getVisibility() == View.VISIBLE) {
+                    if (TextUtils.isEmpty(etPName1.getText().toString())) {
+                        etPName1.requestFocus();
+                        Toast.makeText(context, "Enter Patients's Name", Toast.LENGTH_SHORT).show();
+                    } else if (TextUtils.isEmpty(etAge1.getText().toString())) {
+                        etAge1.requestFocus();
+                        Toast.makeText(context, "Enter Patients's Age", Toast.LENGTH_SHORT).show();
+                    } else if (TextUtils.isEmpty(etDiagnosis1.getText().toString())) {
+                        etDiagnosis1.requestFocus();
+                        Toast.makeText(context, "Enter Patients's Diagnosis Info", Toast.LENGTH_SHORT).show();
+                    } else {
+                       /* if (data == null) {
+                            if (TextUtils.isEmpty(image_base64))
+                                Toast.makeText(context, "Select Image", Toast.LENGTH_SHORT).show();
+                            else new SaveTask().execute();
+                        } else
+                            new UpdateTask().execute();*/
+                        tvTabDoctor1.setTextColor(getResources().getColor(R.color.colorGray));
+                        tvTabPatient1.setTextColor(getResources().getColor(R.color.colorGray));
+                        tvTabMedicine1.setTextColor(getResources().getColor(R.color.colorPrimary));
+                        cardPatient1.setVisibility(View.GONE);
+                        cardDoctor1.setVisibility(View.GONE);
+                        cardMedicines1.setVisibility(View.VISIBLE);
+                        btnAllNext.setText("Save");
+                    }
+                } else if (cardMedicines1.getVisibility() == View.VISIBLE) {
+                    if (medListMain.size() == 0) {
+                        Toast.makeText(context, "Please add alteast one prescription medicine.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        if (data == null) {
+                            if (TextUtils.isEmpty(image_base64))
+                                Toast.makeText(context, "Select Image", Toast.LENGTH_SHORT).show();
+                            else new SaveTask().execute();
+                        } else
+                            new UpdateTask().execute();
+                    }
                 }
             }
         });
+
+        btnAllPrev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (cardDoctor1.getVisibility() == View.VISIBLE) {
+
+                } else if (cardPatient1.getVisibility() == View.VISIBLE) {
+                    {
+                        tvTabDoctor1.setTextColor(getResources().getColor(R.color.colorPrimary));
+                        tvTabPatient1.setTextColor(getResources().getColor(R.color.colorGray));
+                        tvTabMedicine1.setTextColor(getResources().getColor(R.color.colorGray));
+                        cardPatient1.setVisibility(View.GONE);
+                        cardDoctor1.setVisibility(View.VISIBLE);
+                        cardMedicines1.setVisibility(View.GONE);
+                        btnAllPrev.setVisibility(View.GONE);
+                        btnAllNext.setVisibility(View.VISIBLE);
+                        btnAllNext.setText("Next");
+                    }
+                } else if (cardMedicines1.getVisibility() == View.VISIBLE) {
+                    tvTabDoctor1.setTextColor(getResources().getColor(R.color.colorGray));
+                    tvTabPatient1.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    tvTabMedicine1.setTextColor(getResources().getColor(R.color.colorGray));
+                    cardPatient1.setVisibility(View.VISIBLE);
+                    cardDoctor1.setVisibility(View.GONE);
+                    cardMedicines1.setVisibility(View.GONE);
+                    btnAllNext.setText("Next");
+                }
+            }
+        });
+
+        btnOrderWithDetail.setOnClickListener(this);
+        btnContinueOrder.setOnClickListener(this);
+        btnOrderNow.setOnClickListener(this);
+        btnAddPD.setOnClickListener(this);
     }
 
+
     private void animateBottomSheetArrows(float slideOffset) {
-        // Animate counter-clockwise
         imgArrow.setRotation(slideOffset * -180);
-        // Animate clockwise
-//        imgArrow.setRotation(slideOffset * 180);
     }
 
     private void init() {
-        tvAdd = rootView.findViewById(R.id.tvAdd);
-        btnSubmit = rootView.findViewById(R.id.btnSubmit);
-        btnAdd = rootView.findViewById(R.id.btnAdd);
-        btnCancel = rootView.findViewById(R.id.btnCancel);
+        tvAdd1 = rootView.findViewById(R.id.tvAdd1);
+        tvAdd2 = rootView.findViewById(R.id.tvAdd2);
+        tvAdd3 = rootView.findViewById(R.id.tvAdd3);
+        btnAdd1 = rootView.findViewById(R.id.btnAdd1);
+        btnCancel1 = rootView.findViewById(R.id.btnCancel1);
         imgThumb = rootView.findViewById(R.id.imgThumb);
         imgArrow = rootView.findViewById(R.id.imgArrow);
-        recylcer_view = rootView.findViewById(R.id.recylcer_view);
-        etDName = rootView.findViewById(R.id.etDName);
-        etAddress = rootView.findViewById(R.id.etAddress);
-        etEmail = rootView.findViewById(R.id.etEmail);
-        etPhoneNo = rootView.findViewById(R.id.etPhoneNo);
-        etPName = rootView.findViewById(R.id.etPName);
-        etAge = rootView.findViewById(R.id.etAge);
-        etWeight = rootView.findViewById(R.id.etWeight);
-        rgGender = rootView.findViewById(R.id.rgGender);
-        etDiagnosis = rootView.findViewById(R.id.etDiagnosis);
-        etNote = rootView.findViewById(R.id.etNote);
-        layout_add_med = rootView.findViewById(R.id.layout_add_med);
-        layout_main = rootView.findViewById(R.id.layout_main);
-        etMedType = rootView.findViewById(R.id.etMedType);
-        etMedName = rootView.findViewById(R.id.etMedName);
-        etMedDescription = rootView.findViewById(R.id.etMedDescription);
-        etMedQty = rootView.findViewById(R.id.etMedQty);
-        etMedDoses = rootView.findViewById(R.id.etMedDoses);
-        tvUpload = rootView.findViewById(R.id.tvUpload);
-        tvUpload.setOnClickListener(this);
-        etMedDoses.setOnClickListener(new View.OnClickListener() {
+        imgArrow1 = rootView.findViewById(R.id.imgArrow1);
+        recylcer_view_main = rootView.findViewById(R.id.recylcer_view_main);
+        recylcer_view_editable = rootView.findViewById(R.id.recylcer_view_editable1);
+
+        etDName1 = rootView.findViewById(R.id.etDName1);
+        etAddress1 = rootView.findViewById(R.id.etAddress1);
+        etEmail1 = rootView.findViewById(R.id.etEmail1);
+        etPhoneNo1 = rootView.findViewById(R.id.etPhoneNo1);
+        etPName1 = rootView.findViewById(R.id.etPName1);
+        etAge1 = rootView.findViewById(R.id.etAge1);
+        etWeight1 = rootView.findViewById(R.id.etWeight1);
+        rgGender1 = rootView.findViewById(R.id.rgGender1);
+        etDiagnosis1 = rootView.findViewById(R.id.etDiagnosis1);
+
+        layout_add_med1 = rootView.findViewById(R.id.layout_add_med1);
+        layout_main1 = rootView.findViewById(R.id.layout_main1);
+
+
+        etMedType1 = rootView.findViewById(R.id.etMedType1);
+        etMedName1 = rootView.findViewById(R.id.etMedName1);
+        etMedManufacturer1 = rootView.findViewById(R.id.etMedManufacturer1);
+        etMedDescription1 = rootView.findViewById(R.id.etMedDescription1);
+        etMedQty1 = rootView.findViewById(R.id.etMedQty1);
+        etMedDoses1 = rootView.findViewById(R.id.etMedDoses1);
+        spinnerType1 = (Spinner) rootView.findViewById(R.id.spinnerType1);
+
+        spinnerType1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                etMedType1.setText((String) spinnerType1.getSelectedItem());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        etMedType1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                spinnerType1.performClick();
+            }
+        });
+
+        etMedDoses1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final DialogMultipleChoiceAdapter adapter1 = new DialogMultipleChoiceAdapter(context, dosesList);
@@ -297,7 +495,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                                 String selectedDosage = TextUtils.join(", ", adapter1.getSelectedItemNames());
                                 Log.e(TAG, "onClick: selectedTableIds >> " + selectedDosesId);
                                 Log.e(TAG, "onClick: selectedDosage >> " + selectedDosage);
-                                etMedDoses.setText(selectedDosage);
+                                etMedDoses1.setText(selectedDosage);
                             }
                         })
                         .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -307,11 +505,13 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                         }).show();
             }
         });
-        btnSubmit.setOnClickListener(this);
-        tvAdd.setOnClickListener(this);
-        btnAdd.setOnClickListener(this);
-        btnCancel.setOnClickListener(this);
+        tvAdd1.setOnClickListener(this);
+        tvAdd2.setOnClickListener(this);
+        tvAdd3.setOnClickListener(this);
+        btnAdd1.setOnClickListener(this);
+        btnCancel1.setOnClickListener(this);
         imgArrow.setOnClickListener(this);
+        imgArrow1.setOnClickListener(this);
         initDoses();
     }
 
@@ -328,11 +528,58 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         dosesList.add(new DoseData("10", "Before Dinner"));
     }
 
-    private void setRecyclerView() {
-        recylcer_view.setLayoutManager(new LinearLayoutManager(context));
-        adapter = new PreMedicineItemAdapter(context, medList);
-        recylcer_view.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+    private void setRecyclerViewEditable() {
+        recylcer_view_editable.setLayoutManager(new LinearLayoutManager(context));
+        adapter_editable = new PreMedicineItemAdapterEditable(context, medListEditable,
+                new PreMedicineItemAdapterEditable.MyAdapterListenerEditable() {
+                    @Override
+                    public void removeItem(View v, int position) {
+                        Log.e(TAG, "setRecyclerViewEditable removeItem: ");
+                        medListEditable.remove(position);
+                        adapter_editable.notifyDataSetChanged();
+                        Log.e(TAG, "removeItem: medListMain >> " + medListMain);
+                        Log.e(TAG, "removeItem: medListEditable >> " + medListEditable);
+                    }
+
+                    @Override
+                    public void editItem(View v, int position, String qty) {
+                        medListEditable.get(position).setQuantity(qty);
+                    }
+                });
+
+        recylcer_view_editable.setAdapter(adapter_editable);
+        adapter_editable.notifyDataSetChanged();
+    }
+
+    private void setRecyclerViewMain() {
+        recylcer_view_main.setLayoutManager(new LinearLayoutManager(context));
+        adapter_main = new PreMedicineItemAdapterMain(context, medListMain,
+                new PreMedicineItemAdapterMain.MyAdapterListener() {
+                    @Override
+                    public void removeItem(View v, int position) {
+                        Log.e(TAG, "setRecyclerViewMain removeItem: ");
+                        medListMain.remove(position);
+                        adapter_main.notifyDataSetChanged();
+                        adapter_editable.notifyDataSetChanged();
+                        Log.e(TAG, "removeItem: medListMain >> main " + medListMain);
+                        Log.e(TAG, "removeItem: medListEditable >> main " + medListEditable);
+                    }
+
+                    @Override
+                    public void editItem(View v, int position) {
+                        isEdit = true;
+                        last_edit_position = position;
+                        etMedName1.setText(medListMain.get(position).getName());
+                        etMedType1.setText(medListMain.get(position).getType());
+                        etMedDescription1.setText(medListMain.get(position).getDescription());
+                        etMedQty1.setText(medListMain.get(position).getQuantity());
+                        etMedDoses1.setText(medListMain.get(position).getDoses());
+                        layout_main1.setVisibility(View.GONE);
+                        layout_add_med1.setVisibility(View.VISIBLE);
+                    }
+                });
+        recylcer_view_main.setAdapter(adapter_main);
+        adapter_main.notifyDataSetChanged();
     }
 
     @Override
@@ -355,64 +602,180 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btnSubmit:
-                if (TextUtils.isEmpty(image_base64))
-                    Toast.makeText(context, "Select Image", Toast.LENGTH_SHORT).show();
-                else {
-                    if (data == null)
-                        saveData();
-                    else
-                        updateData();
-                }
+            case R.id.tvAdd1:
+                layout_main1.setVisibility(View.GONE);
+                layout_add_med1.setVisibility(View.VISIBLE);
+                isEdit = false;
                 break;
-            case R.id.cardUpload:
+            case R.id.tvAdd2:
+                layout_main1.setVisibility(View.GONE);
+                layout_add_med1.setVisibility(View.VISIBLE);
+                isEdit = false;
                 break;
-            case R.id.tvUpload:
-                selectImage();
-                break;
-            case R.id.tvAdd:
-                layout_main.setVisibility(View.GONE);
-                layout_add_med.setVisibility(View.VISIBLE);
-                break;
-            case R.id.btnCancel:
-                layout_add_med.setVisibility(View.GONE);
-                layout_main.setVisibility(View.VISIBLE);
+            case R.id.btnCancel1:
+                isEdit = false;
+                layout_add_med1.setVisibility(View.GONE);
+                layout_main1.setVisibility(View.VISIBLE);
                 break;
             case R.id.imgArrow:
-                if (isExpand)
-                    behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                else
-                    behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 break;
-            case R.id.btnAdd:
-                layout_add_med.setVisibility(View.GONE);
-                layout_main.setVisibility(View.VISIBLE);
-                PreMedicineData data = new PreMedicineData();
-                data.setType(etMedType.getText().toString());
-                data.setName(etMedName.getText().toString());
-                data.setDescription(etMedDescription.getText().toString());
-                data.setQuantity(etMedQty.getText().toString());
-                data.setDoses(etMedDoses.getText().toString());
-                data.setDoses_id(selectedDosesId);
-                medList.add(data);
-                adapter.notifyDataSetChanged();
-                etMedType.setText("");
-                etMedName.setText("");
-                etMedDescription.setText("");
-                etMedQty.setText("");
-                etMedDoses.setText("");
-                selectedDosesId = "";
+            case R.id.btnAdd1:
+                PreMedicineData predata1;
+                if (TextUtils.isEmpty(etMedType1.getText().toString())) {
+                    Toast.makeText(context, "Select medicine type", Toast.LENGTH_SHORT).show();
+                    spinnerType1.performClick();
+                } else if (TextUtils.isEmpty(etMedName1.getText().toString())) {
+                    etMedName1.requestFocus();
+                    Toast.makeText(context, "Enter medicine name", Toast.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(etMedManufacturer1.getText().toString())) {
+                    etMedManufacturer1.requestFocus();
+                    Toast.makeText(context, "Enter medicine manufacturer", Toast.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(etMedDoses1.getText().toString())) {
+                    etMedDoses1.requestFocus();
+                    Toast.makeText(context, "Select medicine doses", Toast.LENGTH_SHORT).show();
+                } else if (isEdit) {
+                    layout_add_med1.setVisibility(View.GONE);
+                    layout_main1.setVisibility(View.VISIBLE);
+                    predata1 = medListMain.get(last_edit_position);
+                    predata1.setType(etMedType1.getText().toString());
+                    predata1.setName(etMedName1.getText().toString());
+                    predata1.setManufacturer(etMedManufacturer1.getText().toString());
+                    predata1.setDescription(etMedDescription1.getText().toString());
+                    predata1.setQuantity(etMedQty1.getText().toString());
+                    predata1.setDoses(etMedDoses1.getText().toString());
+                    predata1.setDoses_id(selectedDosesId);
+                    medListMain.set(last_edit_position, predata1);
+                    adapter_editable.notifyDataSetChanged();
+                    adapter_main.notifyDataSetChanged();
+                    etMedType1.setText("");
+                    etMedName1.setText("");
+                    etMedManufacturer1.setText("");
+                    etMedDescription1.setText("");
+                    etMedQty1.setText("");
+                    etMedDoses1.setText("");
+                    selectedDosesId = "";
+                } else {
+                    layout_add_med1.setVisibility(View.GONE);
+                    layout_main1.setVisibility(View.VISIBLE);
+                    predata1 = new PreMedicineData();
+                    predata1.setPresc_medicine_id("0");
+                    predata1.setType(etMedType1.getText().toString());
+                    predata1.setName(etMedName1.getText().toString());
+                    predata1.setManufacturer(etMedManufacturer1.getText().toString());
+                    predata1.setDescription(etMedDescription1.getText().toString());
+                    predata1.setQuantity(etMedQty1.getText().toString());
+                    predata1.setDoses(etMedDoses1.getText().toString());
+                    predata1.setDoses_id(selectedDosesId);
+                    medListMain.add(predata1);
+                    medListEditable.add(predata1);
+                    last_edit_position = 0;
+                    adapter_editable.notifyDataSetChanged();
+                    adapter_main.notifyDataSetChanged();
+                    etMedType1.setText("");
+                    etMedName1.setText("");
+                    etMedManufacturer1.setText("");
+                    etMedDescription1.setText("");
+                    etMedQty1.setText("");
+                    etMedDoses1.setText("");
+                    selectedDosesId = "";
+                }
+
+                break;
+            case R.id.btnContinueOrder:
+                if (medListEditable.size() == 0) {
+                    Toast.makeText(context, "Please add your medicines.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                PrescriptionData tempData = new PrescriptionData();
+                DoctorDetails dData = new DoctorDetails();
+                PatientDetails pData = new PatientDetails();
+
+
+                dData.setName(etDName1.getText().toString());
+                dData.setAddress(etAddress1.getText().toString());
+                dData.setEmail(etEmail1.getText().toString());
+                dData.setPhoneNo(etPhoneNo1.getText().toString());
+
+                pData.setName(etPName1.getText().toString());
+                pData.setAge(etAge1.getText().toString());
+                pData.setWeight(etWeight1.getText().toString());
+                pData.setGender(((RadioButton) rootView.findViewById(rgGender1.getCheckedRadioButtonId())).getText().toString());
+
+                if (data != null) {
+                    tempData.setPrescription_id(data.getPrescription_id());
+                    tempData.setPrescription_title(data.getPrescription_title());
+                    tempData.setImage(data.getImage());
+                } else {
+                    tempData.setPrescription_id("0");
+                    tempData.setPrescription_title("");
+                    tempData.setImage(image_base64);
+                }
+                tempData.setDoctorDetails(dData);
+                tempData.setPatientDetails(pData);
+                tempData.setMedicineDetails(medListMain);
+                tempData.setDiagnosisDetails(etDiagnosis1.getText().toString());
+                tempData.setNotes("");
+
+                CartActivity.selectedPresc = tempData;
+                Log.e(TAG, "onClick: CartActivity.selectedPresc  >> " + CartActivity.selectedPresc);
+                startActivity(new Intent(context, SelectAddressActivity.class));
+                break;
+            case R.id.btnOrderNow:
+                btnOrderNow.setVisibility(View.GONE);
+                bottomsheet_bottom.setVisibility(View.VISIBLE);
+                break;
+            case R.id.btnOrderWithDetail:
+                bsAction.setVisibility(View.GONE);
+                imgArrow.setVisibility(View.VISIBLE);
+                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                bottomSheetTop.setVisibility(View.GONE);
+                imgArrow1.setVisibility(View.GONE);
+                bsAction1.setVisibility(View.VISIBLE);
+                break;
+            case R.id.btnAddPD:
+                bottomSheetTop.setVisibility(View.VISIBLE);
+                bsAction1.setVisibility(View.GONE);
+                imgArrow1.setVisibility(View.VISIBLE);
+                behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                btnOrderNow.setVisibility(View.GONE);
+                bottomsheet_bottom.setVisibility(View.GONE);
+                break;
+            case R.id.imgArrow1:
+                bottomSheetTop.setVisibility(View.GONE);
+                bsAction1.setVisibility(View.VISIBLE);
+                imgArrow1.setVisibility(View.GONE);
+                btnOrderNow.setVisibility(View.VISIBLE);
+                bottomsheet_bottom.setVisibility(View.VISIBLE);
+                break;
+            case R.id.tvTabDoctor1:
+                tvTabDoctor1.setTextColor(getResources().getColor(R.color.colorPrimary));
+                tvTabPatient1.setTextColor(getResources().getColor(R.color.colorGray));
+                tvTabMedicine1.setTextColor(getResources().getColor(R.color.colorGray));
+                cardDoctor1.setVisibility(View.VISIBLE);
+                cardPatient1.setVisibility(View.GONE);
+                cardMedicines1.setVisibility(View.GONE);
+                btnAllPrev.setVisibility(View.GONE);
+                break;
+            case R.id.tvTabPatient1:
+                tvTabDoctor1.setTextColor(getResources().getColor(R.color.colorGray));
+                tvTabPatient1.setTextColor(getResources().getColor(R.color.colorPrimary));
+                tvTabMedicine1.setTextColor(getResources().getColor(R.color.colorGray));
+                cardDoctor1.setVisibility(View.GONE);
+                cardPatient1.setVisibility(View.VISIBLE);
+                cardMedicines1.setVisibility(View.GONE);
+                btnAllPrev.setVisibility(View.VISIBLE);
+                break;
+            case R.id.tvTabMedicine1:
+                tvTabDoctor1.setTextColor(getResources().getColor(R.color.colorGray));
+                tvTabPatient1.setTextColor(getResources().getColor(R.color.colorGray));
+                tvTabMedicine1.setTextColor(getResources().getColor(R.color.colorPrimary));
+                cardDoctor1.setVisibility(View.GONE);
+                cardPatient1.setVisibility(View.GONE);
+                cardMedicines1.setVisibility(View.VISIBLE);
+                btnAllPrev.setVisibility(View.VISIBLE);
                 break;
         }
-    }
-
-    private void updateData() {
-    }
-
-    private void saveData() {
-        Log.e(TAG, "saveData: ");
-        new UploadTask().execute();
-
     }
 
     private void showProgressDialog() {
@@ -516,8 +879,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                         e.printStackTrace();
                     }
                     imgThumb.setImageBitmap(bitmap);
-                    bottomSheet.setVisibility(View.VISIBLE);
-                    btnSubmit.setVisibility(View.VISIBLE);
+                    bottomsheet_bottom.setVisibility(View.VISIBLE);
                     new ImageTask().execute(bitmap);
 
                 } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
@@ -534,11 +896,12 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                 .setAspectRatio(3, 4)
                 .setOutputCompressQuality(50)
                 .setRequestedSize(768, 1024)
-                .setScaleType(CropImageView.ScaleType.CENTER_INSIDE)
+                .setScaleType(CropImageView.ScaleType.FIT_CENTER)
+                .setAutoZoomEnabled(false)
                 .start(getContext(), this);
     }
 
-    class UploadTask extends AsyncTask<Void, String, Void> {
+    class SaveTask extends AsyncTask<Void, String, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -548,18 +911,18 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         @Override
         protected Void doInBackground(Void... voids) {
             final JsonObject jsonDoctor = new JsonObject();
-            jsonDoctor.addProperty("name", etDName.getText().toString());
-            jsonDoctor.addProperty("address", etAddress.getText().toString());
-            jsonDoctor.addProperty("email", etEmail.getText().toString());
-            jsonDoctor.addProperty("phone_no", etPhoneNo.getText().toString());
+            jsonDoctor.addProperty("name", etDName1.getText().toString());
+            jsonDoctor.addProperty("address", etAddress1.getText().toString());
+            jsonDoctor.addProperty("email", etEmail1.getText().toString());
+            jsonDoctor.addProperty("phone_no", etPhoneNo1.getText().toString());
 
             JsonObject jsonPatient = new JsonObject();
-            jsonPatient.addProperty("name", etPName.getText().toString());
-            jsonPatient.addProperty("age", etAge.getText().toString());
-            jsonPatient.addProperty("weight", etWeight.getText().toString());
-            jsonPatient.addProperty("gender", "" + ((RadioButton) rootView.findViewById(rgGender.getCheckedRadioButtonId())).getText());
+            jsonPatient.addProperty("name", etPName1.getText().toString());
+            jsonPatient.addProperty("age", etAge1.getText().toString());
+            jsonPatient.addProperty("weight", etWeight1.getText().toString());
+            jsonPatient.addProperty("gender", "" + ((RadioButton) rootView.findViewById(rgGender1.getCheckedRadioButtonId())).getText());
 
-            JsonArray jsonMedicine = new GsonBuilder().create().toJsonTree(medList).getAsJsonArray();
+            JsonArray jsonMedicine = new GsonBuilder().create().toJsonTree(medListMain).getAsJsonArray();
 
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("method", AppConstants.METHODS.ADD_PRESCRIPTION);
@@ -568,26 +931,25 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
             jsonObject.add("doctor_details", jsonDoctor);
             jsonObject.add("patient_details", jsonPatient);
             jsonObject.add("medicine_details", jsonMedicine);
-            jsonObject.addProperty("diagnosis_details", etDiagnosis.getText().toString());
-            jsonObject.addProperty("notes", etNote.getText().toString());
+            jsonObject.addProperty("diagnosis_details", etDiagnosis1.getText().toString());
+            jsonObject.addProperty("notes", "");
 
-            Log.e(TAG, "UploadTask: Request >> " + jsonObject.toString());
+            Log.e(TAG, "SaveTask: Request >> " + jsonObject.toString());
 
             MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
             Call<JsonObject> call = apiService.order(jsonObject);
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    Log.e(TAG, "UploadTask: Response >> " + response.body().toString());
+                    Log.e(TAG, "SaveTask: Response >> " + response.body().toString());
                     String resp = response.body().toString();
                     try {
                         JSONObject jsonObject = new JSONObject(resp);
                         if (jsonObject.getString("status").equalsIgnoreCase("200")) {
                             JSONObject jsonObject1 = jsonObject.getJSONArray("result").getJSONObject(0);
                             PrescriptionData newData = new Gson().fromJson(String.valueOf(jsonObject1), PrescriptionData.class);
-                            CartActivity.selectedPresc = newData;
-                            AppPreferences.setSelectedPresId(context, newData.getPrescription_id());
-                            Log.e(TAG, "onResponse: newData >> " + newData);
+                            data = newData;
+                            Log.e(TAG, "onResponse: data >> " + data);
                             publishProgress("200", "");
                         } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
                             String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
@@ -611,15 +973,105 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
             hideProgressDialog();
-            adapter.notifyDataSetChanged();
+            adapter_editable.notifyDataSetChanged();
             String status = values[0];
             String msg = values[1];
             if (status.equalsIgnoreCase("200")) {
-                if (from == null) {
-                    getActivity().onBackPressed();
-                } else if (from.equalsIgnoreCase("new")) {
-                    startActivity(new Intent(context, SelectAddressActivity.class));
-                } else getActivity().onBackPressed();
+                Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+                bottomSheetTop.setVisibility(View.GONE);
+                bsAction1.setVisibility(View.VISIBLE);
+                imgArrow1.setVisibility(View.GONE);
+                btnOrderNow.setVisibility(View.VISIBLE);
+                bottomsheet_bottom.setVisibility(View.VISIBLE);
+            } else if (status.equalsIgnoreCase("400")) {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    class UpdateTask extends AsyncTask<Void, String, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            final JsonObject jsonDoctor = new JsonObject();
+            jsonDoctor.addProperty("name", etDName1.getText().toString());
+            jsonDoctor.addProperty("address", etAddress1.getText().toString());
+            jsonDoctor.addProperty("email", etEmail1.getText().toString());
+            jsonDoctor.addProperty("phone_no", etPhoneNo1.getText().toString());
+
+            JsonObject jsonPatient = new JsonObject();
+            jsonPatient.addProperty("name", etPName1.getText().toString());
+            jsonPatient.addProperty("age", etAge1.getText().toString());
+            jsonPatient.addProperty("weight", etWeight1.getText().toString());
+            jsonPatient.addProperty("gender", "" + ((RadioButton) rootView.findViewById(rgGender1.getCheckedRadioButtonId())).getText());
+
+            JsonArray jsonMedicine = new GsonBuilder().create().toJsonTree(medListMain).getAsJsonArray();
+
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.UPDATE_PRESCRIPTION);
+            jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
+            jsonObject.addProperty("prescription_id", data.getPrescription_id());
+            jsonObject.addProperty("image", "");
+            jsonObject.add("doctor_details", jsonDoctor);
+            jsonObject.add("patient_details", jsonPatient);
+            jsonObject.add("medicine_details", jsonMedicine);
+            jsonObject.addProperty("diagnosis_details", etDiagnosis1.getText().toString());
+            jsonObject.addProperty("notes", "");
+
+            Log.e(TAG, "UpdateTask: Request >> " + jsonObject.toString());
+
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.order(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "UpdateTask: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            JSONObject jsonObject1 = jsonObject.getJSONArray("result").getJSONObject(0);
+                            PrescriptionData newData = new Gson().fromJson(String.valueOf(jsonObject1), PrescriptionData.class);
+                            //data = newData;
+                            Log.e(TAG, "onResponse: data >> " + newData);
+                            publishProgress("200", "");
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getActivity().getResources().getString(R.string.api_error_msg));
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    publishProgress("400", getResources().getString(R.string.api_error_msg));
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            hideProgressDialog();
+            adapter_editable.notifyDataSetChanged();
+            String status = values[0];
+            String msg = values[1];
+            if (status.equalsIgnoreCase("200")) {
+                Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+                bottomSheetTop.setVisibility(View.GONE);
+                bsAction1.setVisibility(View.VISIBLE);
+                imgArrow1.setVisibility(View.GONE);
+                btnOrderNow.setVisibility(View.VISIBLE);
+                bottomsheet_bottom.setVisibility(View.VISIBLE);
             } else if (status.equalsIgnoreCase("400")) {
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }
@@ -651,6 +1103,4 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
             hideProgressDialog();
         }
     }
-
-
 }

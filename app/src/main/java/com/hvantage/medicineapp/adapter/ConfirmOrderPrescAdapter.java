@@ -64,11 +64,15 @@ public class ConfirmOrderPrescAdapter extends RecyclerView.Adapter<ConfirmOrderP
         else
             holder.tvDate.setText(Functions.getCurrentDate());
         if (!data.getImage().equalsIgnoreCase("")) {
-            Glide.with(context)
-                    .load(data.getImage())
-                    .placeholder(R.drawable.action_upload_rx)
-                    .crossFade()
-                    .into(holder.imgThumb);
+            if (data.getImage().contains("http"))
+                Glide.with(context)
+                        .load(data.getImage())
+                        .placeholder(R.drawable.action_upload_rx)
+                        .crossFade()
+                        .into(holder.imgThumb);
+            else {
+                holder.imgThumb.setImageBitmap(Functions.base64ToBitmap(data.getImage()));
+            }
         }
 
         holder.imgRemove.setOnClickListener(new View.OnClickListener() {

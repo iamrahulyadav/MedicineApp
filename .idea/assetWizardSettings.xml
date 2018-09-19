@@ -101,7 +101,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/maps/ic_local_offer_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/image/ic_edit_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -111,8 +111,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="111111" />
-                            <entry key="outputName" value="ic_local_offer_black_24dp" />
+                            <entry key="color" value="a9a9a9" />
+                            <entry key="outputName" value="ic_edit_black_24dp" />
                             <entry key="sourceFile" value="C:\Users\Hvantage" />
                           </map>
                         </option>

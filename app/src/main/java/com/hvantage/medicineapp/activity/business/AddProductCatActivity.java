@@ -463,8 +463,8 @@ public class AddProductCatActivity extends AppCompatActivity implements View.OnC
                 .setMultiTouchEnabled(false)
                 .setAspectRatio(1, 1)
                 .setOutputCompressQuality(100)
-//                .setRequestedSize(200, 200)
-                .setScaleType(CropImageView.ScaleType.CENTER_INSIDE)
+                .setScaleType(CropImageView.ScaleType.FIT_CENTER)
+                .setAutoZoomEnabled(false)
                 .start(this);
     }
 

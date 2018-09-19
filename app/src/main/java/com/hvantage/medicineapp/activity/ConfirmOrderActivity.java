@@ -33,14 +33,18 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.CartItemAdapter;
+import com.hvantage.medicineapp.adapter.CartMedicineItemAdapter;
 import com.hvantage.medicineapp.adapter.ConfirmOrderPrescAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.AddressData;
 import com.hvantage.medicineapp.model.CartData;
+import com.hvantage.medicineapp.model.PreMedicineData;
 import com.hvantage.medicineapp.model.PrescriptionData;
 import com.hvantage.medicineapp.model.ProductData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
@@ -76,24 +80,22 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private Double taxes = 0.0;
     private Double delivery_fee = 10.0;
     private String payment_mode = "Cash On Delivery";
-    private RecyclerView recylcer_view;
+    private RecyclerView recylcer_view, recylcer_view_items, recylcer_view_medicines;
     private ConfirmOrderPrescAdapter adapterPres;
     private CartItemAdapter adapterCart;
-    private double total = 0;
-    private RecyclerView recylcer_view_items;
-    private int spacing = 30, spanCount = 3;
-    private boolean includeEdge = true;
     private String selected_pres_id = "", selected_add_id = "";
     private EditText etNote;
     private RadioGroup rgOrderType;
     private String orderType = "1";
     private ArrayList<CartData> cartList = new ArrayList<CartData>();
+    private ArrayList<PreMedicineData> medList = new ArrayList<PreMedicineData>();
     private double payable_amt = 0.0, subtotal_amt = 0.0;
     private ArrayList<PrescriptionData> prescList = new ArrayList<PrescriptionData>();
     private ArrayList<ProductData> list = new ArrayList<ProductData>();
     private AppCompatAutoCompleteTextView etSearch;
     private SearchBarAdapter adapter;
     private boolean prescription_required = false;
+    private CartMedicineItemAdapter adapterMedicine;
 
     class CartUpdateReciever extends BroadcastReceiver {
         @Override
@@ -216,6 +218,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private void init() {
         recylcer_view_items = (RecyclerView) findViewById(R.id.recylcer_view_items);
         recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
+        recylcer_view_medicines = (RecyclerView) findViewById(R.id.recylcer_view_medicines);
         etSearch = (AppCompatAutoCompleteTextView) findViewById(R.id.etSearch);
         llPrescription = (LinearLayout) findViewById(R.id.llPrescription);
         etNote = (EditText) findViewById(R.id.etNote);
@@ -287,6 +290,13 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         adapterCart.notifyDataSetChanged();
     }
 
+    private void setRecyclerViewMedicine() {
+        adapterMedicine = new CartMedicineItemAdapter(context, medList);
+        recylcer_view_medicines.setLayoutManager(new LinearLayoutManager(context));
+        recylcer_view_medicines.setAdapter(adapterMedicine);
+        adapterMedicine.notifyDataSetChanged();
+    }
+
     private void showProgressDialog() {
         progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
             @Override
@@ -315,9 +325,9 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         switch (v.getId()) {
             case R.id.tvCheckout:
                 if (Functions.isConnectingToInternet(context)) {
-                    if (prescription_required == true && AppPreferences.getSelectedPresId(context).equalsIgnoreCase("") && CartActivity.selectedPresc == null) {
+                    if (prescription_required == true && CartActivity.selectedPresc == null) {
                         showUploadRxDialog();
-                    } else if (AppPreferences.getSelectedPresId(context).equalsIgnoreCase("")) {
+                    } else if (CartActivity.selectedPresc == null) {
                         new OrderTaskWithout().execute();
                     } else {
                         new OrderTask().execute();
@@ -381,6 +391,9 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             llPrescription.setVisibility(View.VISIBLE);
             llAmount.setVisibility(View.GONE);
             llPayMode.setVisibility(View.GONE);
+            medList = CartActivity.selectedPresc.getMedicineDetails();
+            Log.e(TAG, "onResume: medList >> " + medList);
+            setRecyclerViewMedicine();
         } else {
             llPrescription.setVisibility(View.GONE);
             llAmount.setVisibility(View.VISIBLE);
@@ -398,15 +411,19 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         @Override
         protected Void doInBackground(Void... voids) {
             JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("method", AppConstants.METHODS.PLACE_ORDER_WITH_PRESCRIPTION);
+//            jsonObject.addProperty("method", AppConstants.METHODS.PLACE_ORDER_WITH_PRESCRIPTION);
+            jsonObject.addProperty("method", AppConstants.METHODS.PLACEORDERWITHPRESCRIPTION);
             jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
-            jsonObject.addProperty("prescription_id", selected_pres_id);
+            jsonObject.add("prescription_data", new Gson().toJsonTree(CartActivity.selectedPresc));
             jsonObject.addProperty("address_id", selected_add_id);
             jsonObject.addProperty("order_type", selected_add_id);
             jsonObject.addProperty("payment_mode", orderType);
             jsonObject.addProperty("payment_type", "cash");
             jsonObject.addProperty("note", etNote.getText().toString());
-            jsonObject.add("additional_items", new GsonBuilder().create().toJsonTree(cartList).getAsJsonArray());
+            if (cartList == null)
+                jsonObject.add("additional_items", new JsonArray());
+            else
+                jsonObject.add("additional_items", new GsonBuilder().create().toJsonTree(cartList).getAsJsonArray());
             jsonObject.addProperty("payable_amount", 0);
             jsonObject.addProperty("cod_charges ", 0);
             jsonObject.addProperty("gst_tax_amt", 0);
@@ -453,7 +470,6 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             String msg = values[1];
             if (status.equalsIgnoreCase("200")) {
                 dialogOrderSent();
-
 //                startActivity(new Intent(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
             } else if (status.equalsIgnoreCase("400")) {
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();

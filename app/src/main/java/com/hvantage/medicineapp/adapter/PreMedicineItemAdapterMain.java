@@ -17,20 +17,18 @@ import com.hvantage.medicineapp.model.PreMedicineData;
 
 import java.util.ArrayList;
 
-public class PreMedicineItemAdapter extends RecyclerView.Adapter<PreMedicineItemAdapter.ViewHolder> {
+public class PreMedicineItemAdapterMain extends RecyclerView.Adapter<PreMedicineItemAdapterMain.ViewHolder> {
 
     private static final String TAG = "PreMedicineItemAdapter";
-    private String edit_status = "edit";
     private MyAdapterListener listener;
     Context context;
     ArrayList<PreMedicineData> arrayList;
 
 
-    public PreMedicineItemAdapter(Context context, ArrayList<PreMedicineData> arrayList, MyAdapterListener listener, String edit_status) {
+    public PreMedicineItemAdapterMain(Context context, ArrayList<PreMedicineData> arrayList, MyAdapterListener listener) {
         this.context = context;
         this.arrayList = arrayList;
         this.listener = listener;
-        this.edit_status = edit_status;
     }
 
     @Override
@@ -46,6 +44,7 @@ public class PreMedicineItemAdapter extends RecyclerView.Adapter<PreMedicineItem
         Log.d(TAG, position + " data : " + data);
         holder.tvMedType.setText(data.getType());
         holder.tvMedName.setText(data.getName());
+        holder.tvMedManufacturer.setText(data.getManufacturer());
         holder.tvMedDescription.setText(data.getDescription());
         holder.tvMedQty.setText(data.getQuantity());
         holder.tvMedDoses.setText(data.getDoses());
@@ -72,17 +71,13 @@ public class PreMedicineItemAdapter extends RecyclerView.Adapter<PreMedicineItem
                 }
             });
 
-            if (edit_status.equalsIgnoreCase("edit")) {
-                holder.imgEdit.setVisibility(View.VISIBLE);
-                holder.imgEdit.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        listener.editItem(v, position);
-                    }
-                });
-            } else {
-                holder.imgEdit.setVisibility(View.GONE);
-            }
+            holder.imgEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+                    listener.editItem(v, position);
+                }
+            });
+
         } else {
             holder.imgEdit.setVisibility(View.GONE);
             holder.imgRemove.setVisibility(View.GONE);
@@ -110,7 +105,7 @@ public class PreMedicineItemAdapter extends RecyclerView.Adapter<PreMedicineItem
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvMedType, tvMedName, tvMedDescription, tvMedQty, tvMedDoses;
+        TextView tvMedType, tvMedName, tvMedManufacturer, tvMedDescription, tvMedQty, tvMedDoses;
         ImageView imgRemove, imgEdit, imgHideShow;
         LinearLayout llHideShow;
 
@@ -118,6 +113,7 @@ public class PreMedicineItemAdapter extends RecyclerView.Adapter<PreMedicineItem
             super(itemView);
             tvMedType = (TextView) itemView.findViewById(R.id.tvMedType);
             tvMedName = (TextView) itemView.findViewById(R.id.tvMedName);
+            tvMedManufacturer = (TextView) itemView.findViewById(R.id.tvMedManufacturer);
             tvMedDescription = (TextView) itemView.findViewById(R.id.tvMedDescription);
             tvMedQty = (TextView) itemView.findViewById(R.id.tvMedQty);
             tvMedDoses = (TextView) itemView.findViewById(R.id.tvMedDoses);

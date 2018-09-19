@@ -313,11 +313,11 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     private void saveData() {
         if (TextUtils.isEmpty(etName.getText().toString()))
             Snackbar.make(findViewById(android.R.id.content), "Enter Your Name", Snackbar.LENGTH_SHORT).show();
-        /*else if (TextUtils.isEmpty(etEmail.getText().toString()))
+        else if (TextUtils.isEmpty(etEmail.getText().toString()))
             Snackbar.make(findViewById(android.R.id.content), "Enter Email", Snackbar.LENGTH_SHORT).show();
         else if (!Functions.isEmailValid(etEmail))
             Snackbar.make(findViewById(android.R.id.content), "Invalid Email", Snackbar.LENGTH_SHORT).show();
-        else if (TextUtils.isEmpty(etPassword.getText().toString()))
+        /*else if (TextUtils.isEmpty(etPassword.getText().toString()))
             Snackbar.make(findViewById(android.R.id.content), "Enter Password", Snackbar.LENGTH_SHORT).show();
         */
         else {

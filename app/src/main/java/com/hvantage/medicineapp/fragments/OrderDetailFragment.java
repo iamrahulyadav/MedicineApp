@@ -20,16 +20,16 @@ import android.widget.TextView;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.OrderDetailItemAdapter;
 import com.hvantage.medicineapp.adapter.OrderDetailPresAdapter;
-import com.hvantage.medicineapp.model.AddressData;
-import com.hvantage.medicineapp.model.CartModel;
+import com.hvantage.medicineapp.model.Item;
 import com.hvantage.medicineapp.model.OrderData;
-import com.hvantage.medicineapp.model.PrescriptionModel;
+import com.hvantage.medicineapp.model.PrescriptionData;
 import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.GridSpacingItemDecoration;
 import com.hvantage.medicineapp.util.ProgressBar;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class OrderDetailFragment extends Fragment implements View.OnClickListener {
@@ -41,7 +41,7 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
     private View rootView;
     private FragmentIntraction intraction;
     private OrderDetailItemAdapter adapter;
-    private ArrayList<CartModel> list = new ArrayList<CartModel>();
+    private List<Item> list = new ArrayList<Item>();
     private ProgressBar progressBar;
     private OrderData data;
     private CardView cardEmptyText;
@@ -50,7 +50,7 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
     private LinearLayout llAmount;
     private RecyclerView recylcer_view_precs;
     private OrderDetailPresAdapter adapterPres;
-    private ArrayList<PrescriptionModel> presList = new ArrayList<PrescriptionModel>();
+    private List<PrescriptionData> presList = new ArrayList<PrescriptionData>();
 
     @Nullable
     @Override
@@ -61,30 +61,30 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
             intraction.actionbarsetTitle("Order Detail");
         }
         if (getArguments() != null) {
-            data = (OrderData) getArguments().getSerializable("data");
+            data = (OrderData) getArguments().getParcelable("data");
             Log.e(TAG, "onCreateView: data >> " + data);
         }
 
         init();
         //setRecyclerView();
         if (data != null) {
-            tvOrderID.setText("ORD" + data.getKey().replace(",", ""));
-            tvStatus.setText(data.getStatus());
-            tvDateTime.setText(data.getDate() + ", " + data.getTime());
-            tvPayableAmt1.setText("Rs. " + data.getPayable_amount());
-            tvPayableAmt.setText("Rs. " + data.getPayable_amount());
-            tvTotalPrice.setText("Rs. " + data.getPayable_amount());
-            tvPayMode.setText(data.getPayment_mode());
-            AddressData deliveryData = data.getDelivery_details();
+            tvOrderID.setText("ORD" + data.getOrderId().replace(",", ""));
+            tvStatus.setText(data.getOrderStatus());
+            tvDateTime.setText(data.getDatdateTimee());
+            tvPayableAmt1.setText("Rs. " + data.getPayableAmount());
+            tvPayableAmt.setText("Rs. " + data.getPayableAmount());
+            tvTotalPrice.setText("Rs. " + data.getTotalAmount());
+            tvPayMode.setText(data.getPaymentMode());
+           /* AddressData deliveryData = data.getDelivery_details();
 
             tvAddress1.setText(deliveryData.getName() + ", " + deliveryData.getContactNo());
             tvAddress2.setText(deliveryData.getAddress() + ", " + deliveryData.getLandmark());
             tvAddress3.setText(deliveryData.getCity() + ", " + deliveryData.getPincode());
-            tvAddress4.setText(deliveryData.getState() + ", " + "India");
+            tvAddress4.setText(deliveryData.getState() + ", " + "India");*/
 
             list = data.getItems();
-            presList = data.getPrescriptions();
-            if (data.getOrder_type().equalsIgnoreCase(String.valueOf(AppPreferences.getOrderType(context))))
+            presList = data.getPrescription();
+            if (data.getOrderType().equalsIgnoreCase(String.valueOf(AppPreferences.getOrderType(context))))
                 llAmount.setVisibility(View.GONE);
             else
                 llAmount.setVisibility(View.VISIBLE);

@@ -3,7 +3,10 @@ package com.hvantage.medicineapp.adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,25 +20,23 @@ import com.hvantage.medicineapp.model.PreMedicineData;
 
 import java.util.ArrayList;
 
-public class PreMedicineItemAdapter extends RecyclerView.Adapter<PreMedicineItemAdapter.ViewHolder> {
+public class PreMedicineItemAdapterEditable extends RecyclerView.Adapter<PreMedicineItemAdapterEditable.ViewHolder> {
 
     private static final String TAG = "PreMedicineItemAdapter";
-    private String edit_status = "edit";
-    private MyAdapterListener listener;
+    private MyAdapterListenerEditable listener;
     Context context;
     ArrayList<PreMedicineData> arrayList;
 
 
-    public PreMedicineItemAdapter(Context context, ArrayList<PreMedicineData> arrayList, MyAdapterListener listener, String edit_status) {
+    public PreMedicineItemAdapterEditable(Context context, ArrayList<PreMedicineData> arrayList, MyAdapterListenerEditable listener) {
         this.context = context;
         this.arrayList = arrayList;
         this.listener = listener;
-        this.edit_status = edit_status;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.premedicine_item_layout, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.premedicine_item_layout_editable, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }
@@ -46,8 +47,9 @@ public class PreMedicineItemAdapter extends RecyclerView.Adapter<PreMedicineItem
         Log.d(TAG, position + " data : " + data);
         holder.tvMedType.setText(data.getType());
         holder.tvMedName.setText(data.getName());
+        holder.tvMedManufacturer.setText(data.getManufacturer());
         holder.tvMedDescription.setText(data.getDescription());
-        holder.tvMedQty.setText(data.getQuantity());
+        holder.etMedQty.setText(data.getQuantity());
         holder.tvMedDoses.setText(data.getDoses());
         if (listener != null) {
             holder.imgRemove.setOnClickListener(new View.OnClickListener() {
@@ -72,19 +74,7 @@ public class PreMedicineItemAdapter extends RecyclerView.Adapter<PreMedicineItem
                 }
             });
 
-            if (edit_status.equalsIgnoreCase("edit")) {
-                holder.imgEdit.setVisibility(View.VISIBLE);
-                holder.imgEdit.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        listener.editItem(v, position);
-                    }
-                });
-            } else {
-                holder.imgEdit.setVisibility(View.GONE);
-            }
         } else {
-            holder.imgEdit.setVisibility(View.GONE);
             holder.imgRemove.setVisibility(View.GONE);
         }
 
@@ -100,6 +90,23 @@ public class PreMedicineItemAdapter extends RecyclerView.Adapter<PreMedicineItem
                 }
             }
         });
+
+        holder.etMedQty.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                listener.editItem(null, position, s + "");
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
 
@@ -110,29 +117,29 @@ public class PreMedicineItemAdapter extends RecyclerView.Adapter<PreMedicineItem
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvMedType, tvMedName, tvMedDescription, tvMedQty, tvMedDoses;
-        ImageView imgRemove, imgEdit, imgHideShow;
+        TextView tvMedType, tvMedName, tvMedManufacturer, tvMedDescription, tvMedDoses;
+        ImageView imgRemove, imgHideShow;
         LinearLayout llHideShow;
+        AppCompatEditText etMedQty;
 
         public ViewHolder(View itemView) {
             super(itemView);
             tvMedType = (TextView) itemView.findViewById(R.id.tvMedType);
             tvMedName = (TextView) itemView.findViewById(R.id.tvMedName);
+            tvMedManufacturer = (TextView) itemView.findViewById(R.id.tvMedManufacturer);
             tvMedDescription = (TextView) itemView.findViewById(R.id.tvMedDescription);
-            tvMedQty = (TextView) itemView.findViewById(R.id.tvMedQty);
+            etMedQty = (AppCompatEditText) itemView.findViewById(R.id.etMedQty);
             tvMedDoses = (TextView) itemView.findViewById(R.id.tvMedDoses);
             imgRemove = (ImageView) itemView.findViewById(R.id.imgRemove);
-            imgEdit = (ImageView) itemView.findViewById(R.id.imgEdit);
             imgHideShow = (ImageView) itemView.findViewById(R.id.imgHideShow);
             llHideShow = (LinearLayout) itemView.findViewById(R.id.llHideShow);
-
         }
     }
 
-    public interface MyAdapterListener {
+    public interface MyAdapterListenerEditable {
         void removeItem(View v, int position);
 
-        void editItem(View v, int position);
+        void editItem(View v, int position, String qty);
 
     }
 

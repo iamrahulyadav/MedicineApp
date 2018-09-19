@@ -3,9 +3,7 @@ package com.hvantage.medicineapp.adapter;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,21 +14,21 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.model.PrescriptionModel;
-import com.hvantage.medicineapp.util.Functions;
+import com.hvantage.medicineapp.model.PrescriptionData;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.TouchImageView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class OrderDetailPresAdapter extends RecyclerView.Adapter<OrderDetailPresAdapter.ViewHolder> {
 
     private static final String TAG = "OrderDetailPresAdapter";
     Context context;
-    ArrayList<PrescriptionModel> arrayList;
+    List<PrescriptionData> arrayList;
     private ProgressBar progressBar;
 
-    public OrderDetailPresAdapter(Context context, ArrayList<PrescriptionModel> arrayList) {
+    public OrderDetailPresAdapter(Context context, List<PrescriptionData> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
     }
@@ -44,17 +42,14 @@ public class OrderDetailPresAdapter extends RecyclerView.Adapter<OrderDetailPres
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final PrescriptionModel data = arrayList.get(position);
+        final PrescriptionData data = arrayList.get(position);
         Log.d(TAG, "onBindViewHolder: data >> " + data);
-        byte[] imageByteArray = Base64.decode(data.getImage_base64(), Base64.DEFAULT);
-        Glide.with(context)
-                .load(imageByteArray)
-                .crossFade()
-                .centerCrop()
-                .override(100, 100)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(holder.image);
-//        holder.image.setImageBitmap(data);
+        if (!data.getImage().equalsIgnoreCase(""))
+            Glide.with(context)
+                    .load(data.getImage())
+                    .crossFade()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(holder.image);
 
 
         holder.image.setOnClickListener(new View.OnClickListener() {
@@ -62,7 +57,7 @@ public class OrderDetailPresAdapter extends RecyclerView.Adapter<OrderDetailPres
             public void onClick(View view) {
                 Log.e(TAG, "onBindViewHolder: data >> " + data);
                 // context.startActivity(new Intent(context, PrescPreviewActivity.class).putExtra("prescription_data", data));
-                showPreviewDialog(Functions.base64ToBitmap(data.getImage_base64()));
+                showPreviewDialog(data.getImage());
             }
         });
     }
@@ -82,7 +77,7 @@ public class OrderDetailPresAdapter extends RecyclerView.Adapter<OrderDetailPres
     }
 
 
-    private void showPreviewDialog(Bitmap bitmap) {
+    private void showPreviewDialog(String url) {
         Dialog dialog1 = new Dialog(context, R.style.image_preview_dialog);
         dialog1.setContentView(R.layout.image_preview_layout);
         Window window = dialog1.getWindow();
@@ -91,7 +86,12 @@ public class OrderDetailPresAdapter extends RecyclerView.Adapter<OrderDetailPres
         dialog1.setCanceledOnTouchOutside(true);
         TouchImageView imgPreview = (TouchImageView) dialog1.findViewById(R.id.imgPreview);
         imgPreview.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        imgPreview.setImageBitmap(bitmap);
+        if (!url.equalsIgnoreCase(""))
+            Glide.with(context)
+                    .load(url)
+                    .crossFade()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(imgPreview);
         dialog1.show();
     }
 

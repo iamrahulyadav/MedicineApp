@@ -35,9 +35,9 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final OrderData data = arrayList.get(position);
         Log.e(TAG, position + " data : " + data);
-        holder.tvDate.setText(data.getDate());
-        holder.tvStatus.setText(data.getStatus());
-        holder.tvID.setText("ORD" + data.getKey().replace("-", ""));
+        holder.tvDate.setText(data.getDatdateTimee());
+        holder.tvStatus.setText(data.getOrderStatus());
+        holder.tvID.setText("ORD" + data.getOrderId().replace("-", ""));
     }
 
 

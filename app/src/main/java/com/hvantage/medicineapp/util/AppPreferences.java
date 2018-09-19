@@ -76,14 +76,14 @@ public class AppPreferences {
         SharedPreferences preferences = context.getSharedPreferences(
                 PREFERENCES, 0);
         Editor editor = preferences.edit();
-        editor.putInt(MOBILE_NO, value);
+        editor.putInt(ORDER_TYPE, value);
         editor.commit();
     }
 
     public static int getOrderType(Context context) {
         SharedPreferences pereference = context.getSharedPreferences(
                 PREFERENCES, 0);
-        return pereference.getInt(MOBILE_NO, 0);
+        return pereference.getInt(ORDER_TYPE, 0);
     }
 
     public static void setSelectedPresId(Context context, String value) {
@@ -120,6 +120,4 @@ public class AppPreferences {
         editor.clear();
         editor.commit();
     }
-
-
 }

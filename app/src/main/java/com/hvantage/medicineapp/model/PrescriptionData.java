@@ -27,7 +27,7 @@ public class PrescriptionData implements Parcelable {
     private String prescription_id;
     @SerializedName("prescription_title")
     @Expose
-    private String prescription_title;
+    private String prescription_title = "";
     @SerializedName("date")
     @Expose
     private String date;

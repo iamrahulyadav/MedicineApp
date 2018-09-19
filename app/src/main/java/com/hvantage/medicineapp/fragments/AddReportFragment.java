@@ -311,7 +311,8 @@ public class AddReportFragment extends Fragment implements View.OnClickListener 
                 .setAspectRatio(3, 4)
                 .setOutputCompressQuality(50)
                 .setRequestedSize(768, 1024)
-                .setScaleType(CropImageView.ScaleType.CENTER_INSIDE)
+                .setScaleType(CropImageView.ScaleType.FIT_CENTER)
+                .setAutoZoomEnabled(false)
                 .start(getContext(), this);
     }
 

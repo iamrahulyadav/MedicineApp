@@ -67,6 +67,18 @@
         <item>20</item>
     </string-array>
 
+    <string-array name="medicine_types">
+        <item>Tablet</item>
+        <item>Capsule</item>
+        <item>Syrup</item>
+        <item>Injection</item>
+        <item>Drop</item>
+        <item>Soap</item>
+        <item>Gel</item>
+        <item>Cream</item>
+        <item>Lotion</item>
+    </string-array>
+
     <string-array name="doses">
         <item>After Wake-Up</item>
         <item>Before Sleeping</item>

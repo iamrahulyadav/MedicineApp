@@ -1,146 +1,264 @@
 package com.hvantage.medicineapp.model;
 
-import java.io.Serializable;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
+import java.util.List;
 
-public class OrderData implements Serializable {
+public class OrderData implements Parcelable {
 
-    private AddressData delivery_details;
-    private ArrayList<PrescriptionModel> prescriptions = new ArrayList<PrescriptionModel>();
-    private ArrayList<CartModel> items = new ArrayList<CartModel>();
-    private String item_total;
-    private String delivery_fee;
-    private String taxes;
-    private String total_amount;
-    private String payable_amount;
-    private String date;
-    private String time;
-    private String order_type;
-    private String payment_mode;
-    private String status;
-    private String by;
-    private String key;
+    @SerializedName("order_id")
+    @Expose
+    private String orderId;
+    @SerializedName("address")
+    @Expose
+    private String address;
+    @SerializedName("note")
+    @Expose
+    private String note;
+    @SerializedName("order_type")
+    @Expose
+    private String orderType;
+    @SerializedName("order_status")
+    @Expose
+    private String orderStatus;
+    @SerializedName("total_amount")
+    @Expose
+    private String totalAmount;
+    @SerializedName("payment_mode")
+    @Expose
+    private String paymentMode;
+    @SerializedName("payment_type")
+    @Expose
+    private String paymentType;
+    @SerializedName("payable_amount")
+    @Expose
+    private String payableAmount;
+    @SerializedName("promo_code_applied")
+    @Expose
+    private String promoCodeApplied;
+    @SerializedName("cod_charges")
+    @Expose
+    private String codCharges;
+    @SerializedName("gst_tax_amt")
+    @Expose
+    private String gstTaxAmt;
+    @SerializedName("other_tax_amt")
+    @Expose
+    private String otherTaxAmt;
+    @SerializedName("payment_status")
+    @Expose
+    private String paymentStatus;
+    @SerializedName("datdate_timee")
+    @Expose
+    private String datdateTimee;
+    @SerializedName("prescription_data")
+    @Expose
+    private List<PrescriptionData> prescription = null;
+    @SerializedName("items")
+    @Expose
+    private List<Item> items = null;
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
+    }
+
+    public String getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public String getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(String totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public String getPaymentMode() {
+        return paymentMode;
+    }
+
+    public void setPaymentMode(String paymentMode) {
+        this.paymentMode = paymentMode;
+    }
+
+    public String getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentType(String paymentType) {
+        this.paymentType = paymentType;
+    }
+
+    public String getPayableAmount() {
+        return payableAmount;
+    }
+
+    public void setPayableAmount(String payableAmount) {
+        this.payableAmount = payableAmount;
+    }
+
+    public String getPromoCodeApplied() {
+        return promoCodeApplied;
+    }
+
+    public void setPromoCodeApplied(String promoCodeApplied) {
+        this.promoCodeApplied = promoCodeApplied;
+    }
+
+    public String getCodCharges() {
+        return codCharges;
+    }
+
+    public void setCodCharges(String codCharges) {
+        this.codCharges = codCharges;
+    }
+
+    public String getGstTaxAmt() {
+        return gstTaxAmt;
+    }
+
+    public void setGstTaxAmt(String gstTaxAmt) {
+        this.gstTaxAmt = gstTaxAmt;
+    }
+
+    public String getOtherTaxAmt() {
+        return otherTaxAmt;
+    }
+
+    public void setOtherTaxAmt(String otherTaxAmt) {
+        this.otherTaxAmt = otherTaxAmt;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public String getDatdateTimee() {
+        return datdateTimee;
+    }
+
+    public void setDatdateTimee(String datdateTimee) {
+        this.datdateTimee = datdateTimee;
+    }
+
+    public List<PrescriptionData> getPrescription() {
+        return prescription;
+    }
+
+    public void setPrescription(List<PrescriptionData> prescription) {
+        this.prescription = prescription;
+    }
+
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.orderId);
+        dest.writeString(this.address);
+        dest.writeString(this.note);
+        dest.writeString(this.orderType);
+        dest.writeString(this.orderStatus);
+        dest.writeString(this.totalAmount);
+        dest.writeString(this.paymentMode);
+        dest.writeString(this.paymentType);
+        dest.writeString(this.payableAmount);
+        dest.writeString(this.promoCodeApplied);
+        dest.writeString(this.codCharges);
+        dest.writeString(this.gstTaxAmt);
+        dest.writeString(this.otherTaxAmt);
+        dest.writeString(this.paymentStatus);
+        dest.writeString(this.datdateTimee);
+        dest.writeTypedList(this.prescription);
+        dest.writeList(this.items);
+    }
 
     public OrderData() {
     }
 
-    public String getOrder_type() {
-        return order_type;
+    protected OrderData(Parcel in) {
+        this.orderId = in.readString();
+        this.address = in.readString();
+        this.note = in.readString();
+        this.orderType = in.readString();
+        this.orderStatus = in.readString();
+        this.totalAmount = in.readString();
+        this.paymentMode = in.readString();
+        this.paymentType = in.readString();
+        this.payableAmount = in.readString();
+        this.promoCodeApplied = in.readString();
+        this.codCharges = in.readString();
+        this.gstTaxAmt = in.readString();
+        this.otherTaxAmt = in.readString();
+        this.paymentStatus = in.readString();
+        this.datdateTimee = in.readString();
+        this.prescription = in.createTypedArrayList(PrescriptionData.CREATOR);
+        this.items = new ArrayList<Item>();
+        in.readList(this.items, Item.class.getClassLoader());
     }
 
-    public void setOrder_type(String order_type) {
-        this.order_type = order_type;
-    }
+    public static final Parcelable.Creator<OrderData> CREATOR = new Parcelable.Creator<OrderData>() {
+        @Override
+        public OrderData createFromParcel(Parcel source) {
+            return new OrderData(source);
+        }
 
-    public String getPayment_mode() {
-        return payment_mode;
-    }
-
-    public void setPayment_mode(String payment_mode) {
-        this.payment_mode = payment_mode;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getBy() {
-        return by;
-    }
-
-    public void setBy(String by) {
-        this.by = by;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public AddressData getDelivery_details() {
-        return delivery_details;
-    }
-
-    public void setDelivery_details(AddressData delivery_details) {
-        this.delivery_details = delivery_details;
-    }
-
-    public ArrayList<PrescriptionModel> getPrescriptions() {
-        return prescriptions;
-    }
-
-    public void setPrescriptions(ArrayList<PrescriptionModel> prescriptions) {
-        this.prescriptions = prescriptions;
-    }
-
-    public ArrayList<CartModel> getItems() {
-        return items;
-    }
-
-    public void setItems(ArrayList<CartModel> items) {
-        this.items = items;
-    }
-
-    public String getItem_total() {
-        return item_total;
-    }
-
-    public void setItem_total(String item_total) {
-        this.item_total = item_total;
-    }
-
-    public String getDelivery_fee() {
-        return delivery_fee;
-    }
-
-    public void setDelivery_fee(String delivery_fee) {
-        this.delivery_fee = delivery_fee;
-    }
-
-    public String getTaxes() {
-        return taxes;
-    }
-
-    public void setTaxes(String taxes) {
-        this.taxes = taxes;
-    }
-
-    public String getTotal_amount() {
-        return total_amount;
-    }
-
-    public void setTotal_amount(String total_amount) {
-        this.total_amount = total_amount;
-    }
-
-    public String getPayable_amount() {
-        return payable_amount;
-    }
-
-    public void setPayable_amount(String payable_amount) {
-        this.payable_amount = payable_amount;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
+        @Override
+        public OrderData[] newArray(int size) {
+            return new OrderData[size];
+        }
+    };
 }

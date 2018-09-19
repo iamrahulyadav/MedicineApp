@@ -69,41 +69,33 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:text="Uploaded Prescriptions"
-                            android:textAlignment="center"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                            android:textColor="@color/colorPrimary"
-                            android:textStyle="bold" />
+                    android:visibility="visible">
 
 
-                    </RelativeLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="Uploaded Prescriptions"
+                        android:textAlignment="center"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="@color/colorPrimary"
+                        android:textStyle="bold" />
+
 
                     <android.support.v4.widget.NestedScrollView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
 
-                            <android.support.v7.widget.RecyclerView
-                                android:id="@+id/recylcer_view"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="5dp"
-                                android:overScrollMode="never" />
-                        </RelativeLayout>
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/recylcer_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:overScrollMode="never" />
                     </android.support.v4.widget.NestedScrollView>
+
 
                     <TextView
                         android:id="@+id/tvNotePres"
@@ -116,6 +108,29 @@
                         android:textAppearance="@style/TextAppearance.Compat.Notification.Time"
                         android:textColor="@color/colorTextHeading"
                         android:textStyle="italic" />
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="Prescriptions Medicines"
+                        android:textAlignment="center"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textColor="@color/colorPrimary"
+                        android:textStyle="bold" />
+
+                    <android.support.v4.widget.NestedScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/recylcer_view_medicines"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:overScrollMode="never" />
+                    </android.support.v4.widget.NestedScrollView>
                 </LinearLayout>
 
 

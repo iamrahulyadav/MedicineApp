@@ -18,6 +18,8 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatEditText;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,8 +28,10 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -45,7 +49,7 @@ import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.DialogMultipleChoiceAdapter;
-import com.hvantage.medicineapp.adapter.PreMedicineItemAdapter;
+import com.hvantage.medicineapp.adapter.PreMedicineItemAdapterMain;
 import com.hvantage.medicineapp.model.DoctorDetails;
 import com.hvantage.medicineapp.model.DoseData;
 import com.hvantage.medicineapp.model.PatientDetails;
@@ -81,7 +85,7 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
     private static final int REQUEST_IMAGE_CAPTURE = REQUEST_STORAGE + 1;
     private static final int REQUEST_LOAD_IMAGE = REQUEST_IMAGE_CAPTURE + 1;
     ArrayList<PreMedicineData> medList = new ArrayList<PreMedicineData>();
-    EditText etDName, etAddress, etEmail, etPhoneNo, etPName, etAge,
+    AppCompatEditText etDName, etAddress, etEmail, etPhoneNo, etPName, etAge,
             etWeight, etDiagnosis, etNote, etMedType, etMedName,
             etMedDescription, etMedQty, etMedDoses;
     RadioGroup rgGender;
@@ -95,7 +99,7 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
     private String image_base64;
     private TextView tvAdd;
     private RecyclerView recylcer_view;
-    private PreMedicineItemAdapter adapter;
+    private PreMedicineItemAdapterMain adapter;
     private CoordinatorLayout coordinatorLayout;
     private View bottomSheet;
     private BottomSheetBehavior<View> behavior;
@@ -106,6 +110,12 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
     private boolean isExpand = false;
     private String from;
     private JsonObject jsonObject;
+    private CardView cardDoctor, cardPatient, cardMedicines, cardNotes;
+    private AppCompatTextView tvTabDoctor, tvTabPatient, tvTabMedicine, tvTabNotes;
+    private LinearLayout bsAction;
+    private CardView btnOrderCall, btnAllNext;
+    private CardView btnAllPrev;
+    private boolean isEdit = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +131,7 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
         if (!Functions.isConnectingToInternet(context))
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
         if (data != null) {
+            bsAction.setVisibility(View.VISIBLE);
             if (!data.getImage().equalsIgnoreCase("")) {
                /* Picasso.with(context)
                         .load(data.getImage())
@@ -182,8 +193,10 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
             }
             setRecyclerView();
 
-        } else
+        } else {
+            bsAction.setVisibility(View.GONE);
             selectImage();
+        }
     }
 
     private void setBottomBar() {
@@ -202,22 +215,33 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
                     case BottomSheetBehavior.STATE_EXPANDED:
                         isExpand = true;
                         Log.d(TAG, "onStateChanged: STATE_EXPANDED");
+                        if (data != null) {
+                            Animation slide_down = AnimationUtils.loadAnimation(getApplicationContext(),
+                                    R.anim.slide_down);
+                            bsAction.startAnimation(slide_down);
+                            bsAction.setVisibility(View.GONE);
+                        }
                         Functions.hideSoftKeyboard(context, bottomSheet);
                         break;
                     case BottomSheetBehavior.STATE_COLLAPSED:
                         isExpand = false;
                         Log.d(TAG, "onStateChanged: STATE_COLLAPSED");
+                        if (data != null) {
+                            Animation slide_up = AnimationUtils.loadAnimation(getApplicationContext(),
+                                    R.anim.slide_up);
+                            bsAction.startAnimation(slide_up);
+                            bsAction.setVisibility(View.VISIBLE);
+                        }
                         Functions.hideSoftKeyboard(context, bottomSheet);
                         break;
                     case BottomSheetBehavior.STATE_DRAGGING:
+//                        bsAction.setVisibility(View.GONE);
                         Log.d(TAG, "onStateChanged: STATE_DRAGGING");
                         Functions.hideSoftKeyboard(context, bottomSheet);
-
                         break;
                     case BottomSheetBehavior.STATE_SETTLING:
                         Log.d(TAG, "onStateChanged: STATE_SETTLING");
                         Functions.hideSoftKeyboard(context, bottomSheet);
-
                         break;
                 }
             }
@@ -225,6 +249,143 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
                 animateBottomSheetArrows(slideOffset);
+            }
+        });
+        bottomSheet.setVisibility(View.VISIBLE);
+        bsAction = (LinearLayout) findViewById(R.id.bsAction);
+        btnOrderCall = (CardView) findViewById(R.id.btnOrderCall);
+        btnAllNext = (CardView) findViewById(R.id.btnAllNext);
+        btnAllPrev = (CardView) findViewById(R.id.btnAllPrev);
+        cardDoctor = (CardView) findViewById(R.id.cardDoctor);
+        cardPatient = (CardView) findViewById(R.id.cardPatient);
+        cardMedicines = (CardView) findViewById(R.id.cardMedicines);
+        cardNotes = (CardView) findViewById(R.id.cardNotes);
+        tvTabDoctor = (AppCompatTextView) findViewById(R.id.tvTabDoctor);
+        tvTabPatient = (AppCompatTextView) findViewById(R.id.tvTabPatient);
+        tvTabMedicine = (AppCompatTextView) findViewById(R.id.tvTabMedicine);
+        tvTabNotes = (AppCompatTextView) findViewById(R.id.tvTabNotes);
+
+        btnOrderCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppPreferences.setSelectedPresId(context, data.getPrescription_id());
+                startActivity(new Intent(context, SelectAddressActivity.class));
+            }
+        });
+        cardDoctor.setVisibility(View.VISIBLE);
+        cardPatient.setVisibility(View.GONE);
+        cardMedicines.setVisibility(View.GONE);
+        cardNotes.setVisibility(View.GONE);
+        btnAllPrev.setVisibility(View.GONE);
+
+        btnAllNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (cardDoctor.getVisibility() == View.VISIBLE) {
+                    if (TextUtils.isEmpty(etDName.getText().toString())) {
+                        etDName.requestFocus();
+                        Toast.makeText(context, "Enter Doctor's Name", Toast.LENGTH_SHORT).show();
+                    } else if (TextUtils.isEmpty(etAddress.getText().toString())) {
+                        etAddress.requestFocus();
+                        Toast.makeText(context, "Enter Doctor's Address", Toast.LENGTH_SHORT).show();
+                    } else if (TextUtils.isEmpty(etPhoneNo.getText().toString())) {
+                        etPhoneNo.requestFocus();
+                        Toast.makeText(context, "Enter Doctor's Phone", Toast.LENGTH_SHORT).show();
+                    } else {
+                        tvTabDoctor.setTextColor(getResources().getColor(R.color.colorGray));
+                        tvTabPatient.setTextColor(getResources().getColor(R.color.colorPrimary));
+                        tvTabMedicine.setTextColor(getResources().getColor(R.color.colorGray));
+                        tvTabNotes.setTextColor(getResources().getColor(R.color.colorGray));
+                        cardDoctor.setVisibility(View.GONE);
+                        cardPatient.setVisibility(View.VISIBLE);
+                        cardMedicines.setVisibility(View.GONE);
+                        cardNotes.setVisibility(View.GONE);
+                        btnAllPrev.setVisibility(View.VISIBLE);
+                    }
+                } else if (cardPatient.getVisibility() == View.VISIBLE) {
+                    if (TextUtils.isEmpty(etPName.getText().toString())) {
+                        etPName.requestFocus();
+                        Toast.makeText(context, "Enter Patients's Name", Toast.LENGTH_SHORT).show();
+                    } else if (TextUtils.isEmpty(etAge.getText().toString())) {
+                        etAge.requestFocus();
+                        Toast.makeText(context, "Enter Patients's Age", Toast.LENGTH_SHORT).show();
+                    } else if (TextUtils.isEmpty(etDiagnosis.getText().toString())) {
+                        etDiagnosis.requestFocus();
+                        Toast.makeText(context, "Enter Patients's Diagnosis Info", Toast.LENGTH_SHORT).show();
+                    } else {
+                        tvTabDoctor.setTextColor(getResources().getColor(R.color.colorGray));
+                        tvTabPatient.setTextColor(getResources().getColor(R.color.colorGray));
+                        tvTabMedicine.setTextColor(getResources().getColor(R.color.colorPrimary));
+                        tvTabNotes.setTextColor(getResources().getColor(R.color.colorGray));
+                        cardPatient.setVisibility(View.GONE);
+                        cardDoctor.setVisibility(View.GONE);
+                        cardMedicines.setVisibility(View.VISIBLE);
+                        cardNotes.setVisibility(View.GONE);
+                    }
+                } else if (cardMedicines.getVisibility() == View.VISIBLE) {
+                    if (medList.size() == 0) {
+                        Toast.makeText(context, "Please add alteast one prescription medicine.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        tvTabDoctor.setTextColor(getResources().getColor(R.color.colorGray));
+                        tvTabPatient.setTextColor(getResources().getColor(R.color.colorGray));
+                        tvTabMedicine.setTextColor(getResources().getColor(R.color.colorGray));
+                        tvTabNotes.setTextColor(getResources().getColor(R.color.colorPrimary));
+                        cardPatient.setVisibility(View.GONE);
+                        cardDoctor.setVisibility(View.GONE);
+                        cardMedicines.setVisibility(View.GONE);
+                        cardNotes.setVisibility(View.VISIBLE);
+                        btnAllNext.setVisibility(View.GONE);
+                    }
+                } else if (cardNotes.getVisibility() == View.VISIBLE) {
+                    /*tvTabDoctor.setTextColor(getResources().getColor(R.color.colorGray));
+                    tvTabPatient.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    tvTabMedicine.setTextColor(getResources().getColor(R.color.colorGray));
+                    tvTabNotes.setTextColor(getResources().getColor(R.color.colorGray));
+                    cardPatient.setVisibility(View.GONE);
+                    cardDoctor.setVisibility(View.GONE);
+                    cardMedicines.setVisibility(View.GONE);
+                    cardNotes.setVisibility(View.VISIBLE);*/
+                }
+            }
+        });
+        btnAllPrev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (cardDoctor.getVisibility() == View.VISIBLE) {
+
+                } else if (cardPatient.getVisibility() == View.VISIBLE) {
+                    {
+                        tvTabDoctor.setTextColor(getResources().getColor(R.color.colorPrimary));
+                        tvTabPatient.setTextColor(getResources().getColor(R.color.colorGray));
+                        tvTabMedicine.setTextColor(getResources().getColor(R.color.colorGray));
+                        tvTabNotes.setTextColor(getResources().getColor(R.color.colorGray));
+                        cardPatient.setVisibility(View.GONE);
+                        cardDoctor.setVisibility(View.VISIBLE);
+                        cardMedicines.setVisibility(View.GONE);
+                        cardNotes.setVisibility(View.GONE);
+                        btnAllPrev.setVisibility(View.GONE);
+                        btnAllNext.setVisibility(View.VISIBLE);
+                    }
+                } else if (cardMedicines.getVisibility() == View.VISIBLE) {
+                    tvTabDoctor.setTextColor(getResources().getColor(R.color.colorGray));
+                    tvTabPatient.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    tvTabMedicine.setTextColor(getResources().getColor(R.color.colorGray));
+                    tvTabNotes.setTextColor(getResources().getColor(R.color.colorGray));
+                    cardPatient.setVisibility(View.VISIBLE);
+                    cardDoctor.setVisibility(View.GONE);
+                    cardMedicines.setVisibility(View.GONE);
+                    cardNotes.setVisibility(View.GONE);
+                } else if (cardNotes.getVisibility() == View.VISIBLE) {
+                    tvTabDoctor.setTextColor(getResources().getColor(R.color.colorGray));
+                    tvTabPatient.setTextColor(getResources().getColor(R.color.colorGray));
+                    tvTabMedicine.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    tvTabNotes.setTextColor(getResources().getColor(R.color.colorGray));
+                    cardPatient.setVisibility(View.GONE);
+                    cardDoctor.setVisibility(View.GONE);
+                    cardMedicines.setVisibility(View.VISIBLE);
+                    cardNotes.setVisibility(View.GONE);
+                    btnAllNext.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
@@ -309,7 +470,26 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
 
     private void setRecyclerView() {
         recylcer_view.setLayoutManager(new LinearLayoutManager(context));
-        adapter = new PreMedicineItemAdapter(context, medList);
+        adapter = new PreMedicineItemAdapterMain(context, medList, new PreMedicineItemAdapterMain.MyAdapterListener() {
+            @Override
+            public void removeItem(View v, int position) {
+                medList.remove(position);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void editItem(View v, int position) {
+                isEdit = true;
+                etMedName.setText(medList.get(position).getName());
+                etMedType.setText(medList.get(position).getType());
+                etMedDescription.setText(medList.get(position).getDescription());
+                etMedQty.setText(medList.get(position).getQuantity());
+                etMedDoses.setText(medList.get(position).getDoses());
+                layout_main.setVisibility(View.GONE);
+                layout_add_med.setVisibility(View.VISIBLE);
+            }
+        });
+
         recylcer_view.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
@@ -333,6 +513,7 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
                 selectImage();
                 break;
             case R.id.tvAdd:
+                isEdit = false;
                 layout_main.setVisibility(View.GONE);
                 layout_add_med.setVisibility(View.VISIBLE);
                 break;
@@ -347,23 +528,37 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
                     behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 break;
             case R.id.btnAdd:
-                layout_add_med.setVisibility(View.GONE);
-                layout_main.setVisibility(View.VISIBLE);
-                PreMedicineData data = new PreMedicineData();
-                data.setType(etMedType.getText().toString());
-                data.setName(etMedName.getText().toString());
-                data.setDescription(etMedDescription.getText().toString());
-                data.setQuantity(etMedQty.getText().toString());
-                data.setDoses(etMedDoses.getText().toString());
-                data.setDoses_id(selectedDosesId);
-                medList.add(data);
-                adapter.notifyDataSetChanged();
-                etMedType.setText("");
-                etMedName.setText("");
-                etMedDescription.setText("");
-                etMedQty.setText("");
-                etMedDoses.setText("");
-                selectedDosesId = "";
+                if (TextUtils.isEmpty(etMedType.getText().toString())) {
+                    etMedType.requestFocus();
+                    Toast.makeText(context, "Enter Medicine Type", Toast.LENGTH_SHORT).show();
+                } else if (TextUtils.isEmpty(etMedName.getText().toString())) {
+                    etMedName.requestFocus();
+                    Toast.makeText(context, "Enter Medicine Name", Toast.LENGTH_SHORT).show();
+                }/* else if (TextUtils.isEmpty(etMedDescription.getText().toString())) {
+                    etMedDescription.requestFocus();
+                    Toast.makeText(context, "Enter Medicine Description", Toast.LENGTH_SHORT).show();
+                } */ else if (TextUtils.isEmpty(etMedDoses.getText().toString())) {
+                    etMedDoses.requestFocus();
+                    Toast.makeText(context, "Select Medicine Dose", Toast.LENGTH_SHORT).show();
+                } else {
+                    layout_add_med.setVisibility(View.GONE);
+                    layout_main.setVisibility(View.VISIBLE);
+                    PreMedicineData data = new PreMedicineData();
+                    data.setType(etMedType.getText().toString());
+                    data.setName(etMedName.getText().toString());
+                    data.setDescription(etMedDescription.getText().toString());
+                    data.setQuantity(etMedQty.getText().toString());
+                    data.setDoses(etMedDoses.getText().toString());
+                    data.setDoses_id(selectedDosesId);
+                    medList.add(data);
+                    adapter.notifyDataSetChanged();
+                    etMedType.setText("");
+                    etMedName.setText("");
+                    etMedDescription.setText("");
+                    etMedQty.setText("");
+                    etMedDoses.setText("");
+                    selectedDosesId = "";
+                }
                 break;
         }
     }
@@ -374,7 +569,6 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
     private void saveData() {
         Log.e(TAG, "saveData: ");
         new UploadTask().execute();
-
     }
 
     private void showProgressDialog() {
@@ -390,22 +584,6 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
         if (progressBar != null)
             progressBar.dismiss();
     }
-
-  /*  private void selectImage() {
-        final CharSequence[] items = {"Camera", "Gallery"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Camera")) {
-                    cameraIntent();
-                } else if (items[item].equals("Gallery")) {
-                    galleryIntent();
-                }
-            }
-        });
-        builder.show();
-    }*/
 
     private void selectImage() {
         final CharSequence[] items = {"Take Photo", "Choose From Gallery", "Cancel"};
@@ -512,7 +690,8 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
                 .setAspectRatio(3, 4)
                 .setOutputCompressQuality(50)
                 .setRequestedSize(768, 1024)
-                .setScaleType(CropImageView.ScaleType.CENTER_INSIDE)
+                .setScaleType(CropImageView.ScaleType.FIT_CENTER)
+                .setAutoZoomEnabled(false)
                 .start(this);
     }
 

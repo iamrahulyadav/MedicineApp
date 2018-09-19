@@ -2,6 +2,7 @@ package com.hvantage.medicineapp.activity;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,8 +15,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.model.AddressData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
 import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
@@ -36,6 +39,7 @@ public class AddAddressActivity extends AppCompatActivity implements View.OnClic
     private ProgressBar progressBar;
     private Context context;
     private EditText etAddress, etLandmark, etState, etCity, etPostalCode, etName, etPhoneNo;
+    private AddressData newData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +62,9 @@ public class AddAddressActivity extends AppCompatActivity implements View.OnClic
         etPostalCode = (EditText) findViewById(R.id.etPostalCode);
         btnSubmit = (CardView) findViewById(R.id.btnSubmit);
         btnSubmit.setOnClickListener(this);
+
+        etName.setText(AppPreferences.getUserName(context));
+        etPhoneNo.setText(AppPreferences.getMobileNo(context));
     }
 
     @Override
@@ -140,6 +147,9 @@ public class AddAddressActivity extends AppCompatActivity implements View.OnClic
                     try {
                         JSONObject jsonObject = new JSONObject(resp);
                         if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            JSONObject jsonObject1 = jsonObject.getJSONArray("result").getJSONObject(0);
+                            newData = new Gson().fromJson(String.valueOf(jsonObject1), AddressData.class);
+                            AppPreferences.setSelectedAddId(context, newData.getAddressId());
                             publishProgress("200", "");
                         } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
                             String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
@@ -166,6 +176,10 @@ public class AddAddressActivity extends AppCompatActivity implements View.OnClic
             String status = values[0];
             String msg = values[1];
             if (status.equalsIgnoreCase("200")) {
+                Log.e(TAG, "onProgressUpdate: newData >> " + newData);
+                Intent intent = new Intent(context, ConfirmOrderActivity.class);
+                intent.putExtra("data", newData);
+                startActivity(intent);
                 finish();
             } else if (status.equalsIgnoreCase("400")) {
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();

@@ -2,7 +2,6 @@ package com.hvantage.medicineapp.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -22,8 +21,6 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.activity.CartActivity;
-import com.hvantage.medicineapp.activity.SelectAddressActivity;
 import com.hvantage.medicineapp.adapter.AllUploadedPreAdapter;
 import com.hvantage.medicineapp.model.PrescriptionData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
@@ -47,7 +44,7 @@ import retrofit2.Response;
 
 public class MyPrescriptionFragment extends Fragment implements View.OnClickListener {
 
-    private static final String TAG = "MyDoctorsFragment";
+    private static final String TAG = "MyPrescriptionFragment";
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
@@ -104,12 +101,22 @@ public class MyPrescriptionFragment extends Fragment implements View.OnClickList
 
             @Override
             public void placeOrder(View v, int position) {
-                AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
+                /*AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
                 AppPreferences.setSelectedPresId(context, list.get(position).getPrescription_id());
                 CartActivity.selectedPresc = list.get(position);
                 Log.e(TAG, "viewOrder: CartActivity.selectedPresc >> " + CartActivity.selectedPresc);
                 Intent intent = new Intent(getActivity(), SelectAddressActivity.class);
-                startActivity(intent);
+                startActivity(intent);*/
+                FragmentManager manager = getFragmentManager();
+                FragmentTransaction ft = manager.beginTransaction();
+                Fragment fragment = new AddPrescrFragment();
+                Bundle args = new Bundle();
+                args.putParcelable("data", list.get(position));
+                args.putString("from", "view");
+                fragment.setArguments(args);
+                ft.replace(R.id.main_container, fragment);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
             }
         });
         recylcer_view.setLayoutManager(new LinearLayoutManager(context));
