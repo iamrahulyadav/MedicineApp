@@ -60,10 +60,8 @@ public class CartMedicineItemAdapter extends RecyclerView.Adapter<CartMedicineIt
             @Override
             public void onClick(View v) {
                 int qty = Integer.parseInt(holder.tvQty.getText().toString());
-                if (qty < 10) {
-                    qty++;
-                    holder.tvQty.setText(String.valueOf(qty));
-                }
+                qty++;
+                holder.tvQty.setText(String.valueOf(qty));
             }
         });
 

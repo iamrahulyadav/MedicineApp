@@ -51,6 +51,8 @@ import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.BuildConfig;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.CartActivity;
+import com.hvantage.medicineapp.activity.ConfirmOrderActivity;
+import com.hvantage.medicineapp.activity.MainActivity;
 import com.hvantage.medicineapp.activity.SelectAddressActivity;
 import com.hvantage.medicineapp.adapter.DialogMultipleChoiceAdapter;
 import com.hvantage.medicineapp.adapter.PreMedicineItemAdapterEditable;
@@ -128,7 +130,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
     private LinearLayout bottomSheetTop;
     private boolean isEdit = false;
     private int last_edit_position = 0;
-    private AppCompatButton btnAllNext, btnAllPrev, btnContinueOrder, btnAddPD, btnOrderNow;
+    private AppCompatButton btnAllNext, btnAllPrev, btnContinueOrder, btnAddPD, btnOrderNow, btnExit;
     private Spinner spinnerType1;
     private View bottomsheet_top;
 
@@ -151,10 +153,11 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                 intraction.actionbarsetTitle("Prescription Details");
         }
 
-
+        medListEditable = new ArrayList<>();
+        medListMain = new ArrayList<>();
         init();
-        //setRecyclerViewEditable();
-        //setRecyclerViewMain();
+        setRecyclerViewEditable();
+        setRecyclerViewMain();
         setBottomBar();
         if (!Functions.isConnectingToInternet(context))
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
@@ -202,26 +205,23 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                     ((RadioButton) rootView.findViewById(R.id.rbfemale1)).setChecked(true);
 
             etDiagnosis1.setText(data.getDiagnosisDetails());
-            medListMain = data.getMedicineDetails();
-            medListMain.addAll(data.getMedicineDetails());
-            //Log.e(TAG, "onCreateView: medListMain >> " + medListMain);
+
+            for (PreMedicineData data : data.getMedicineDetails()) {
+                medListMain.add(data);
+                medListEditable.add(data);
+            }
+
             Log.e(TAG, "onCreateView: medListMain.size() >> " + medListMain.size());
             if (medListMain.contains(null)) {
                 medListMain.remove(null);
-
             }
-            setRecyclerViewMain();
-
-
-            medListEditable = data.getMedicineDetails();
-            Log.e(TAG, "onCreateView: medListEditable >> " + medListEditable);
             if (medListEditable.contains(null)) {
                 medListEditable.remove(null);
-                Log.e(TAG, "onCreateView: medListEditable.size() >> " + medListEditable.size());
             }
 
-            Log.d(TAG, "onCreateView: medListMain >> " + medListMain);
-            Log.d(TAG, "onCreateView: medListEditable >> " + medListEditable);
+            Log.d(TAG, "onCreateView: medListMain >> " + medListMain.size());
+            Log.d(TAG, "onCreateView: medListEditable >> " + medListEditable.size());
+            setRecyclerViewMain();
             setRecyclerViewEditable();
         } else {
             selectImage();
@@ -288,6 +288,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         btnAllPrev = (AppCompatButton) rootView.findViewById(R.id.btnAllPrev);
         btnContinueOrder = (AppCompatButton) rootView.findViewById(R.id.btnContinueOrder);
         btnOrderNow = (AppCompatButton) rootView.findViewById(R.id.btnOrderNow);
+        btnExit = (AppCompatButton) rootView.findViewById(R.id.btnExit);
 
         bottomSheetTop = (LinearLayout) rootView.findViewById(R.id.bottomSheetTop);
         btnAddPD = rootView.findViewById(R.id.btnAddPD);
@@ -311,8 +312,10 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                 AppPreferences.setSelectedPresId(context, data.getPrescription_id());
                 CartActivity.selectedPresc = data;
                 Log.e(TAG, "viewOrder: CartActivity.selectedPresc >> " + CartActivity.selectedPresc);
-                Intent intent = new Intent(getActivity(), SelectAddressActivity.class);
-                startActivity(intent);
+                if (!AppPreferences.getSelectedPresId(context).equalsIgnoreCase("") && !AppPreferences.getSelectedAdd(context).equalsIgnoreCase("")) {
+                    startActivity(new Intent(context, ConfirmOrderActivity.class));
+                } else
+                    startActivity(new Intent(context, SelectAddressActivity.class));
             }
         });
 
@@ -422,6 +425,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         btnContinueOrder.setOnClickListener(this);
         btnOrderNow.setOnClickListener(this);
         btnAddPD.setOnClickListener(this);
+        btnExit.setOnClickListener(this);
     }
 
 
@@ -683,6 +687,8 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
 
                 break;
             case R.id.btnContinueOrder:
+
+
                 if (medListEditable.size() == 0) {
                     Toast.makeText(context, "Please add your medicines.", Toast.LENGTH_SHORT).show();
                     return;
@@ -719,11 +725,30 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
 
                 CartActivity.selectedPresc = tempData;
                 Log.e(TAG, "onClick: CartActivity.selectedPresc  >> " + CartActivity.selectedPresc);
-                startActivity(new Intent(context, SelectAddressActivity.class));
+                if (!AppPreferences.getSelectedPresId(context).equalsIgnoreCase("") && !AppPreferences.getSelectedAdd(context).equalsIgnoreCase("")) {
+                    startActivity(new Intent(context, ConfirmOrderActivity.class));
+                } else
+                    startActivity(new Intent(context, SelectAddressActivity.class));
                 break;
             case R.id.btnOrderNow:
                 btnOrderNow.setVisibility(View.GONE);
                 bottomsheet_bottom.setVisibility(View.VISIBLE);
+                break;
+            case R.id.btnExit:
+                new AlertDialog.Builder(context)
+                        .setMessage("Do you want to discard all changes and want to exit?")
+                        .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startActivity(new Intent(context, MainActivity.class));
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .show();
                 break;
             case R.id.btnOrderWithDetail:
                 bsAction.setVisibility(View.GONE);

@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+
 public class PreMedicineData implements Parcelable {
 
     @SerializedName("medicine_id")
@@ -120,6 +121,9 @@ public class PreMedicineData implements Parcelable {
                 '}';
     }
 
+    public PreMedicineData() {
+    }
+
 
     @Override
     public int describeContents() {
@@ -138,9 +142,6 @@ public class PreMedicineData implements Parcelable {
         dest.writeString(this.doses_id);
     }
 
-    public PreMedicineData() {
-    }
-
     protected PreMedicineData(Parcel in) {
         this.medicine_id = in.readString();
         this.type = in.readString();
@@ -152,7 +153,7 @@ public class PreMedicineData implements Parcelable {
         this.doses_id = in.readString();
     }
 
-    public static final Parcelable.Creator<PreMedicineData> CREATOR = new Parcelable.Creator<PreMedicineData>() {
+    public static final Creator<PreMedicineData> CREATOR = new Creator<PreMedicineData>() {
         @Override
         public PreMedicineData createFromParcel(Parcel source) {
             return new PreMedicineData(source);
@@ -164,4 +165,3 @@ public class PreMedicineData implements Parcelable {
         }
     };
 }
-

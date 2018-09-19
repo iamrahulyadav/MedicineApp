@@ -599,6 +599,16 @@
                                     android:textColor="@color/colorToolbarTitle"
                                     android:textStyle="bold" />
 
+                                <ImageView
+                                    android:id="@+id/imgArrow1"
+                                    android:layout_width="20dp"
+                                    android:layout_height="18dp"
+                                    android:layout_centerHorizontal="true"
+                                    android:layout_centerVertical="true"
+                                    android:scaleType="fitXY"
+                                    android:src="@drawable/arrow_up"
+                                    android:tint="@color/colorTextSubHeading"
+                                    android:visibility="gone" />
 
                                 <android.support.v7.widget.AppCompatButton
                                     android:id="@+id/btnAllNext"
@@ -714,6 +724,7 @@
                                     android:textColor="@color/colorPrimary"
                                     android:textStyle="bold" />
 
+
                                 <android.support.v7.widget.AppCompatButton
                                     android:id="@+id/btnAdd1"
                                     style="@style/Widget.AppCompat.Button.Colored"
@@ -746,7 +757,10 @@
                         android:layout_width="0dp"
                         android:layout_height="45dp"
                         android:layout_gravity="center"
-                        android:layout_margin="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="1dp"
+                        android:layout_marginTop="5dp"
                         android:layout_weight="0.7"
                         android:drawableLeft="@drawable/ic_add_white_drawable"
                         android:drawablePadding="3dp"
@@ -762,7 +776,10 @@
                         android:layout_width="0dp"
                         android:layout_height="45dp"
                         android:layout_gravity="center"
-                        android:layout_margin="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginLeft="1dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="5dp"
                         android:layout_weight="0.3"
                         android:drawablePadding="3dp"
                         android:drawableTint="@color/colorToolbarTitle"
@@ -772,16 +789,7 @@
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/imgArrow1"
-                    android:layout_width="20dp"
-                    android:layout_height="18dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="5dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/arrow_up"
-                    android:tint="@color/colorTextSubHeading"
-                    android:visibility="gone" />
+
             </LinearLayout>
         </android.support.v7.widget.CardView>
 

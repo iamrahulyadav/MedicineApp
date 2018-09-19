@@ -19,6 +19,9 @@ public class AppPreferences {
     public static final String SELECTED_PRES_ID = "selected_pres_id";
     public static final String SELECTED_ADD_ID = "selected_add_id";
 
+
+    public static final String SELECTED_ADD = "selected_add";
+
     private static AppPreferences instance;
     private final SharedPreferences sharedPreferences;
     private final Editor editor;
@@ -112,6 +115,20 @@ public class AppPreferences {
         SharedPreferences pereference = context.getSharedPreferences(
                 PREFERENCES, 0);
         return pereference.getString(SELECTED_ADD_ID, "");
+    }
+
+    public static void setSelectedAdd(Context context, String value) {
+        SharedPreferences preferences = context.getSharedPreferences(
+                PREFERENCES, 0);
+        Editor editor = preferences.edit();
+        editor.putString(SELECTED_ADD, value);
+        editor.commit();
+    }
+
+    public static String getSelectedAdd(Context context) {
+        SharedPreferences pereference = context.getSharedPreferences(
+                PREFERENCES, 0);
+        return pereference.getString(SELECTED_ADD, "");
     }
 
     public static void clearPreference(Context context) {

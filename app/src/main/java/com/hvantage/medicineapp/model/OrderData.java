@@ -245,7 +245,7 @@ public class OrderData implements Parcelable {
         this.otherTaxAmt = in.readString();
         this.paymentStatus = in.readString();
         this.datdateTimee = in.readString();
-        this.prescription = in.createTypedArrayList(PrescriptionData.CREATOR);
+//        this.prescription = in.createTypedArrayList(PrescriptionData.CREATOR);
         this.items = new ArrayList<Item>();
         in.readList(this.items, Item.class.getClassLoader());
     }

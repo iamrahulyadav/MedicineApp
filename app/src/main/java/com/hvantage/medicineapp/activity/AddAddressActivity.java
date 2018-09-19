@@ -150,6 +150,7 @@ public class AddAddressActivity extends AppCompatActivity implements View.OnClic
                             JSONObject jsonObject1 = jsonObject.getJSONArray("result").getJSONObject(0);
                             newData = new Gson().fromJson(String.valueOf(jsonObject1), AddressData.class);
                             AppPreferences.setSelectedAddId(context, newData.getAddressId());
+                            AppPreferences.setSelectedAdd(context, String.valueOf(newData));
                             publishProgress("200", "");
                         } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
                             String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");

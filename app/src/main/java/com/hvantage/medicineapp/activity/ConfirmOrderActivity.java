@@ -157,18 +157,11 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         Log.e(TAG, "onCreate: selected_pres_id >> " + selected_pres_id);
         Log.e(TAG, "onCreate: selected_add_id >> " + selected_add_id);
         if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
-            if (getIntent().hasExtra("data"))
-                addressData = (AddressData) getIntent().getParcelableExtra("data");
-            else {
-                startActivity(new Intent(context, SelectAddressActivity.class));
-                finish();
-            }
-
+            addressData = new Gson().fromJson(AppPreferences.getSelectedAdd(context), AddressData.class);
             Log.e(TAG, "onCreate: addressData >> " + addressData);
             list = new DBHelper(context).getMedicines();
             Log.e(TAG, "onCreate: list >> " + list);
             init();
-
 
             cartList = new DBHelper(context).getCartData();
             if (cartList != null) {

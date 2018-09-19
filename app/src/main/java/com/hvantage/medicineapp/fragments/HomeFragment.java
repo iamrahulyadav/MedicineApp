@@ -163,7 +163,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             etSearch.setAdapter(adapter);
         }
         AppPreferences.setSelectedPresId(context, "");
-        AppPreferences.setSelectedAddId(context, "");
         CartActivity.selectedPresc = null;
         return rootView;
     }

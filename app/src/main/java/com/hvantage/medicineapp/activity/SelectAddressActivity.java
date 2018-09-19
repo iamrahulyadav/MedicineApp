@@ -95,7 +95,9 @@ public class SelectAddressActivity extends AppCompatActivity {
 
             @Override
             public void select(View v, int position) {
+                Log.e(TAG, "select: " + String.valueOf(new Gson().toJsonTree(list.get(position), AddressData.class)));
                 AppPreferences.setSelectedAddId(context, list.get(position).getAddressId());
+                AppPreferences.setSelectedAdd(context, String.valueOf(new Gson().toJsonTree(list.get(position), AddressData.class)));
                 Intent intent = new Intent(context, ConfirmOrderActivity.class);
                 intent.putExtra("data", list.get(position));
                 startActivity(intent);
