@@ -42,59 +42,62 @@ public class PreMedicineItemAdapterMain extends RecyclerView.Adapter<PreMedicine
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final PreMedicineData data = arrayList.get(position);
         Log.d(TAG, position + " data : " + data);
-        holder.tvMedType.setText(data.getType());
-        holder.tvMedName.setText(data.getName());
-        holder.tvMedManufacturer.setText(data.getManufacturer());
-        holder.tvMedDescription.setText(data.getDescription());
-        holder.tvMedQty.setText(data.getQuantity());
-        holder.tvMedDoses.setText(data.getDoses());
-        if (listener != null) {
-            holder.imgRemove.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-                    new AlertDialog.Builder(context)
-                            .setMessage("Remove " + data.getName())
-                            .setPositiveButton("Remove", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    listener.removeItem(v, position);
-                                }
-                            })
-                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
+        if (data != null) {
 
-                                }
-                            })
-                            .show();
+            holder.tvMedType.setText(data.getType());
+            holder.tvMedName.setText(data.getName());
+            holder.tvMedManufacturer.setText(data.getManufacturer());
+            holder.tvMedDescription.setText(data.getDescription());
+            holder.tvMedQty.setText(data.getQuantity());
+            holder.tvMedDoses.setText(data.getDoses());
+            if (listener != null) {
+                holder.imgRemove.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+                        new AlertDialog.Builder(context)
+                                .setMessage("Remove " + data.getName())
+                                .setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        listener.removeItem(v, position);
+                                    }
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
 
-                }
-            });
+                                    }
+                                })
+                                .show();
 
-            holder.imgEdit.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-                    listener.editItem(v, position);
-                }
-            });
+                    }
+                });
 
-        } else {
-            holder.imgEdit.setVisibility(View.GONE);
-            holder.imgRemove.setVisibility(View.GONE);
-        }
+                holder.imgEdit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+                        listener.editItem(v, position);
+                    }
+                });
 
-        holder.imgHideShow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (holder.llHideShow.getVisibility() == View.VISIBLE) {
-                    holder.llHideShow.setVisibility(View.GONE);
-                    holder.imgHideShow.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
-                } else {
-                    holder.llHideShow.setVisibility(View.VISIBLE);
-                    holder.imgHideShow.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
-                }
+            } else {
+                holder.imgEdit.setVisibility(View.GONE);
+                holder.imgRemove.setVisibility(View.GONE);
             }
-        });
+
+            holder.imgHideShow.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (holder.llHideShow.getVisibility() == View.VISIBLE) {
+                        holder.llHideShow.setVisibility(View.GONE);
+                        holder.imgHideShow.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
+                    } else {
+                        holder.llHideShow.setVisibility(View.VISIBLE);
+                        holder.imgHideShow.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
+                    }
+                }
+            });
+        }
     }
 
 

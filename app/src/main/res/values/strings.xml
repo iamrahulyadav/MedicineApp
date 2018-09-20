@@ -29,4 +29,6 @@
     <string name="step3_text">Delivery at your home</string>
     <string name="steps_title">3 Easy steps to order</string>
     <string name="call_order_no">+911122334455</string>
+    <string name="support_email">help@onlinemedicine.com</string>
+    <string name="prescription_details_missing">Your prescription details are missing! Do you want to add it or skip and continue ordering? </string>
 </resources>

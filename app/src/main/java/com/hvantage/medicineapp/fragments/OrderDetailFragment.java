@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.OrderDetailItemAdapter;
 import com.hvantage.medicineapp.adapter.OrderDetailPresAdapter;
+import com.hvantage.medicineapp.model.AddressData;
 import com.hvantage.medicineapp.model.Item;
 import com.hvantage.medicineapp.model.OrderData;
 import com.hvantage.medicineapp.model.PrescriptionData;
@@ -66,7 +67,6 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         }
 
         init();
-        //setRecyclerView();
         if (data != null) {
             tvOrderID.setText("ORD" + data.getOrderId().replace(",", ""));
             tvStatus.setText(data.getOrderStatus());
@@ -75,15 +75,17 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
             tvPayableAmt.setText("Rs. " + data.getPayableAmount());
             tvTotalPrice.setText("Rs. " + data.getTotalAmount());
             tvPayMode.setText(data.getPaymentMode());
-           /* AddressData deliveryData = data.getDelivery_details();
-
-            tvAddress1.setText(deliveryData.getName() + ", " + deliveryData.getContactNo());
-            tvAddress2.setText(deliveryData.getAddress() + ", " + deliveryData.getLandmark());
-            tvAddress3.setText(deliveryData.getCity() + ", " + deliveryData.getPincode());
-            tvAddress4.setText(deliveryData.getState() + ", " + "India");*/
-
+            AddressData deliveryData = data.getAddressData();
+            if (deliveryData != null) {
+                tvAddress1.setText(deliveryData.getName() + ", " + deliveryData.getContactNo());
+                tvAddress2.setText(deliveryData.getAddress() + ", " + deliveryData.getLandmark());
+                tvAddress3.setText(deliveryData.getCity() + ", " + deliveryData.getPincode());
+                tvAddress4.setText(deliveryData.getState() + ", " + "India");
+            }
             list = data.getItems();
-            presList = data.getPrescription();
+            if (list.contains(null))
+                list.remove(null);
+            presList = data.getPrescriptionData();
             if (data.getOrderType().equalsIgnoreCase(String.valueOf(AppPreferences.getOrderType(context))))
                 llAmount.setVisibility(View.GONE);
             else

@@ -79,28 +79,6 @@
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/AppTheme" />
-        <activity
-            android:name=".activity.business.BusinessHomeActivity"
-            android:label=""
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden">
-
-            <!--
-              <intent-filter>
-                  <action android:name="android.intent.action.MAIN" />
-                  <category android:name="android.intent.category.LAUNCHER" />
-              </intent-filter>
-            -->
-        </activity>
-        <activity
-            android:name=".activity.business.BusinessLoginActivity"
-            android:label=""
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".activity.business.AddProductCatActivity"
-            android:label=""
-            android:theme="@style/AppTheme.NoActionBar" />
 
         <service
             android:name=".services.DBService"
@@ -115,7 +93,8 @@
         <activity
             android:name=".activity.ConfirmOrderActivity"
             android:label=""
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
             android:name=".activity.SelectAddressActivity"
             android:label=""

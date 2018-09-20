@@ -18,6 +18,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
@@ -30,7 +31,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -57,11 +60,13 @@ import com.hvantage.medicineapp.activity.SelectAddressActivity;
 import com.hvantage.medicineapp.adapter.DialogMultipleChoiceAdapter;
 import com.hvantage.medicineapp.adapter.PreMedicineItemAdapterEditable;
 import com.hvantage.medicineapp.adapter.PreMedicineItemAdapterMain;
+import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.DoctorDetails;
 import com.hvantage.medicineapp.model.DoseData;
 import com.hvantage.medicineapp.model.PatientDetails;
 import com.hvantage.medicineapp.model.PreMedicineData;
 import com.hvantage.medicineapp.model.PrescriptionData;
+import com.hvantage.medicineapp.model.ProductData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
 import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
@@ -94,11 +99,12 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
     private static final int REQUEST_IMAGE_CAPTURE = REQUEST_STORAGE + 1;
     private static final int REQUEST_LOAD_IMAGE = REQUEST_IMAGE_CAPTURE + 1;
     private static final String TAG = "AddPrescrFragment";
-    private ArrayList<PreMedicineData> medListMain;
+    public static ArrayList<PreMedicineData> medListMain;
     private ArrayList<PreMedicineData> medListEditable;
+    AppCompatAutoCompleteTextView etMedName1;
     EditText etDName1, etAddress1, etEmail1, etPhoneNo1, etPName1, etAge1,
-            etWeight1, etDiagnosis1, etMedType1, etMedName1, etMedManufacturer1,
-            etMedDescription1, etMedQty1, etMedDoses1;
+            etWeight1, etDiagnosis1, etMedType1, etMedManufacturer1,
+            etMedDescription1, etMedQty1, etMedDoses1, etMedPrice1, etMedImgUrl1;
     RadioGroup rgGender1;
     List<DoseData> dosesList = new ArrayList<DoseData>();
     String selectedDosesId = "";
@@ -133,6 +139,8 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
     private AppCompatButton btnAllNext, btnAllPrev, btnContinueOrder, btnAddPD, btnOrderNow, btnExit;
     private Spinner spinnerType1;
     private View bottomsheet_top;
+    private ArrayList<ProductData> searchList;
+    private SearchBarAdapter searchAdapter;
 
     @Nullable
     @Override
@@ -234,6 +242,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         bottomsheet_bottom = coordinatorLayout.findViewById(R.id.bottom_sheet);
         bottomsheet_top = coordinatorLayout.findViewById(R.id.bottomsheet_top);
         behavior = BottomSheetBehavior.from(bottomsheet_bottom);
+        behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomsheet_bottom, int newState) {
@@ -308,11 +317,40 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         btnOrderCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                PrescriptionData tempData = new PrescriptionData();
+                DoctorDetails dData = new DoctorDetails();
+                PatientDetails pData = new PatientDetails();
+
+
+                dData.setName(etDName1.getText().toString());
+                dData.setAddress(etAddress1.getText().toString());
+                dData.setEmail(etEmail1.getText().toString());
+                dData.setPhoneNo(etPhoneNo1.getText().toString());
+
+                pData.setName(etPName1.getText().toString());
+                pData.setAge(etAge1.getText().toString());
+                pData.setWeight(etWeight1.getText().toString());
+                pData.setGender(((RadioButton) rootView.findViewById(rgGender1.getCheckedRadioButtonId())).getText().toString());
+
+                if (data != null) {
+                    tempData.setPrescription_id(data.getPrescription_id());
+                    tempData.setPrescription_title(data.getPrescription_title());
+                    tempData.setImage(data.getImage());
+                } else {
+                    tempData.setPrescription_id("0");
+                    tempData.setPrescription_title("");
+                    tempData.setImage(image_base64);
+                }
+                tempData.setDoctorDetails(dData);
+                tempData.setPatientDetails(pData);
+                tempData.setMedicineDetails(null);
+                tempData.setDiagnosisDetails(etDiagnosis1.getText().toString());
+                tempData.setNotes("");
+
+                CartActivity.selectedPresc = tempData;
                 AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
-                AppPreferences.setSelectedPresId(context, data.getPrescription_id());
-                CartActivity.selectedPresc = data;
-                Log.e(TAG, "viewOrder: CartActivity.selectedPresc >> " + CartActivity.selectedPresc);
-                if (!AppPreferences.getSelectedPresId(context).equalsIgnoreCase("") && !AppPreferences.getSelectedAdd(context).equalsIgnoreCase("")) {
+                Log.e(TAG, "onClick: CartActivity.selectedPresc  >> " + CartActivity.selectedPresc);
+                if (!AppPreferences.getSelectedAddId(context).equalsIgnoreCase("") && !AppPreferences.getSelectedAdd(context).equalsIgnoreCase("")) {
                     startActivity(new Intent(context, ConfirmOrderActivity.class));
                 } else
                     startActivity(new Intent(context, SelectAddressActivity.class));
@@ -465,6 +503,8 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         etMedDescription1 = rootView.findViewById(R.id.etMedDescription1);
         etMedQty1 = rootView.findViewById(R.id.etMedQty1);
         etMedDoses1 = rootView.findViewById(R.id.etMedDoses1);
+        etMedPrice1 = rootView.findViewById(R.id.etMedPrice1);
+        etMedImgUrl1 = rootView.findViewById(R.id.etMedImgUrl1);
         spinnerType1 = (Spinner) rootView.findViewById(R.id.spinnerType1);
 
         spinnerType1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -517,6 +557,14 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         imgArrow.setOnClickListener(this);
         imgArrow1.setOnClickListener(this);
         initDoses();
+        searchList = new DBHelper(context).getMedicines();
+
+        if (searchList != null) {
+            Log.e(TAG, "onCreateView: searchList >> " + searchList.size());
+            etMedName1.setThreshold(1);
+            searchAdapter = new SearchBarAdapter(context, R.layout.auto_complete_text, searchList);
+            etMedName1.setAdapter(searchAdapter);
+        }
     }
 
     private void initDoses() {
@@ -647,6 +695,8 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                     predata1.setManufacturer(etMedManufacturer1.getText().toString());
                     predata1.setDescription(etMedDescription1.getText().toString());
                     predata1.setQuantity(etMedQty1.getText().toString());
+                    predata1.setPrice(etMedPrice1.getText().toString());
+                    predata1.setImage(etMedImgUrl1.getText().toString());
                     predata1.setDoses(etMedDoses1.getText().toString());
                     predata1.setDoses_id(selectedDosesId);
                     medListMain.set(last_edit_position, predata1);
@@ -657,6 +707,8 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                     etMedManufacturer1.setText("");
                     etMedDescription1.setText("");
                     etMedQty1.setText("");
+                    etMedPrice1.setText("");
+                    etMedImgUrl1.setText("");
                     etMedDoses1.setText("");
                     selectedDosesId = "";
                 } else {
@@ -669,6 +721,8 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                     predata1.setManufacturer(etMedManufacturer1.getText().toString());
                     predata1.setDescription(etMedDescription1.getText().toString());
                     predata1.setQuantity(etMedQty1.getText().toString());
+                    predata1.setPrice(etMedPrice1.getText().toString());
+                    predata1.setImage(etMedImgUrl1.getText().toString());
                     predata1.setDoses(etMedDoses1.getText().toString());
                     predata1.setDoses_id(selectedDosesId);
                     medListMain.add(predata1);
@@ -681,58 +735,76 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                     etMedManufacturer1.setText("");
                     etMedDescription1.setText("");
                     etMedQty1.setText("");
+                    etMedPrice1.setText("");
+                    etMedImgUrl1.setText("");
                     etMedDoses1.setText("");
                     selectedDosesId = "";
                 }
 
                 break;
             case R.id.btnContinueOrder:
-
-
                 if (medListEditable.size() == 0) {
-                    Toast.makeText(context, "Please add your medicines.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                PrescriptionData tempData = new PrescriptionData();
-                DoctorDetails dData = new DoctorDetails();
-                PatientDetails pData = new PatientDetails();
-
-
-                dData.setName(etDName1.getText().toString());
-                dData.setAddress(etAddress1.getText().toString());
-                dData.setEmail(etEmail1.getText().toString());
-                dData.setPhoneNo(etPhoneNo1.getText().toString());
-
-                pData.setName(etPName1.getText().toString());
-                pData.setAge(etAge1.getText().toString());
-                pData.setWeight(etWeight1.getText().toString());
-                pData.setGender(((RadioButton) rootView.findViewById(rgGender1.getCheckedRadioButtonId())).getText().toString());
-
-                if (data != null) {
-                    tempData.setPrescription_id(data.getPrescription_id());
-                    tempData.setPrescription_title(data.getPrescription_title());
-                    tempData.setImage(data.getImage());
+                    new AlertDialog.Builder(context)
+                            .setMessage(getString(R.string.prescription_details_missing))
+                            .setNegativeButton("Add Details", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    btnAddPD.performClick();
+                                }
+                            })
+                            .setPositiveButton("Skip & Order", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    btnOrderCall.performClick();
+                                }
+                            })
+                            .show();
                 } else {
-                    tempData.setPrescription_id("0");
-                    tempData.setPrescription_title("");
-                    tempData.setImage(image_base64);
-                }
-                tempData.setDoctorDetails(dData);
-                tempData.setPatientDetails(pData);
-                tempData.setMedicineDetails(medListMain);
-                tempData.setDiagnosisDetails(etDiagnosis1.getText().toString());
-                tempData.setNotes("");
+                    PrescriptionData tempData = new PrescriptionData();
+                    DoctorDetails dData = new DoctorDetails();
+                    PatientDetails pData = new PatientDetails();
 
-                CartActivity.selectedPresc = tempData;
-                Log.e(TAG, "onClick: CartActivity.selectedPresc  >> " + CartActivity.selectedPresc);
-                if (!AppPreferences.getSelectedPresId(context).equalsIgnoreCase("") && !AppPreferences.getSelectedAdd(context).equalsIgnoreCase("")) {
-                    startActivity(new Intent(context, ConfirmOrderActivity.class));
-                } else
-                    startActivity(new Intent(context, SelectAddressActivity.class));
+
+                    dData.setName(etDName1.getText().toString());
+                    dData.setAddress(etAddress1.getText().toString());
+                    dData.setEmail(etEmail1.getText().toString());
+                    dData.setPhoneNo(etPhoneNo1.getText().toString());
+
+                    pData.setName(etPName1.getText().toString());
+                    pData.setAge(etAge1.getText().toString());
+                    pData.setWeight(etWeight1.getText().toString());
+                    pData.setGender(((RadioButton) rootView.findViewById(rgGender1.getCheckedRadioButtonId())).getText().toString());
+
+                    if (data != null) {
+                        tempData.setPrescription_id(data.getPrescription_id());
+                        tempData.setPrescription_title(data.getPrescription_title());
+                        tempData.setImage(data.getImage());
+                    } else {
+                        tempData.setPrescription_id("0");
+                        tempData.setPrescription_title("");
+                        tempData.setImage(image_base64);
+                    }
+                    tempData.setDoctorDetails(dData);
+                    tempData.setPatientDetails(pData);
+                    tempData.setMedicineDetails(medListEditable);
+                    tempData.setDiagnosisDetails(etDiagnosis1.getText().toString());
+                    tempData.setNotes("");
+
+                    CartActivity.selectedPresc = tempData;
+                    Log.e(TAG, "onClick: CartActivity.selectedPresc  >> " + CartActivity.selectedPresc);
+                    AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
+                    if (!AppPreferences.getSelectedAddId(context).equalsIgnoreCase("") && !AppPreferences.getSelectedAdd(context).equalsIgnoreCase("")) {
+                        startActivity(new Intent(context, ConfirmOrderActivity.class));
+                    } else
+                        startActivity(new Intent(context, SelectAddressActivity.class));
+                }
                 break;
             case R.id.btnOrderNow:
+                behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                behavior.setHideable(false);
                 btnOrderNow.setVisibility(View.GONE);
                 bottomsheet_bottom.setVisibility(View.VISIBLE);
+
                 break;
             case R.id.btnExit:
                 new AlertDialog.Builder(context)
@@ -767,6 +839,13 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                 bottomsheet_bottom.setVisibility(View.GONE);
                 break;
             case R.id.imgArrow1:
+                /*if (cardMedicines1.getVisibility() == View.VISIBLE)
+                    if (data == null) {
+                        if (TextUtils.isEmpty(image_base64))
+                            Toast.makeText(context, "Select Image", Toast.LENGTH_SHORT).show();
+                        else new SaveTask().execute();
+                    } else
+                        new UpdateTask().execute();*/
                 bottomSheetTop.setVisibility(View.GONE);
                 bsAction1.setVisibility(View.VISIBLE);
                 imgArrow1.setVisibility(View.GONE);
@@ -974,7 +1053,19 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                             JSONObject jsonObject1 = jsonObject.getJSONArray("result").getJSONObject(0);
                             PrescriptionData newData = new Gson().fromJson(String.valueOf(jsonObject1), PrescriptionData.class);
                             data = newData;
-                            Log.e(TAG, "onResponse: data >> " + data);
+                            Log.e(TAG, "onResponse: newData >> " + data);
+                            medListMain.clear();
+                            medListEditable.clear();
+                            for (PreMedicineData data : data.getMedicineDetails()) {
+                                medListMain.add(data);
+                                medListEditable.add(data);
+                            }
+                            if (medListMain.contains(null)) {
+                                medListMain.remove(null);
+                            }
+                            if (medListEditable.contains(null)) {
+                                medListEditable.remove(null);
+                            }
                             publishProgress("200", "");
                         } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
                             String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
@@ -999,10 +1090,11 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
             super.onProgressUpdate(values);
             hideProgressDialog();
             adapter_editable.notifyDataSetChanged();
+            adapter_main.notifyDataSetChanged();
             String status = values[0];
             String msg = values[1];
             if (status.equalsIgnoreCase("200")) {
-                Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
                 bottomSheetTop.setVisibility(View.GONE);
                 bsAction1.setVisibility(View.VISIBLE);
                 imgArrow1.setVisibility(View.GONE);
@@ -1062,8 +1154,20 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                         if (jsonObject.getString("status").equalsIgnoreCase("200")) {
                             JSONObject jsonObject1 = jsonObject.getJSONArray("result").getJSONObject(0);
                             PrescriptionData newData = new Gson().fromJson(String.valueOf(jsonObject1), PrescriptionData.class);
-                            //data = newData;
-                            Log.e(TAG, "onResponse: data >> " + newData);
+                            data = newData;
+                            Log.e(TAG, "onResponse: newData >> " + newData);
+                            medListMain.clear();
+                            medListEditable.clear();
+                            for (PreMedicineData data : data.getMedicineDetails()) {
+                                medListMain.add(data);
+                                medListEditable.add(data);
+                            }
+                            if (medListMain.contains(null)) {
+                                medListMain.remove(null);
+                            }
+                            if (medListEditable.contains(null)) {
+                                medListEditable.remove(null);
+                            }
                             publishProgress("200", "");
                         } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
                             String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
@@ -1088,10 +1192,11 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
             super.onProgressUpdate(values);
             hideProgressDialog();
             adapter_editable.notifyDataSetChanged();
+            adapter_main.notifyDataSetChanged();
             String status = values[0];
             String msg = values[1];
             if (status.equalsIgnoreCase("200")) {
-                Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
                 bottomSheetTop.setVisibility(View.GONE);
                 bsAction1.setVisibility(View.VISIBLE);
                 imgArrow1.setVisibility(View.GONE);
@@ -1126,6 +1231,99 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         protected void onProgressUpdate(Void... values) {
             super.onProgressUpdate(values);
             hideProgressDialog();
+        }
+    }
+
+    public class SearchBarAdapter extends ArrayAdapter<ProductData> {
+
+        Context context;
+        int resource;
+        ArrayList<ProductData> items, tempItems, suggestions;
+        /**
+         * Custom Filter implementation for custom suggestions we provide.
+         */
+        Filter nameFilter = new Filter() {
+            @Override
+            public CharSequence convertResultToString(Object resultValue) {
+                String str = ((ProductData) resultValue).getName();
+                return str;
+            }
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                if (constraint != null) {
+                    suggestions.clear();
+                    for (ProductData tempdata : tempItems) {
+                        if (tempdata.getName().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                            suggestions.add(tempdata);
+                        }
+                    }
+                    FilterResults filterResults = new FilterResults();
+                    filterResults.values = suggestions;
+                    filterResults.count = suggestions.size();
+                    return filterResults;
+                } else {
+                    return new FilterResults();
+                }
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                ArrayList<ProductData> filterList = (ArrayList<ProductData>) results.values;
+                if (results != null && results.count > 0) {
+                    clear();
+                    for (ProductData tempdata : filterList) {
+                        add(tempdata);
+                        notifyDataSetChanged();
+                    }
+                }
+            }
+        };
+
+        public SearchBarAdapter(Context context, int resource, ArrayList<ProductData> items) {
+            super(context, resource, items);
+            this.context = context;
+            this.resource = resource;
+            this.items = items;
+            tempItems = new ArrayList<ProductData>(items); // this makes the difference.
+            suggestions = new ArrayList<ProductData>();
+        }
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            View view = convertView;
+            if (convertView == null) {
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.auto_complete_text_single_line, parent, false);
+            }
+            ProductData tempdata = items.get(position);
+            if (tempdata != null) {
+                TextView tvName = (TextView) view.findViewById(R.id.tvName);
+                if (tvName != null) {
+                    tvName.setText(tempdata.getName());
+                    tvName.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ProductData data = searchList.get(position);
+                            etMedName1.setText(data.getName());
+                            etMedDescription1.setText(data.getShortDescription());
+                            etMedManufacturer1.setText(data.getManufacturer());
+                            etMedType1.setText(data.getProductType());
+                            etMedPrice1.setText(data.getPriceDiscount());
+                            etMedImgUrl1.setText(data.getImage());
+//                            etMedName1.setSelection(0, etMedName1.getText().length());
+                            etMedQty1.requestFocus();
+                            etMedName1.dismissDropDown();
+                        }
+                    });
+                }
+            }
+            return view;
+        }
+
+        @Override
+        public Filter getFilter() {
+            return nameFilter;
         }
     }
 }

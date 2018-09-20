@@ -31,6 +31,12 @@ public class PreMedicineData implements Parcelable {
     @SerializedName("quantity")
     @Expose
     private String quantity = "";
+    @SerializedName("price")
+    @Expose
+    private String price = "";
+    @SerializedName("image")
+    @Expose
+    private String image = "";
     @SerializedName("doses_id")
     @Expose
     private String doses_id = "";
@@ -107,6 +113,22 @@ public class PreMedicineData implements Parcelable {
         this.quantity = quantity;
     }
 
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     @Override
     public String toString() {
         return "PreMedicineData{" +
@@ -117,6 +139,8 @@ public class PreMedicineData implements Parcelable {
                 ", doses='" + doses + '\'' +
                 ", description='" + description + '\'' +
                 ", quantity='" + quantity + '\'' +
+                ", price='" + price + '\'' +
+                ", image='" + image + '\'' +
                 ", doses_id='" + doses_id + '\'' +
                 '}';
     }
@@ -139,6 +163,8 @@ public class PreMedicineData implements Parcelable {
         dest.writeString(this.doses);
         dest.writeString(this.description);
         dest.writeString(this.quantity);
+        dest.writeString(this.price);
+        dest.writeString(this.image);
         dest.writeString(this.doses_id);
     }
 
@@ -150,6 +176,8 @@ public class PreMedicineData implements Parcelable {
         this.doses = in.readString();
         this.description = in.readString();
         this.quantity = in.readString();
+        this.price = in.readString();
+        this.image = in.readString();
         this.doses_id = in.readString();
     }
 

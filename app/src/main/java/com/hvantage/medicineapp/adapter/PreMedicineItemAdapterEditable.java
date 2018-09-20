@@ -45,68 +45,70 @@ public class PreMedicineItemAdapterEditable extends RecyclerView.Adapter<PreMedi
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final PreMedicineData data = arrayList.get(position);
         Log.d(TAG, position + " data : " + data);
-        holder.tvMedType.setText(data.getType());
-        holder.tvMedName.setText(data.getName());
-        holder.tvMedManufacturer.setText(data.getManufacturer());
-        holder.tvMedDescription.setText(data.getDescription());
-        holder.etMedQty.setText(data.getQuantity());
-        holder.tvMedDoses.setText(data.getDoses());
-        if (listener != null) {
-            holder.imgRemove.setOnClickListener(new View.OnClickListener() {
+        if (data != null) {
+            holder.tvMedType.setText(data.getType());
+            holder.tvMedName.setText(data.getName());
+            holder.tvMedManufacturer.setText(data.getManufacturer());
+            holder.tvMedDescription.setText(data.getDescription());
+            holder.etMedQty.setText(data.getQuantity());
+            holder.tvMedDoses.setText(data.getDoses());
+            if (listener != null) {
+                holder.imgRemove.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(final View v) {
+                        new AlertDialog.Builder(context)
+                                .setMessage("Remove " + data.getName())
+                                .setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        listener.removeItem(v, position);
+                                    }
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                })
+                                .show();
+
+                    }
+                });
+
+            } else {
+                holder.imgRemove.setVisibility(View.GONE);
+            }
+
+            holder.imgHideShow.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(final View v) {
-                    new AlertDialog.Builder(context)
-                            .setMessage("Remove " + data.getName())
-                            .setPositiveButton("Remove", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    listener.removeItem(v, position);
-                                }
-                            })
-                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                }
-                            })
-                            .show();
-
+                public void onClick(View v) {
+                    if (holder.llHideShow.getVisibility() == View.VISIBLE) {
+                        holder.llHideShow.setVisibility(View.GONE);
+                        holder.imgHideShow.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
+                    } else {
+                        holder.llHideShow.setVisibility(View.VISIBLE);
+                        holder.imgHideShow.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
+                    }
                 }
             });
 
-        } else {
-            holder.imgRemove.setVisibility(View.GONE);
-        }
+            holder.etMedQty.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-        holder.imgHideShow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (holder.llHideShow.getVisibility() == View.VISIBLE) {
-                    holder.llHideShow.setVisibility(View.GONE);
-                    holder.imgHideShow.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
-                } else {
-                    holder.llHideShow.setVisibility(View.VISIBLE);
-                    holder.imgHideShow.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
                 }
-            }
-        });
 
-        holder.etMedQty.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    listener.editItem(null, position, s + "");
+                }
 
-            }
+                @Override
+                public void afterTextChanged(Editable s) {
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                listener.editItem(null, position, s + "");
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
+                }
+            });
+        }
     }
 
 

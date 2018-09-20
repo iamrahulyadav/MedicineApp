@@ -8,12 +8,17 @@ import android.content.IntentFilter;
 import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatImageView;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -96,51 +101,12 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private SearchBarAdapter adapter;
     private boolean prescription_required = false;
     private CartMedicineItemAdapter adapterMedicine;
-
-    class CartUpdateReciever extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.e(TAG, "onReceive:");
-            if (cartList != null) {
-                cartList.clear();
-                payable_amt = 0;
-                subtotal_amt = 0;
-                cartList = new DBHelper(context).getCartData();
-                if (cartList.size() > 0) {
-                    Log.e(TAG, "onCreate: cartList >> " + cartList);
-                    llMedicine.setVisibility(View.VISIBLE);
-                    setRecyclerViewCart();
-                    for (int i = 0; i < cartList.size(); i++) {
-                        subtotal_amt = Functions.roundTwoDecimals(subtotal_amt + cartList.get(i).getItem_total_price());
-                        if (prescription_required == false)
-                            if (cartList.get(i).isIs_prescription_required() == true) {
-                                prescription_required = true;
-                            }
-                    }
-                    payable_amt = subtotal_amt + delivery_fee;
-                    tvTotalPrice.setText("Rs. " + subtotal_amt + "");
-                    tvDeliveryFee.setText("Rs. " + delivery_fee + "");
-                    tvPayableAmt.setText("Rs. " + payable_amt + "");
-                } else {
-                    llMedicine.setVisibility(View.GONE);
-                    llAmount.setVisibility(View.GONE);
-                    llPayMode.setVisibility(View.GONE);
-                }
-            } else {
-                llMedicine.setVisibility(View.GONE);
-                llAmount.setVisibility(View.GONE);
-                llPayMode.setVisibility(View.GONE);
-            }
-
-            Log.e(TAG, "onReceive: CartActivity.selectedPresc  >> " + CartActivity.selectedPresc);
-            Log.e(TAG, "onReceive: AppPreferences.getSelectedPresId(context) >> " + AppPreferences.getSelectedPresId(context));
-            if (CartActivity.selectedPresc == null && AppPreferences.getSelectedPresId(context).equalsIgnoreCase("")) {
-                llAmount.setVisibility(View.VISIBLE);
-                llPayMode.setVisibility(View.GONE);
-                llPrescription.setVisibility(View.GONE);
-            }
-        }
-    }
+    private AppCompatTextView tvAdd1;
+    private boolean isExpand = false;
+    private CoordinatorLayout coordinatorLayout;
+    private AppCompatImageView imgArrow;
+    private View bottomsheet_bottom;
+    private BottomSheetBehavior<View> behavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,6 +128,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             list = new DBHelper(context).getMedicines();
             Log.e(TAG, "onCreate: list >> " + list);
             init();
+            setBottomBar();
 
             cartList = new DBHelper(context).getCartData();
             if (cartList != null) {
@@ -209,6 +176,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void init() {
+        tvAdd1 = findViewById(R.id.tvAdd1);
         recylcer_view_items = (RecyclerView) findViewById(R.id.recylcer_view_items);
         recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
         recylcer_view_medicines = (RecyclerView) findViewById(R.id.recylcer_view_medicines);
@@ -229,6 +197,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         llAmount = (LinearLayout) findViewById(R.id.llAmount);
         llPayMode = (LinearLayout) findViewById(R.id.llPayMode);
         tvCheckout.setOnClickListener(this);
+        tvAdd1.setOnClickListener(this);
         tvChangeAddress.setOnClickListener(this);
         rgOrderType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -245,6 +214,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             adapter = new SearchBarAdapter(context, R.layout.auto_complete_text, list);
             etSearch.setAdapter(adapter);
         }
+
         ((NestedScrollView) findViewById(R.id.touch_outside)).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -252,6 +222,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 return false;
             }
         });
+
         recylcer_view_items.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -259,6 +230,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 return false;
             }
         });
+
         recylcer_view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -267,7 +239,6 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             }
         });
     }
-
 
     private void setRecyclerView() {
         adapterPres = new ConfirmOrderPrescAdapter(context, prescList, null);
@@ -317,6 +288,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tvCheckout:
+                Log.e(TAG, "onClick: orderType >> " + orderType);
                 if (Functions.isConnectingToInternet(context)) {
                     if (prescription_required == true && CartActivity.selectedPresc == null) {
                         showUploadRxDialog();
@@ -332,7 +304,63 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             case R.id.tvChangeAddress:
                 startActivity(new Intent(context, SelectAddressActivity.class));
                 break;
+            case R.id.tvAdd1:
+                if (isExpand)
+                    behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                else
+                    behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                break;
+            case R.id.imgArrow:
+                behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                break;
         }
+    }
+
+    private void setBottomBar() {
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.main_content);
+        bottomsheet_bottom = coordinatorLayout.findViewById(R.id.bottom_sheet);
+        imgArrow = findViewById(R.id.imgArrow);
+
+        imgArrow.setOnClickListener(this);
+        behavior = BottomSheetBehavior.from(bottomsheet_bottom);
+        behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomsheet_bottom, int newState) {
+                Log.e("onStateChanged", "onStateChanged:" + newState);
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        Log.d(TAG, "onStateChanged: STATE_HIDDEN");
+                        Functions.hideSoftKeyboard(context, bottomsheet_bottom);
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED:
+                        isExpand = true;
+                        Log.d(TAG, "onStateChanged: STATE_EXPANDED");
+                        break;
+                    case BottomSheetBehavior.STATE_COLLAPSED:
+                        isExpand = false;
+                        break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        Log.d(TAG, "onStateChanged: STATE_DRAGGING");
+                        Functions.hideSoftKeyboard(context, bottomsheet_bottom);
+                        break;
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        Log.d(TAG, "onStateChanged: STATE_SETTLING");
+                        Functions.hideSoftKeyboard(context, bottomsheet_bottom);
+                        break;
+
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomsheet_bottom, float slideOffset) {
+                animateBottomSheetArrows(slideOffset);
+            }
+        });
+    }
+
+    private void animateBottomSheetArrows(float slideOffset) {
+        imgArrow.setRotation(slideOffset * -180);
     }
 
     private void showUploadRxDialog() {
@@ -386,11 +414,60 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             llPayMode.setVisibility(View.GONE);
             medList = CartActivity.selectedPresc.getMedicineDetails();
             Log.e(TAG, "onResume: medList >> " + medList);
-            setRecyclerViewMedicine();
+            if (CartActivity.selectedPresc.getMedicineDetails() != null) {
+                setRecyclerViewMedicine();
+            } else {
+            }
         } else {
             llPrescription.setVisibility(View.GONE);
             llAmount.setVisibility(View.VISIBLE);
             llPayMode.setVisibility(View.VISIBLE);
+        }
+    }
+
+    class CartUpdateReciever extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            cartList = new DBHelper(context).getCartData();
+            Log.e(TAG, "onReceive: cartList >> " + cartList);
+
+            if (cartList != null) {
+                cartList.clear();
+                payable_amt = 0;
+                subtotal_amt = 0;
+                if (cartList.size() > 0) {
+                    Log.e(TAG, "onCreate: cartList >> " + cartList);
+                    llMedicine.setVisibility(View.VISIBLE);
+                    setRecyclerViewCart();
+                    for (int i = 0; i < cartList.size(); i++) {
+                        subtotal_amt = Functions.roundTwoDecimals(subtotal_amt + cartList.get(i).getItem_total_price());
+                        if (prescription_required == false)
+                            if (cartList.get(i).isIs_prescription_required() == true) {
+                                prescription_required = true;
+                            }
+                    }
+                    payable_amt = subtotal_amt + delivery_fee;
+                    tvTotalPrice.setText("Rs. " + subtotal_amt + "");
+                    tvDeliveryFee.setText("Rs. " + delivery_fee + "");
+                    tvPayableAmt.setText("Rs. " + payable_amt + "");
+                } else {
+                    llMedicine.setVisibility(View.GONE);
+                    llAmount.setVisibility(View.GONE);
+                    llPayMode.setVisibility(View.GONE);
+                }
+            } else {
+                llMedicine.setVisibility(View.GONE);
+                llAmount.setVisibility(View.GONE);
+                llPayMode.setVisibility(View.GONE);
+            }
+
+            Log.e(TAG, "onReceive: CartActivity.selectedPresc  >> " + CartActivity.selectedPresc);
+            Log.e(TAG, "onReceive: AppPreferences.getSelectedPresId(context) >> " + AppPreferences.getSelectedPresId(context));
+            if (CartActivity.selectedPresc == null && AppPreferences.getSelectedPresId(context).equalsIgnoreCase("")) {
+                llAmount.setVisibility(View.VISIBLE);
+                llPayMode.setVisibility(View.GONE);
+                llPrescription.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -409,8 +486,8 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
             jsonObject.add("prescription_data", new Gson().toJsonTree(CartActivity.selectedPresc));
             jsonObject.addProperty("address_id", selected_add_id);
-            jsonObject.addProperty("order_type", selected_add_id);
-            jsonObject.addProperty("payment_mode", orderType);
+            jsonObject.addProperty("order_type", orderType);
+            jsonObject.addProperty("payment_mode", "1");
             jsonObject.addProperty("payment_type", "cash");
             jsonObject.addProperty("note", etNote.getText().toString());
             if (cartList == null)

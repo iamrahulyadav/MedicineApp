@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorWhite"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".activity.ConfirmOrderActivity"
     tools:showIn="@layout/activity_confirm_item">
+
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -78,7 +80,7 @@
                         android:layout_marginTop="5dp"
                         android:text="Uploaded Prescriptions"
                         android:textAlignment="center"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                         android:textColor="@color/colorPrimary"
                         android:textStyle="bold" />
 
@@ -109,28 +111,47 @@
                         android:textColor="@color/colorTextHeading"
                         android:textStyle="italic" />
 
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:text="Prescriptions Medicines"
-                        android:textAlignment="center"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/colorPrimary"
-                        android:textStyle="bold" />
-
-                    <android.support.v4.widget.NestedScrollView
+                    <LinearLayout
+                        android:id="@+id/llPMedicines"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
-                        <android.support.v7.widget.RecyclerView
-                            android:id="@+id/recylcer_view_medicines"
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="5dp"
-                            android:overScrollMode="never" />
-                    </android.support.v4.widget.NestedScrollView>
+                            android:text="Prescription Medicines"
+                            android:textAlignment="center"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                            android:textColor="@color/colorPrimary"
+                            android:textStyle="bold" />
+
+                        <android.support.v4.widget.NestedScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+
+                            <android.support.v7.widget.RecyclerView
+                                android:id="@+id/recylcer_view_medicines"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:overScrollMode="never" />
+                        </android.support.v4.widget.NestedScrollView>
+                    </LinearLayout>
+
+                    <android.support.v7.widget.AppCompatTextView
+                        android:id="@+id/tvAdd1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/ic_add_colored_drawable"
+                        android:drawablePadding="3dp"
+                        android:text="Add Prescription Medicines"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                        android:textColor="@color/colorPrimary"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
                 </LinearLayout>
 
 
@@ -148,14 +169,12 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:text="Items"
+                            android:layout_marginTop="10dp"
+                            android:text="Cart Items"
                             android:textAlignment="center"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                             android:textColor="@color/colorPrimary"
                             android:textStyle="bold" />
-
-
                     </RelativeLayout>
 
                     <TextView
@@ -354,7 +373,7 @@
                         android:layout_marginTop="5dp"
                         android:text="Delivering to"
                         android:textAlignment="center"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                         android:textColor="@color/colorPrimary"
                         android:textStyle="bold" />
 
@@ -435,7 +454,7 @@
                         android:layout_marginTop="10dp"
                         android:text="Payment method"
                         android:textAlignment="center"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                         android:textColor="@color/colorPrimary"
                         android:textStyle="bold" />
 
@@ -502,7 +521,7 @@
                     android:layout_marginTop="10dp"
                     android:text="Order Type"
                     android:textAlignment="center"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:textColor="@color/colorPrimary"
                     android:textStyle="bold" />
 
@@ -538,6 +557,7 @@
                         style="@style/Base.Widget.AppCompat.CompoundButton.CheckBox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:enabled="false"
                         android:text="Take-Away"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
                         android:textColor="@color/colorTextHeading"
@@ -559,7 +579,7 @@
                     android:layout_marginTop="10dp"
                     android:text="Have a promo code?"
                     android:textAlignment="center"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:textColor="@color/colorPrimary"
                     android:textStyle="bold" />
 
@@ -602,7 +622,7 @@
                     android:layout_marginTop="10dp"
                     android:text="Remark"
                     android:textAlignment="center"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:textColor="@color/colorPrimary"
                     android:textStyle="bold" />
 
@@ -653,4 +673,44 @@
 
 
     </RelativeLayout>
-</android.support.constraint.ConstraintLayout>
+
+    <FrameLayout
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="70dp"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="-12dp"
+            android:layout_marginTop="15dp"
+            android:background="@color/colorActivityBackground"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="15dp"
+            app:cardMaxElevation="15dp"
+            app:contentPadding="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/imgArrow"
+                    android:layout_width="20dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="10dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/arrow_up"
+                    android:tint="@color/colorTextSubHeading"
+                    android:visibility="visible" />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+    </FrameLayout>
+
+</android.support.design.widget.CoordinatorLayout>

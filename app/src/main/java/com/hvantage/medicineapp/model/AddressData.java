@@ -136,7 +136,7 @@ public class AddressData implements Parcelable {
 
     @Override
     public String toString() {
-        return "AddressData{" +
+        return "{" +
                 "address='" + address + '\'' +
                 ", city='" + city + '\'' +
                 ", contactNo='" + contactNo + '\'' +

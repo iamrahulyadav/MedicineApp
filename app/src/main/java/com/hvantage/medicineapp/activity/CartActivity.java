@@ -145,8 +145,11 @@ public class CartActivity extends AppCompatActivity {
                 if (selectedPresc == null) {
                     showAlertDialog();
                 } else {
-                    AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITHOUT_PRESCRIPTION);
-                    startActivity(new Intent(context, SelectAddressActivity.class));
+                    AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
+                    if (!AppPreferences.getSelectedAddId(context).equalsIgnoreCase("") && !AppPreferences.getSelectedAdd(context).equalsIgnoreCase("")) {
+                        startActivity(new Intent(context, ConfirmOrderActivity.class));
+                    } else
+                        startActivity(new Intent(context, SelectAddressActivity.class));
                 }
             }
         });
@@ -172,7 +175,7 @@ public class CartActivity extends AppCompatActivity {
         btnView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showAlertDialog();
+                startActivity(new Intent(context, AddPrescActivity.class).putExtra("data", "data"));
             }
         });
     }

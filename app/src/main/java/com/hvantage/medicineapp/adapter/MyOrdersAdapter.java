@@ -37,7 +37,7 @@ public class MyOrdersAdapter extends RecyclerView.Adapter<MyOrdersAdapter.ViewHo
         Log.e(TAG, position + " data : " + data);
         holder.tvDate.setText(data.getDatdateTimee());
         holder.tvStatus.setText(data.getOrderStatus());
-        holder.tvID.setText("ORD" + data.getOrderId().replace("-", ""));
+        holder.tvID.setText("#ORD-" + data.getOrderId());
     }
 
 

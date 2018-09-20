@@ -3,6 +3,8 @@ package com.hvantage.medicineapp.adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.model.PreMedicineData;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -43,7 +46,13 @@ public class CartMedicineItemAdapter extends RecyclerView.Adapter<CartMedicineIt
         holder.tvTitle.setText(data.getName());
         holder.tvSubtitle.setText(data.getManufacturer());
         holder.tvQty.setText("" + data.getQuantity());
-
+        if (!data.getImage().equalsIgnoreCase("")) {
+            Picasso.with(context)
+                    .load(data.getImage())
+                    .placeholder(R.drawable.no_image_placeholder)
+                    .resize(60, 60)
+                    .into(holder.imageThumb);
+        }
 
         holder.tvMinus.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,6 +89,7 @@ public class CartMedicineItemAdapter extends RecyclerView.Adapter<CartMedicineIt
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         remove(position);
+
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -95,6 +105,7 @@ public class CartMedicineItemAdapter extends RecyclerView.Adapter<CartMedicineIt
         arrayList.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, arrayList.size());
+        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent("cart_update"));
         Toast.makeText(context, "Removed", Toast.LENGTH_SHORT).show();
     }
 

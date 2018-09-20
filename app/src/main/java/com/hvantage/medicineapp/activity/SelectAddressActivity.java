@@ -44,7 +44,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class SelectAddressActivity extends AppCompatActivity {
-
     private static final String TAG = "SelectAddressActivity";
     private Context context;
     private ArrayList<AddressData> list = new ArrayList<AddressData>();

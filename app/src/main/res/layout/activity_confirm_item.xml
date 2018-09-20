@@ -37,5 +37,4 @@
 
     <include layout="@layout/content_confirm_item" />
 
-
 </android.support.design.widget.CoordinatorLayout>

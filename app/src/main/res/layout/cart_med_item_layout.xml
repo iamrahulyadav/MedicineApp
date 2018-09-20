@@ -21,8 +21,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:src="@drawable/action_upload_rx"
-            android:tint="@color/colorGray" />
+            android:src="@drawable/no_image_placeholder" />
 
         <TextView
             android:id="@+id/tvTitle"
@@ -44,7 +43,6 @@
             android:textAppearance="@style/TextAppearance.Compat.Notification.Time"
             android:textColor="@color/colorTextSubHeading"
             android:textStyle="bold" />
-
 
         <RelativeLayout
             android:id="@+id/r1"

@@ -58,7 +58,10 @@ public class OrderData implements Parcelable {
     private String datdateTimee;
     @SerializedName("prescription_data")
     @Expose
-    private List<PrescriptionData> prescription = null;
+    private List<PrescriptionData> prescriptionData = null;
+    @SerializedName("address_data")
+    @Expose
+    private AddressData addressData;
     @SerializedName("items")
     @Expose
     private List<Item> items = null;
@@ -183,12 +186,20 @@ public class OrderData implements Parcelable {
         this.datdateTimee = datdateTimee;
     }
 
-    public List<PrescriptionData> getPrescription() {
-        return prescription;
+    public List<PrescriptionData> getPrescriptionData() {
+        return prescriptionData;
     }
 
-    public void setPrescription(List<PrescriptionData> prescription) {
-        this.prescription = prescription;
+    public void setPrescriptionData(List<PrescriptionData> prescriptionData) {
+        this.prescriptionData = prescriptionData;
+    }
+
+    public AddressData getAddressData() {
+        return addressData;
+    }
+
+    public void setAddressData(AddressData addressData) {
+        this.addressData = addressData;
     }
 
     public List<Item> getItems() {
@@ -222,7 +233,8 @@ public class OrderData implements Parcelable {
         dest.writeString(this.otherTaxAmt);
         dest.writeString(this.paymentStatus);
         dest.writeString(this.datdateTimee);
-        dest.writeTypedList(this.prescription);
+        dest.writeTypedList(this.prescriptionData);
+        dest.writeParcelable(this.addressData, flags);
         dest.writeList(this.items);
     }
 
@@ -245,12 +257,13 @@ public class OrderData implements Parcelable {
         this.otherTaxAmt = in.readString();
         this.paymentStatus = in.readString();
         this.datdateTimee = in.readString();
-//        this.prescription = in.createTypedArrayList(PrescriptionData.CREATOR);
+        this.prescriptionData = in.createTypedArrayList(PrescriptionData.CREATOR);
+        this.addressData = in.readParcelable(AddressData.class.getClassLoader());
         this.items = new ArrayList<Item>();
-        in.readList(this.items, Item.class.getClassLoader());
+        in.readList(this.items, Object.class.getClassLoader());
     }
 
-    public static final Parcelable.Creator<OrderData> CREATOR = new Parcelable.Creator<OrderData>() {
+    public static final Creator<OrderData> CREATOR = new Creator<OrderData>() {
         @Override
         public OrderData createFromParcel(Parcel source) {
             return new OrderData(source);

@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/colorActivityBackground">
 
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -27,7 +26,6 @@
             android:adjustViewBounds="true"
             android:scaleType="centerCrop" />
     </RelativeLayout>
-
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
@@ -55,13 +53,12 @@
             android:textStyle="bold" />
     </android.support.v7.widget.CardView>
 
-
     <FrameLayout
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:behavior_hideable="false"
+        app:behavior_hideable="true"
         app:behavior_peekHeight="70dp"
         app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
@@ -655,9 +652,10 @@
                                 android:imeOptions="actionNext"
                                 android:inputType="textCapWords"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                                android:textColor="@color/colorTextHeading" />
+                                android:textColor="@color/colorTextHeading"
+                                android:textStyle="bold" />
 
-                            <android.support.v7.widget.AppCompatEditText
+                            <android.support.v7.widget.AppCompatAutoCompleteTextView
                                 android:id="@+id/etMedName1"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -665,7 +663,8 @@
                                 android:imeOptions="actionNext"
                                 android:inputType="textCapWords"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                                android:textColor="@color/colorTextHeading" />
+                                android:textColor="@color/colorTextHeading"
+                                android:textStyle="bold" />
 
                             <android.support.v7.widget.AppCompatEditText
                                 android:id="@+id/etMedManufacturer1"
@@ -675,7 +674,8 @@
                                 android:imeOptions="actionNext"
                                 android:inputType="textCapWords"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                                android:textColor="@color/colorTextHeading" />
+                                android:textColor="@color/colorTextHeading"
+                                android:textStyle="bold" />
 
                             <android.support.v7.widget.AppCompatEditText
                                 android:id="@+id/etMedDescription1"
@@ -696,7 +696,8 @@
                                 android:imeOptions="actionDone"
                                 android:inputType="number"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                                android:textColor="@color/colorTextHeading" />
+                                android:textColor="@color/colorTextHeading"
+                                android:textStyle="bold" />
 
                             <android.support.v7.widget.AppCompatEditText
                                 android:id="@+id/etMedDoses1"
@@ -706,11 +707,35 @@
                                 android:focusableInTouchMode="false"
                                 android:hint="Select Doses?"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                                android:textColor="@color/colorTextHeading" />
+                                android:textColor="@color/colorTextHeading"
+                                android:textStyle="bold" />
+
+                            <android.support.v7.widget.AppCompatEditText
+                                android:id="@+id/etMedPrice1"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Price"
+                                android:text=""
+                                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                                android:textColor="@color/colorTextHeading"
+                                android:textStyle="bold"
+                                android:visibility="gone" />
+
+                            <android.support.v7.widget.AppCompatEditText
+                                android:id="@+id/etMedImgUrl1"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Price"
+                                android:text=""
+                                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                                android:textColor="@color/colorTextHeading"
+                                android:textStyle="bold"
+                                android:visibility="gone" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginBottom="10dp"
                                 android:orientation="horizontal">
 
                                 <android.support.v7.widget.AppCompatButton
@@ -723,7 +748,6 @@
                                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
                                     android:textColor="@color/colorPrimary"
                                     android:textStyle="bold" />
-
 
                                 <android.support.v7.widget.AppCompatButton
                                     android:id="@+id/btnAdd1"

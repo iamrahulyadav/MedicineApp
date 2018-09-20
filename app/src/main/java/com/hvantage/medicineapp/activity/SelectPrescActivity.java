@@ -16,7 +16,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.adapter.AllUploadedPreAdapter;
+import com.hvantage.medicineapp.adapter.AllUploadedPreAdapter2;
 import com.hvantage.medicineapp.model.PrescriptionData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
 import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
@@ -40,7 +40,7 @@ public class SelectPrescActivity extends AppCompatActivity {
     private static final String TAG = "SelectPrescActivity";
     private Context context;
     private RecyclerView recylcer_view;
-    private AllUploadedPreAdapter adapter;
+    private AllUploadedPreAdapter2 adapter;
     private ArrayList<PrescriptionData> list = new ArrayList<PrescriptionData>();
     private ProgressBar progressBar;
     private CardView cardEmptyText;
@@ -69,18 +69,18 @@ public class SelectPrescActivity extends AppCompatActivity {
 
     private void setRecyclerView() {
         recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
-        adapter = new AllUploadedPreAdapter(context, list, new AllUploadedPreAdapter.MyAdapterListener() {
+        adapter = new AllUploadedPreAdapter2(context, list, new AllUploadedPreAdapter2.MyAdapterListener() {
             @Override
             public void viewOrder(View v, int position) {
-
-            }
-
-            @Override
-            public void placeOrder(View v, int position) {
                 CartActivity.selectedPresc = list.get(position);
                 AppPreferences.setSelectedPresId(context, list.get(position).getPrescription_id());
                 finish();
                 Log.e(TAG, "viewOrder: CartActivity.selectedPresc >> " + CartActivity.selectedPresc);
+            }
+
+            @Override
+            public void placeOrder(View v, int position) {
+
             }
         });
         recylcer_view.setLayoutManager(new LinearLayoutManager(context));

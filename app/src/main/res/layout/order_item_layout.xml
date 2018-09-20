@@ -10,19 +10,39 @@
     android:foreground="?attr/selectableItemBackgroundBorderless"
     app:cardBackgroundColor="@color/colorWhite"
     app:cardCornerRadius="3dp"
-    app:cardElevation="1dp"
-    app:contentPadding="8dp">
+    app:cardElevation="1dp">
+
+    <View
+        android:layout_width="4dp"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary" />
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp">
 
+        <TextView
+            android:id="@+id/tvID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="5dp"
+            android:maxLength="20"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text=""
+            android:textAllCaps="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@color/colorTextHeading"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
             android:singleLine="true"
             android:text="May 18"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
@@ -33,29 +53,17 @@
             android:id="@+id/tvStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
+            android:layout_below="@id/tvID"
+            android:layout_marginLeft="8dp"
+            android:drawableLeft="@drawable/ic_history_red_drawable"
+            android:drawablePadding="5dp"
             android:singleLine="true"
             android:text="In-Progress"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textColor="@color/colorSuccess"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="@color/colorError"
             android:textStyle="bold" />
 
 
-        <TextView
-            android:id="@+id/tvID"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tvDate"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
-            android:maxLength="20"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:text=""
-            android:textAllCaps="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textColor="@color/colorTextHeading"
-            android:textStyle="bold" />
     </RelativeLayout>
 </android.support.v7.widget.CardView>
 

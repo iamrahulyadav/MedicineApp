@@ -177,9 +177,8 @@ public class AddAddressActivity extends AppCompatActivity implements View.OnClic
             String status = values[0];
             String msg = values[1];
             if (status.equalsIgnoreCase("200")) {
-                Log.e(TAG, "onProgressUpdate: newData >> " + newData);
+                Log.e(TAG, "onProgressUpdate: AppPreferences.getSelectedAdd >> " + AppPreferences.getSelectedAdd(context));
                 Intent intent = new Intent(context, ConfirmOrderActivity.class);
-                intent.putExtra("data", newData);
                 startActivity(intent);
                 finish();
             } else if (status.equalsIgnoreCase("400")) {

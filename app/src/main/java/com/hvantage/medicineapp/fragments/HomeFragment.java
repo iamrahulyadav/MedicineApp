@@ -181,8 +181,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         dots_layout = (LinearLayout) rootView.findViewById(R.id.dotslayout);
         offerList.clear();
         offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer1));
+        offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer2));
         offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer3));
-        offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer4));
         viewPagerOffers.setAdapter(new OfferPagerAdapter(getActivity(), offerList));
         createDots(0);
         viewPagerOffers.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
