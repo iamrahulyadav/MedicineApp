@@ -142,7 +142,7 @@ public class CartActivity extends AppCompatActivity {
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (selectedPresc == null) {
+                if (prescription_required == true && selectedPresc == null) {
                     showAlertDialog();
                 } else {
                     AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);

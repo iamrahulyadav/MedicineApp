@@ -26,6 +26,7 @@ import java.util.ArrayList;
 public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHolder> {
 
     private static final String TAG = "CartItemAdapter";
+    private MyAdapterListener listener;
     Context context;
     ArrayList<CartData> arrayList;
 
@@ -153,5 +154,9 @@ public class CartItemAdapter extends RecyclerView.Adapter<CartItemAdapter.ViewHo
             tvDelete = (TextView) itemView.findViewById(R.id.tvDelete);
             imageThumb = (ImageView) itemView.findViewById(R.id.imageThumb);
         }
+    }
+
+    public interface MyAdapterListener {
+        void removeItem(View v, int position);
     }
 }

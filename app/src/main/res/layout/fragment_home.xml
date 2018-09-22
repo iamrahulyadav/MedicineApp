@@ -416,7 +416,8 @@
                     android:layout_centerVertical="true"
                     android:layout_marginRight="10dp"
                     android:entries="@array/filter_no_items"
-                    android:padding="8dp"></Spinner>
+                    android:padding="8dp"
+                    android:visibility="gone"></Spinner>
             </RelativeLayout>
 
 

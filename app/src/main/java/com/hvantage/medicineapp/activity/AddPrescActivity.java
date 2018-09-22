@@ -428,7 +428,7 @@ public class AddPrescActivity extends AppCompatActivity implements View.OnClickL
 
         if (searchList != null) {
             Log.e(TAG, "onCreateView: searchList >> " + searchList.size());
-            etMedName1.setThreshold(1);
+            etMedName1.setThreshold(4);
             searchAdapter = new SearchBarAdapter(context, R.layout.auto_complete_text, searchList);
             etMedName1.setAdapter(searchAdapter);
         }

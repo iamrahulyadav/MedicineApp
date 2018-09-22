@@ -100,7 +100,6 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
     private static final int REQUEST_LOAD_IMAGE = REQUEST_IMAGE_CAPTURE + 1;
     private static final String TAG = "AddPrescrFragment";
     public static ArrayList<PreMedicineData> medListMain;
-    private ArrayList<PreMedicineData> medListEditable;
     AppCompatAutoCompleteTextView etMedName1;
     EditText etDName1, etAddress1, etEmail1, etPhoneNo1, etPName1, etAge1,
             etWeight1, etDiagnosis1, etMedType1, etMedManufacturer1,
@@ -108,6 +107,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
     RadioGroup rgGender1;
     List<DoseData> dosesList = new ArrayList<DoseData>();
     String selectedDosesId = "";
+    private ArrayList<PreMedicineData> medListEditable;
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
@@ -350,6 +350,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                 CartActivity.selectedPresc = tempData;
                 AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
                 Log.e(TAG, "onClick: CartActivity.selectedPresc  >> " + CartActivity.selectedPresc);
+                behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 if (!AppPreferences.getSelectedAddId(context).equalsIgnoreCase("") && !AppPreferences.getSelectedAdd(context).equalsIgnoreCase("")) {
                     startActivity(new Intent(context, ConfirmOrderActivity.class));
                 } else
@@ -416,16 +417,16 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                         btnAllNext.setText("Save");
                     }
                 } else if (cardMedicines1.getVisibility() == View.VISIBLE) {
-                    if (medListMain.size() == 0) {
+                    /*if (medListMain.size() == 0) {
                         Toast.makeText(context, "Please add alteast one prescription medicine.", Toast.LENGTH_SHORT).show();
-                    } else {
-                        if (data == null) {
-                            if (TextUtils.isEmpty(image_base64))
-                                Toast.makeText(context, "Select Image", Toast.LENGTH_SHORT).show();
-                            else new SaveTask().execute();
-                        } else
-                            new UpdateTask().execute();
-                    }
+                    } else {*/
+                    if (data == null) {
+                        if (TextUtils.isEmpty(image_base64))
+                            Toast.makeText(context, "Select Image", Toast.LENGTH_SHORT).show();
+                        else new SaveTask().execute();
+                    } else
+                        new UpdateTask().execute();
+                    /*}*/
                 }
             }
         });
@@ -561,7 +562,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
 
         if (searchList != null) {
             Log.e(TAG, "onCreateView: searchList >> " + searchList.size());
-            etMedName1.setThreshold(1);
+            etMedName1.setThreshold(4);
             searchAdapter = new SearchBarAdapter(context, R.layout.auto_complete_text, searchList);
             etMedName1.setAdapter(searchAdapter);
         }
@@ -755,6 +756,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                             .setPositiveButton("Skip & Order", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
+                                    behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                                     btnOrderCall.performClick();
                                 }
                             })
@@ -793,6 +795,7 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
                     CartActivity.selectedPresc = tempData;
                     Log.e(TAG, "onClick: CartActivity.selectedPresc  >> " + CartActivity.selectedPresc);
                     AppPreferences.setOrderType(context, AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION);
+                    behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                     if (!AppPreferences.getSelectedAddId(context).equalsIgnoreCase("") && !AppPreferences.getSelectedAdd(context).equalsIgnoreCase("")) {
                         startActivity(new Intent(context, ConfirmOrderActivity.class));
                     } else

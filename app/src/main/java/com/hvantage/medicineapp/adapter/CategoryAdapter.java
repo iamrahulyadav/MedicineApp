@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.model.CategoryData;
 
@@ -42,10 +43,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
             Glide.with(context)
                     .load(data.getCatImage())
                     .crossFade()
-                    .override(100, 100)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(holder.img);
     }
-
 
     @Override
     public int getItemCount() {

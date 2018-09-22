@@ -45,6 +45,7 @@ import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.CartItemAdapter;
 import com.hvantage.medicineapp.adapter.CartMedicineItemAdapter;
+import com.hvantage.medicineapp.adapter.ConfirmOrderMasterListAdapter;
 import com.hvantage.medicineapp.adapter.ConfirmOrderPrescAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.AddressData;
@@ -85,9 +86,10 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
     private Double taxes = 0.0;
     private Double delivery_fee = 10.0;
     private String payment_mode = "Cash On Delivery";
-    private RecyclerView recylcer_view, recylcer_view_items, recylcer_view_medicines;
+    private RecyclerView recylcer_view, recylcer_view_items, recylcer_view_medicines, recylcer_view_master_list;
     private ConfirmOrderPrescAdapter adapterPres;
     private CartItemAdapter adapterCart;
+    private ConfirmOrderMasterListAdapter adapterBottom;
     private String selected_pres_id = "", selected_add_id = "";
     private EditText etNote;
     private RadioGroup rgOrderType;
@@ -154,12 +156,6 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 llPayMode.setVisibility(View.GONE);
             }
 
-           /* if (AppPreferences.getOrderType(context) == AppConstants.ORDER_TYPE.ORDER_WITH_PRESCRIPTION) {
-                llPayMode.setVisibility(View.GONE);
-            } else {
-                llPayMode.setVisibility(View.VISIBLE);
-            }*/
-
             if (addressData != null) {
                 tvAddress1.setText(addressData.getName() + ", +91" + addressData.getContactNo());
                 tvAddress2.setText(addressData.getAddress() + ", " + addressData.getLandmark());
@@ -180,6 +176,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         recylcer_view_items = (RecyclerView) findViewById(R.id.recylcer_view_items);
         recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
         recylcer_view_medicines = (RecyclerView) findViewById(R.id.recylcer_view_medicines);
+        recylcer_view_master_list = (RecyclerView) findViewById(R.id.recylcer_view_master_list);
         etSearch = (AppCompatAutoCompleteTextView) findViewById(R.id.etSearch);
         llPrescription = (LinearLayout) findViewById(R.id.llPrescription);
         etNote = (EditText) findViewById(R.id.etNote);
@@ -210,7 +207,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         });
         if (list != null) {
             Log.e(TAG, "onCreateView: list >> " + list.size());
-            etSearch.setThreshold(1);
+            etSearch.setThreshold(4);
             adapter = new SearchBarAdapter(context, R.layout.auto_complete_text, list);
             etSearch.setAdapter(adapter);
         }
@@ -261,6 +258,18 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         adapterMedicine.notifyDataSetChanged();
     }
 
+    private void setRecyclerViewMedicineMaster() {
+        adapterBottom = new ConfirmOrderMasterListAdapter(context, medList, new ConfirmOrderMasterListAdapter.MyAdapterListener() {
+            @Override
+            public void addItem(View v, int position) {
+
+            }
+        });
+        recylcer_view_medicines.setLayoutManager(new LinearLayoutManager(context));
+        recylcer_view_medicines.setAdapter(adapterMedicine);
+        adapterBottom.notifyDataSetChanged();
+    }
+
     private void showProgressDialog() {
         progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
             @Override
@@ -305,10 +314,11 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 startActivity(new Intent(context, SelectAddressActivity.class));
                 break;
             case R.id.tvAdd1:
-                if (isExpand)
+                finish();
+               /* if (isExpand)
                     behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 else
-                    behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    behavior.setState(BottomSheetBehavior.STATE_EXPANDED);*/
                 break;
             case R.id.imgArrow:
                 behavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -414,7 +424,9 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             llPayMode.setVisibility(View.GONE);
             medList = CartActivity.selectedPresc.getMedicineDetails();
             Log.e(TAG, "onResume: medList >> " + medList);
-            if (CartActivity.selectedPresc.getMedicineDetails() != null) {
+            if (medList != null) {
+                if (medList.contains(null))
+                    medList.remove(null);
                 setRecyclerViewMedicine();
             } else {
             }
@@ -430,9 +442,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
         public void onReceive(Context context, Intent intent) {
             cartList = new DBHelper(context).getCartData();
             Log.e(TAG, "onReceive: cartList >> " + cartList);
-
             if (cartList != null) {
-                cartList.clear();
                 payable_amt = 0;
                 subtotal_amt = 0;
                 if (cartList.size() > 0) {

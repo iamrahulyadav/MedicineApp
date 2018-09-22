@@ -157,9 +157,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
         if (list != null) {
             Log.e(TAG, "onCreateView: list >> " + list.size());
-            etSearch.setThreshold(1);
+            etSearch.setThreshold(4);
             SearchBarAdapter adapter = new SearchBarAdapter(context, R.layout.auto_complete_text, list);
-
             etSearch.setAdapter(adapter);
         }
         AppPreferences.setSelectedPresId(context, "");
@@ -279,24 +278,24 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if (position == 0) {
+               /* if (position == 0) {
                     AllPrescriptionFragment fragment = new AllPrescriptionFragment();
                     FragmentManager manager = getFragmentManager();
                     FragmentTransaction ft = manager.beginTransaction();
                     ft.replace(R.id.main_container, fragment);
                     ft.addToBackStack(null);
                     ft.commitAllowingStateLoss();
-                } else {
-                    BrowseCategoryFragment fragment = new BrowseCategoryFragment();
-                    Bundle args = new Bundle();
-                    args.putParcelable("data", catList.get(position));
-                    fragment.setArguments(args);
-                    FragmentManager manager = getFragmentManager();
-                    FragmentTransaction ft = manager.beginTransaction();
-                    ft.replace(R.id.main_container, fragment);
-                    ft.addToBackStack(null);
-                    ft.commitAllowingStateLoss();
-                }
+                } else {*/
+                BrowseCategoryFragment fragment = new BrowseCategoryFragment();
+                Bundle args = new Bundle();
+                args.putParcelable("data", catList.get(position));
+                fragment.setArguments(args);
+                FragmentManager manager = getFragmentManager();
+                FragmentTransaction ft = manager.beginTransaction();
+                ft.replace(R.id.main_container, fragment);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+//                }
             }
 
             @Override
@@ -500,6 +499,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                                 Gson gson = new Gson();
                                 ProductData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), ProductData.class);
                                 productList.add(data);
+                                if (i == 10) {
+                                    break;
+                                }
                             }
                             publishProgress("200", "");
                         } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
