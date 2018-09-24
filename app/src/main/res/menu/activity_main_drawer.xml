@@ -30,7 +30,7 @@
         android:id="@+id/nav_myaccount"
         android:icon="@drawable/action_user"
         android:title="My Account"
-        android:visible="false" />
+        android:visible="true" />
 
     <item
         android:id="@+id/nav_discount_offer"
@@ -51,4 +51,7 @@
         android:id="@+id/nav_logout"
         android:icon="@drawable/action_logout"
         android:title="Log out" />
+    <item
+        android:id="@+id/item_extra1"
+        android:title="" />
 </menu>

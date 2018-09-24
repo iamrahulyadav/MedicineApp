@@ -226,7 +226,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                 saveData();
                 break;
             case R.id.btnSkip:
-                startActivity(new Intent(SignupActivity.this, SignupActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                startActivity(new Intent(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK));
                 break;
         }
     }
@@ -440,6 +440,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                         AppPreferences.setUserId(context, data.getUser_id());
                         AppPreferences.setMobileNo(context, data.getPhoneNo());
                         AppPreferences.setUserName(context, etName.getText().toString());
+                        AppPreferences.setEmail(context, etEmail.getText().toString());
                         publishProgress("200", "");
                     } else {
                         JsonArray jsonArray = jsonObject.getAsJsonArray("result");

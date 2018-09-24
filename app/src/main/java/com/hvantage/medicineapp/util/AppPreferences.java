@@ -15,6 +15,7 @@ public class AppPreferences {
     public static final String MOBILE_NO = "mobile_no";
     public static final String USER_ID = "user_id";
     public static final String USER_NAME = "user_name";
+    public static final String EMAIL = "email";
     public static final String ORDER_TYPE = "order_type";
     public static final String SELECTED_PRES_ID = "selected_pres_id";
     public static final String SELECTED_ADD_ID = "selected_add_id";
@@ -59,6 +60,20 @@ public class AppPreferences {
         SharedPreferences pereference = context.getSharedPreferences(
                 PREFERENCES, 0);
         return pereference.getString(MOBILE_NO, "");
+    }
+
+    public static void setEmail(Context context, String value) {
+        SharedPreferences preferences = context.getSharedPreferences(
+                PREFERENCES, 0);
+        Editor editor = preferences.edit();
+        editor.putString(EMAIL, value);
+        editor.commit();
+    }
+
+    public static String getEmail(Context context) {
+        SharedPreferences pereference = context.getSharedPreferences(
+                PREFERENCES, 0);
+        return pereference.getString(EMAIL, "");
     }
 
     public static void setUserName(Context context, String value) {

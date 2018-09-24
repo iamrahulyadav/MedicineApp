@@ -24,7 +24,9 @@ import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -60,7 +62,6 @@ import com.hvantage.medicineapp.activity.SelectAddressActivity;
 import com.hvantage.medicineapp.adapter.DialogMultipleChoiceAdapter;
 import com.hvantage.medicineapp.adapter.PreMedicineItemAdapterEditable;
 import com.hvantage.medicineapp.adapter.PreMedicineItemAdapterMain;
-import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.DoctorDetails;
 import com.hvantage.medicineapp.model.DoseData;
 import com.hvantage.medicineapp.model.PatientDetails;
@@ -78,6 +79,7 @@ import com.hvantage.medicineapp.util.TouchImageView;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -558,14 +560,28 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
         imgArrow.setOnClickListener(this);
         imgArrow1.setOnClickListener(this);
         initDoses();
-        searchList = new DBHelper(context).getMedicines();
+        searchList = new ArrayList<>();
+        etMedName1.setThreshold(4);
+        searchAdapter = new SearchBarAdapter(context, R.layout.auto_complete_text, searchList);
+        etMedName1.setAdapter(searchAdapter);
+        etMedName1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-        if (searchList != null) {
-            Log.e(TAG, "onCreateView: searchList >> " + searchList.size());
-            etMedName1.setThreshold(4);
-            searchAdapter = new SearchBarAdapter(context, R.layout.auto_complete_text, searchList);
-            etMedName1.setAdapter(searchAdapter);
-        }
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0) {
+                    new SearchData().execute();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     private void initDoses() {
@@ -1329,4 +1345,54 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
             return nameFilter;
         }
     }
+
+    class SearchData extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.SEARCH_PRODUCT);
+            jsonObject.addProperty("key", etMedName1.getText().toString());
+            Log.e(TAG, "SearchData: Request >> " + jsonObject.toString());
+
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.products(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "SearchData: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            searchList.clear();
+                            JSONArray jsonArray = jsonObject.getJSONArray("result");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                Gson gson = new Gson();
+                                ProductData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), ProductData.class);
+                                searchList.add(data);
+                            }
+                            searchAdapter.notifyDataSetChanged();
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            Log.e(TAG, "onResponse: " + msg);
+                        }
+                    } catch (JSONException e) {
+                        Log.e(TAG, "onFailure: " + e.getMessage());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Log.e(TAG, "onFailure: " + t.getMessage());
+                }
+            });
+            return null;
+        }
+    }
+
 }

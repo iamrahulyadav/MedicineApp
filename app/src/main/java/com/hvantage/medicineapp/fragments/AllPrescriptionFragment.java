@@ -20,7 +20,6 @@ import android.widget.Toast;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.adapter.AllPrescriptionAdapter;
-import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.ProductData;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
@@ -55,7 +54,8 @@ public class AllPrescriptionFragment extends Fragment implements View.OnClickLis
             intraction.actionbarsetTitle("All Prescriptions");
         }
         init();
-        ArrayList<ProductData> list = new DBHelper(context).getMedicinesAll();
+//        ArrayList<ProductData> list = new DBHelper(context).getMedicinesAll();
+        ArrayList<ProductData> list = new ArrayList<>();
         Log.e(TAG, "onCreateView: list >> " + list);
         if (list != null) setRecyclerView(list);
         return rootView;

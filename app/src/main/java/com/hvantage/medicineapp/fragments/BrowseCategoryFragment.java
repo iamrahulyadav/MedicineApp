@@ -68,7 +68,6 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
         }
         init();
         if (Functions.isConnectingToInternet(context))
-            //getData();
             new CategoryTask().execute();
         else {
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();

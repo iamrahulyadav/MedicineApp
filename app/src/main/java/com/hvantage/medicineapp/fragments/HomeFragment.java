@@ -11,12 +11,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -28,6 +28,8 @@ import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -38,7 +40,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,7 +54,6 @@ import com.hvantage.medicineapp.activity.ProductDetailActivity;
 import com.hvantage.medicineapp.activity.SignupActivity;
 import com.hvantage.medicineapp.adapter.CategoryAdapter;
 import com.hvantage.medicineapp.adapter.DailyNeedProductAdapter;
-import com.hvantage.medicineapp.adapter.OfferPagerAdapter;
 import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.CartData;
 import com.hvantage.medicineapp.model.CategoryData;
@@ -66,6 +66,7 @@ import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.RecyclerItemClickListener;
+import com.hvantage.medicineapp.util.SliderUtil;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -97,12 +98,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private CardView btnUpload;
     private ImageView btnVoiceInput;
     private AppCompatAutoCompleteTextView etSearch;
-    private ArrayList<ProductData> list;
+    private ArrayList<ProductData> searchList;
     private ProgressBar progressBar;
     private FloatingActionMenu floatingActionMenu;
     private ViewPager viewPagerOffers;
-    private LinearLayout dots_layout;
-    private ImageView[] dots;
+    private SearchBarAdapter searchAdapter;
 
     private void setFloatingButton() {
         new FloatingButton().showFloatingButton(rootView, context);
@@ -133,9 +133,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         set.play(scaleOutX).with(scaleOutY);
         set.play(scaleInX).with(scaleInY).after(scaleOutX);
         set.setInterpolator(new OvershootInterpolator(2));
-
         floatingActionMenu.setIconToggleAnimatorSet(set);
-
     }
 
     @Nullable
@@ -148,19 +146,36 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
         init();
         setFloatingButton();
-        list = new DBHelper(context).getMedicines();
+//        searchList = new DBHelper(context).getMedicines();
         if (Functions.isConnectingToInternet(context)) {
             new CategoryTask().execute();
             new ProductTask().execute();
         } else {
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
         }
-        if (list != null) {
-            Log.e(TAG, "onCreateView: list >> " + list.size());
-            etSearch.setThreshold(4);
-            SearchBarAdapter adapter = new SearchBarAdapter(context, R.layout.auto_complete_text, list);
-            etSearch.setAdapter(adapter);
-        }
+        searchList = new ArrayList<>();
+        etSearch.setThreshold(4);
+        searchAdapter = new SearchBarAdapter(context, R.layout.auto_complete_text, searchList);
+        etSearch.setAdapter(searchAdapter);
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 3) {
+                    new SearchData().execute();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
         AppPreferences.setSelectedPresId(context, "");
         CartActivity.selectedPresc = null;
         return rootView;
@@ -172,55 +187,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         recylcer_view_daily.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view_daily.setAdapter(productAdapter);
         productAdapter.notifyDataSetChanged();
-
     }
 
-    private void setOffers() {
+    private void setSlider() {
         viewPagerOffers = (ViewPager) rootView.findViewById(R.id.viewPagerOffers);
-        dots_layout = (LinearLayout) rootView.findViewById(R.id.dotslayout);
-        offerList.clear();
-        offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer1));
-        offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer2));
-        offerList.add(BitmapFactory.decodeResource(getResources(), R.drawable.offer3));
-        viewPagerOffers.setAdapter(new OfferPagerAdapter(getActivity(), offerList));
-        createDots(0);
-        viewPagerOffers.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                createDots(position);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-    }
-
-    private void createDots(int current_position) {
-        if (dots_layout != null) {
-            dots_layout.removeAllViews();
-            dots = new ImageView[offerList.size()];
-            for (int i = 0; i < offerList.size(); i++) {
-                dots[i] = new ImageView(context);
-                if (i == current_position) {
-                    dots[i].setImageDrawable(ContextCompat.getDrawable(context, R.drawable.active_dots));
-                } else {
-                    dots[i].setImageDrawable(ContextCompat.getDrawable(context, R.drawable.default_dots));
-                }
-
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.setMargins(4, 0, 4, 0);
-
-                dots_layout.addView(dots[i], params);
-            }
-        }
+        TabLayout tabLayout = (TabLayout) rootView.findViewById(R.id.tab_layout);
+        tabLayout.setupWithViewPager(viewPagerOffers, true);
+        SliderUtil.setSlider(context, viewPagerOffers);
     }
 
     private void showProgressDialog() {
@@ -265,7 +238,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 }
             }
         });
-        setOffers();
+        setSlider();
         setCategoryAdapter();
         setProductAdapter();
     }
@@ -278,24 +251,27 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-               /* if (position == 0) {
-                    AllPrescriptionFragment fragment = new AllPrescriptionFragment();
+                if (catList.get(position).getCatName().contains("Prescription")) {
+                    PrescriptionCatFragment fragment = new PrescriptionCatFragment();
+                    Bundle args = new Bundle();
+                    args.putParcelable("data", catList.get(position));
+                    fragment.setArguments(args);
                     FragmentManager manager = getFragmentManager();
                     FragmentTransaction ft = manager.beginTransaction();
                     ft.replace(R.id.main_container, fragment);
                     ft.addToBackStack(null);
                     ft.commitAllowingStateLoss();
-                } else {*/
-                BrowseCategoryFragment fragment = new BrowseCategoryFragment();
-                Bundle args = new Bundle();
-                args.putParcelable("data", catList.get(position));
-                fragment.setArguments(args);
-                FragmentManager manager = getFragmentManager();
-                FragmentTransaction ft = manager.beginTransaction();
-                ft.replace(R.id.main_container, fragment);
-                ft.addToBackStack(null);
-                ft.commitAllowingStateLoss();
-//                }
+                } else {
+                    BrowseCategoryFragment fragment = new BrowseCategoryFragment();
+                    Bundle args = new Bundle();
+                    args.putParcelable("data", catList.get(position));
+                    fragment.setArguments(args);
+                    FragmentManager manager = getFragmentManager();
+                    FragmentTransaction ft = manager.beginTransaction();
+                    ft.replace(R.id.main_container, fragment);
+                    ft.addToBackStack(null);
+                    ft.commitAllowingStateLoss();
+                }
             }
 
             @Override
@@ -409,6 +385,56 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    class SearchData extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("method", AppConstants.METHODS.SEARCH_PRODUCT);
+            jsonObject.addProperty("key", etSearch.getText().toString());
+            Log.e(TAG, "SearchData: Request >> " + jsonObject.toString());
+
+            MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+            Call<JsonObject> call = apiService.products(jsonObject);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e(TAG, "SearchData: Response >> " + response.body().toString());
+                    String resp = response.body().toString();
+                    try {
+                        JSONObject jsonObject = new JSONObject(resp);
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            searchList.clear();
+                            JSONArray jsonArray = jsonObject.getJSONArray("result");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                Gson gson = new Gson();
+                                ProductData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), ProductData.class);
+                                searchList.add(data);
+                            }
+                            searchAdapter.notifyDataSetChanged();
+
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            Log.e(TAG, "onResponse: " + msg);
+                        }
+                    } catch (JSONException e) {
+                        Log.e(TAG, "onFailure: " + e.getMessage());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Log.e(TAG, "onFailure: " + t.getMessage());
+                }
+            });
+            return null;
+        }
+    }
+
     public class FloatingButton {
         FrameLayout bckgroundDimmer;
         FloatingActionButton button1, button2;
@@ -474,7 +500,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            showProgressDialog();
+//            showProgressDialog();
         }
 
         @Override
@@ -525,7 +551,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            hideProgressDialog();
+//            hideProgressDialog();
             productAdapter.notifyDataSetChanged();
             String status = values[0];
             String msg = values[1];
@@ -705,7 +731,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 tvName.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        ProductData data = list.get(position);
+                        ProductData data = searchList.get(position);
                         Log.e(TAG, "onDataChange: data >> " + data);
                         startActivity(new Intent(context, ProductDetailActivity.class).putExtra("medicine_data", data));
                         etSearch.setText("");
@@ -715,15 +741,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void onClick(View view) {
                         if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
-                            double item_total = Integer.parseInt(tvQty.getText().toString()) * Double.parseDouble(list.get(position).getPriceDiscount());
+                            double item_total = Integer.parseInt(tvQty.getText().toString()) * Double.parseDouble(searchList.get(position).getPriceDiscount());
                             CartData model = new CartData(
-                                    list.get(position).getProductId(),
-                                    list.get(position).getName(),
-                                    list.get(position).getImage(),
+                                    searchList.get(position).getProductId(),
+                                    searchList.get(position).getName(),
+                                    searchList.get(position).getImage(),
                                     Integer.parseInt(tvQty.getText().toString()),
-                                    Double.parseDouble(list.get(position).getPriceDiscount()),
+                                    Double.parseDouble(searchList.get(position).getPriceDiscount()),
                                     item_total,
-                                    list.get(position).getPrescriptionRequired()
+                                    searchList.get(position).getPrescriptionRequired()
                             );
                             if (new DBHelper(context).addToCart(model)) {
                                 etSearch.setText("");

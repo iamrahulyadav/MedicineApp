@@ -1,4 +1,4 @@
-package com.hvantage.medicineapp.activity;
+package com.hvantage.medicineapp.fragments;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -6,25 +6,30 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.activity.AddAddressActivity;
 import com.hvantage.medicineapp.adapter.AddressAdapter;
 import com.hvantage.medicineapp.model.AddressData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
 import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
+import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 
@@ -38,49 +43,64 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SelectAddressActivity extends AppCompatActivity {
-    private static final String TAG = "SelectAddressActivity";
+
+public class MyAccountFragment extends Fragment implements View.OnClickListener {
+
+    private static final String TAG = "MyAccountFragment";
     private Context context;
-    private ArrayList<AddressData> list = new ArrayList<AddressData>();
-    private AddressAdapter adapter;
+    private View rootView;
+    private FragmentIntraction intraction;
     private RecyclerView recylcer_view;
     private ProgressBar progressBar;
-    private CardView btnSubmit;
+    private String data;
+    private CardView cardEmptyText;
+    private ArrayList<AddressData> list;
+    private AddressAdapter adapter;
+    private AppCompatButton btnSubmit;
+    private AppCompatTextView tvNameTag, tvName, tvPhoneNo, tvEmail;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_delivery_address);
-        context = this;
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        context = container.getContext();
+        rootView = inflater.inflate(R.layout.fragment_my_account, container, false);
+        if (intraction != null) {
+            intraction.actionbarsetTitle("My Account");
+        }
+        list = new ArrayList<AddressData>();
         init();
         setRecyclerView();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         if (Functions.isConnectingToInternet(context))
-            new GetDataTask().execute();
+            new GetAddressTask().execute();
         else
             Toast.makeText(context, "Connect to internet", Toast.LENGTH_SHORT).show();
+        return rootView;
     }
 
+
     private void init() {
-        btnSubmit = (CardView) findViewById(R.id.btnSubmit);
+        btnSubmit = (AppCompatButton) rootView.findViewById(R.id.btnSubmit);
+        tvNameTag = (AppCompatTextView) rootView.findViewById(R.id.tvNameTag);
+        tvName = (AppCompatTextView) rootView.findViewById(R.id.tvName);
+        tvPhoneNo = (AppCompatTextView) rootView.findViewById(R.id.tvPhoneNo);
+        tvEmail = (AppCompatTextView) rootView.findViewById(R.id.tvEmail);
+        recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
+
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(context, AddAddressActivity.class));
             }
         });
+
+        tvNameTag.setText(AppPreferences.getUserName(context).charAt(0) + "".toUpperCase());
+        tvName.setText(AppPreferences.getUserName(context));
+        tvPhoneNo.setText(AppPreferences.getMobileNo(context));
+        tvEmail.setText(AppPreferences.getEmail(context));
     }
 
     private void setRecyclerView() {
         list.clear();
-        recylcer_view = (RecyclerView) findViewById(R.id.recylcer_view);
         adapter = new AddressAdapter(context, list, new AddressAdapter.MyAdapterListener() {
             @Override
             public void delete(View v, int position) {
@@ -89,13 +109,6 @@ public class SelectAddressActivity extends AppCompatActivity {
 
             @Override
             public void select(View v, int position) {
-                Log.e(TAG, "select: " + String.valueOf(new Gson().toJsonTree(list.get(position), AddressData.class)));
-                AppPreferences.setSelectedAddId(context, list.get(position).getAddressId());
-                AppPreferences.setSelectedAdd(context, String.valueOf(new Gson().toJsonTree(list.get(position), AddressData.class)));
-                Intent intent = new Intent(context, ConfirmOrderActivity.class);
-                intent.putExtra("data", list.get(position));
-                startActivity(intent);
-                finish();
             }
         });
         recylcer_view.setLayoutManager(new LinearLayoutManager(context));
@@ -141,9 +154,10 @@ public class SelectAddressActivity extends AppCompatActivity {
                         adapter.notifyDataSetChanged();
                         hideProgressDialog();
                     } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
-                        hideProgressDialog();
                         String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
-                        Toast.makeText(SelectAddressActivity.this, msg, Toast.LENGTH_SHORT).show();
+
+                        hideProgressDialog();
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -160,30 +174,7 @@ public class SelectAddressActivity extends AppCompatActivity {
         });
     }
 
-    private void showProgressDialog() {
-        progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                // TODO Auto-generated method stub
-            }
-        });
-    }
-
-    private void hideProgressDialog() {
-        if (progressBar != null)
-            progressBar.dismiss();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home)
-            onBackPressed();
-        else if (item.getItemId() == R.id.action_cart) {
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    class GetDataTask extends AsyncTask<Void, String, Void> {
+    class GetAddressTask extends AsyncTask<Void, String, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -196,14 +187,14 @@ public class SelectAddressActivity extends AppCompatActivity {
             jsonObject.addProperty("method", AppConstants.METHODS.GET_MY_ADDRESSES);
             jsonObject.addProperty("user_id", AppPreferences.getUserId(context));
 
-            Log.e(TAG, "GetDataTask: Request >> " + jsonObject.toString());
+            Log.e(TAG, "GetAddressTask: Request >> " + jsonObject.toString());
 
             MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
             Call<JsonObject> call = apiService.address(jsonObject);
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    Log.e(TAG, "GetDataTask: Response >> " + response.body().toString());
+                    Log.e(TAG, "GetAddressTask: Response >> " + response.body().toString());
                     String resp = response.body().toString();
                     list.clear();
                     try {
@@ -243,8 +234,49 @@ public class SelectAddressActivity extends AppCompatActivity {
             String status = values[0];
             String msg = values[1];
             if (status.equalsIgnoreCase("400")) {
-                Toast.makeText(SelectAddressActivity.this, msg, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }
         }
     }
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof FragmentIntraction) {
+            intraction = (FragmentIntraction) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        intraction = null;
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnUpload:
+                break;
+        }
+    }
+
+    private void showProgressDialog() {
+        progressBar = ProgressBar.show(context, "Processing...", true, false, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                // TODO Auto-generated method stub
+            }
+        });
+    }
+
+    private void hideProgressDialog() {
+        if (progressBar != null)
+            progressBar.dismiss();
+    }
+
 }

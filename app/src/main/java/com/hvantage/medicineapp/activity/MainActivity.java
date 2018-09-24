@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -26,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,8 +37,8 @@ import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.database.DBHelper;
-import com.hvantage.medicineapp.fragments.CartFragment;
 import com.hvantage.medicineapp.fragments.HomeFragment;
+import com.hvantage.medicineapp.fragments.MyAccountFragment;
 import com.hvantage.medicineapp.fragments.MyOrderFragment;
 import com.hvantage.medicineapp.fragments.MyPrescriptionFragment;
 import com.hvantage.medicineapp.fragments.OfferDiscountFragment;
@@ -190,13 +192,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ft.commitAllowingStateLoss();
     }
 
-    private void openCartFragment() {
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction ft = manager.beginTransaction();
-        ft.replace(R.id.main_container, new CartFragment());
-        ft.addToBackStack(null);
-        ft.commitAllowingStateLoss();
-    }
 
     private void initDrawer(Toolbar toolbar) {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -217,6 +212,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        ImageView imgFacebook = (ImageView) navigationView.findViewById(R.id.imgFacebook);
+        imgFacebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.facebook_page_url))));
+            }
+        });
+        ImageView imgInstagram = (ImageView) navigationView.findViewById(R.id.imgInstagram);
+        imgInstagram.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getResources().getString(R.string.instagram_page_url))));
+            }
+        });
     }
 
     @Override
@@ -316,6 +325,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ft.addToBackStack(null);
                 ft.commitAllowingStateLoss();
                 break;
+            case R.id.nav_myaccount:
+                fragment = new MyAccountFragment();
+                ft.replace(R.id.main_container, fragment);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+                break;
             case R.id.nav_discount_offer:
                 fragment = new OfferDiscountFragment();
                 ft.replace(R.id.main_container, fragment);
@@ -327,6 +342,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_cust_support:
                 dialogCustomerSupport();
+                break;
+            case R.id.nav_share:
+                Intent intent2 = new Intent();
+                intent2.setAction(Intent.ACTION_SEND);
+                intent2.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.download_app_text));
+                intent2.setType("text/plain");
+                startActivity(Intent.createChooser(intent2, "Share via"));
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

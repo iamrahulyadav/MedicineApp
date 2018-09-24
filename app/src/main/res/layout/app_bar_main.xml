@@ -53,6 +53,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+
         <android.support.design.widget.NavigationView
             android:id="@+id/nav_view"
             android:layout_width="wrap_content"
@@ -65,6 +66,40 @@
             app:itemTextAppearance="@style/TextAppearance.AppCompat.Subhead"
             app:itemTextColor="@color/colorTextHeading"
             app:menu="@menu/activity_main_drawer">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="@color/colorWhite"
+                android:gravity="center_vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Like &amp; Follow us on "
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/colorTextHeading" />
+
+
+                <ImageView
+                    android:id="@+id/imgFacebook"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_toLeftOf="@id/imgInstagram"
+                    android:src="@drawable/facebook" />
+
+                <ImageView
+                    android:id="@+id/imgInstagram"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginRight="5dp"
+                    android:src="@drawable/instagram" />
+
+            </RelativeLayout>
 
         </android.support.design.widget.NavigationView>
 

@@ -124,7 +124,7 @@ public class MyFamilyFragment extends Fragment implements View.OnClickListener {
     private void setRecyclerView() {
         adapter = new MyFamilyAdapter(context, list, new MyFamilyAdapter.MyAdapterListener() {
             @Override
-            public void delete(View v, final int position) {
+            public void delete(final View v, final int position) {
                 new AlertDialog.Builder(context)
                         .setMessage("Delete " + list.get(position).getName() + "?")
                         .setPositiveButton("Delete", new DialogInterface.OnClickListener() {

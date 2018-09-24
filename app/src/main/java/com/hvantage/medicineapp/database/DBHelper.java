@@ -8,7 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.hvantage.medicineapp.model.CartData;
+import com.hvantage.medicineapp.model.CategoryData;
 import com.hvantage.medicineapp.model.ProductData;
+import com.hvantage.medicineapp.model.SubCategoryData;
 
 import java.util.ArrayList;
 
@@ -54,9 +56,21 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String KEY_ITEM_IMG = "item_img";
     private static final String KEY_ITEM_PRE_REQUIRED = "item_pre_required";
 
+    //Category
+    private static final String KEY_CAT_ID = "CAT_ID";
+    private static final String KEY_CAT_NAME = "CAT_NAME";
+    private static final String KEY_CAT_IMAGE = "CAT_IMAGE";
+
+    //Category
+    private static final String KEY_SUBCAT_ID = "SUBCAT_ID";
+    private static final String KEY_SUBCAT_NAME = "SUBCAT_NAME";
+    private static final String KEY_SUBCAT_IMAGE = "SUBCAT_IMAGE";
+
     //tables
     private static final String TABLE_MEDICINE = "medicine";
     private static final String TABLE_CART = "cart";
+    private static final String TABLE_CATEGORY = "category ";
+    private static final String TABLE_SUBCATEGORY = "subcategory ";
 
     private static final String TAG = "DBHelper";
     private static final int DATABASE_VERSION = 1;
@@ -95,6 +109,20 @@ public class DBHelper extends SQLiteOpenHelper {
             + KEY_ITEM_PRE_REQUIRED + " TEXT "
             + ")";
 
+    String CREATE_TABLE_CATEGORY = "CREATE TABLE " + TABLE_CATEGORY +
+            "( " + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + KEY_CAT_ID + " TEXT, "
+            + KEY_CAT_NAME + " TEXT, "
+            + KEY_CAT_IMAGE + " TEXT "
+            + ")";
+
+    String CREATE_TABLE_SUBCATEGORY = "CREATE TABLE " + TABLE_SUBCATEGORY +
+            "( " + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + KEY_SUBCAT_ID + " TEXT, "
+            + KEY_SUBCAT_NAME + " TEXT, "
+            + KEY_SUBCAT_IMAGE + " TEXT "
+            + ")";
+
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -104,8 +132,9 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(CREATE_TABLE_MEDICINE);
         sqLiteDatabase.execSQL(CREATE_TABLE_CART);
+        sqLiteDatabase.execSQL(CREATE_TABLE_CATEGORY);
+        sqLiteDatabase.execSQL(CREATE_TABLE_SUBCATEGORY);
     }
-
 
     public void saveMedicine(ProductData modal) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -194,45 +223,6 @@ public class DBHelper extends SQLiteOpenHelper {
             do {
                 list.add(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
             } while (cursor.moveToNext());
-        }
-        return list;
-    }
-
-    public ArrayList<ProductData> getMedicinesAll() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        ArrayList<ProductData> list = null;
-        String query = "SELECT * FROM " + TABLE_MEDICINE + " where " + KEY_CATEGORY_NAME + "='Prescriptions (A-Z)'";
-        Cursor cursor = db.rawQuery(query, null);
-        if (cursor == null) {
-            return list;
-        }
-        if (cursor.moveToFirst()) {
-            list = new ArrayList<ProductData>();
-            do {
-                ProductData d = new ProductData();
-                d.setProductId(cursor.getString(cursor.getColumnIndex(KEY_PRODUCT_ID)));
-                d.setCategoryName(cursor.getString(cursor.getColumnIndex(KEY_CATEGORY_NAME)));
-                d.setSubCategoryName(cursor.getString(cursor.getColumnIndex(KEY_SUB_CATEGORY_NAME)));
-                d.setShortDescription(cursor.getString(cursor.getColumnIndex(KEY_SHORT_DESCRIPTION)));
-                d.setLongDescription(cursor.getString(cursor.getColumnIndex(KEY_LONG_DESCRIPTION)));
-                d.setImage(cursor.getString(cursor.getColumnIndex(KEY_IMAGE)));
-                d.setManufacturer(cursor.getString(cursor.getColumnIndex(KEY_MANUFACTURER)));
-                d.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-                d.setPower(cursor.getString(cursor.getColumnIndex(KEY_POWER)));
-                d.setPriceMrp(cursor.getString(cursor.getColumnIndex(KEY_PRICE_MRP)));
-                d.setPriceDiscount(cursor.getString(cursor.getColumnIndex(KEY_PRICE_DISCOUNT)));
-                d.setDiscountPercentage(cursor.getString(cursor.getColumnIndex(KEY_DISCOUNT_PERCENTAGE)));
-                d.setDiscountText(cursor.getString(cursor.getColumnIndex(KEY_DISCOUNT_TEXT)));
-                d.setProductType(cursor.getString(cursor.getColumnIndex(KEY_PRODUCT_TYPE)));
-                d.setPackagingContain(cursor.getString(cursor.getColumnIndex(KEY_PACKAGING_CONTAIN)));
-                d.setPrescriptionRequired(Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(KEY_PRESCRIPTION_REQUIRED))));
-                d.setTotalAvailable(Integer.parseInt(cursor.getString(cursor.getColumnIndex(KEY_TOTAL_AVAILABLE))));
-                list.add(d);
-            } while (cursor.moveToNext());
-            /*list = new ArrayList<String>();
-            do {
-                list.add(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-            } while (cursor.moveToNext());*/
         }
         return list;
     }
@@ -329,5 +319,38 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return rowCount;
     }
+
+    public void saveCategory(CategoryData modal) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_CAT_ID, modal.getCatId());
+        values.put(KEY_CAT_NAME, modal.getCatName());
+        values.put(KEY_CAT_IMAGE, modal.getCatImage());
+        Log.d(TAG, "saveCategory: values >> " + values.toString());
+        boolean bb = db.insert(TABLE_MEDICINE, null, values) > 0;
+        if (bb) {
+            Log.d("saveCategory : ", "Inserted");
+        } else {
+            Log.d("saveCategory : ", "Not inserted");
+        }
+        db.close();
+    }
+
+    public void saveSubCategory(SubCategoryData modal) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_CAT_ID, modal.getSubCatId());
+        values.put(KEY_CAT_NAME, modal.getSubCatName());
+        values.put(KEY_CAT_IMAGE, modal.getSubCatImage());
+        Log.d(TAG, "saveSubCategory: values >> " + values.toString());
+        boolean bb = db.insert(TABLE_MEDICINE, null, values) > 0;
+        if (bb) {
+            Log.d("saveSubCategory : ", "Inserted");
+        } else {
+            Log.d("saveSubCategory : ", "Not inserted");
+        }
+        db.close();
+    }
+
 
 }

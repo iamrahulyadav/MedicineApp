@@ -40,6 +40,7 @@ public class AppConstants {
         public static final String ORDER = "order.php";
         public static final String ADDRESS = "address.php";
         public static final String VAULT = "vault.php";
+        public static final String GENERAL = "general.php";
     }
 
     public class METHODS {
@@ -74,6 +75,8 @@ public class AppConstants {
         public static final String UPDATE_PRESCRIPTION = "update_prescription";
         public static final String PLACEORDERWITHPRESCRIPTION = "placeOrderWithPrescription";
         public static final String GET_MY_CURRENT_ORDERS = "get_my_current_orders";
+        public static final String SEARCH_PRODUCT = "search_product";
+        public static final String GET_SLIDER_IMAGES = "get_slider_images";
     }
 
     public class NOTIFICATION_KEY {

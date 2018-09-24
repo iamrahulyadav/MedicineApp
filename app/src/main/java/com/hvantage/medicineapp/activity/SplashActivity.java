@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.crashlytics.android.Crashlytics;
 import com.hvantage.medicineapp.R;
+import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.services.DBService;
 import com.hvantage.medicineapp.util.AppPreferences;
 
@@ -37,7 +38,8 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         context = this;
         try {
-            startService(new Intent(context, DBService.class));
+          /*  if (new DBHelper(context).getMedicines() == null)
+                startService(new Intent(context, DBService.class));*/
         } catch (Exception ex) {
             Log.e(TAG, "run: exc >> " + ex.getMessage());
         }

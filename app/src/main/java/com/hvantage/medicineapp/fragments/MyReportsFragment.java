@@ -84,7 +84,7 @@ public class MyReportsFragment extends Fragment implements View.OnClickListener 
     private void setRecyclerView() {
         adapter = new MyReportAdapter(context, list, new MyReportAdapter.MyAdapterListener() {
             @Override
-            public void delete(View v, final int position) {
+            public void delete(final View v, final int position) {
                 new AlertDialog.Builder(context)
                         .setMessage("Delete " + list.get(position).getTitle() + "?")
                         .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
