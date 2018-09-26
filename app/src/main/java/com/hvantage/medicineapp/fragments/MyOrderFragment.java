@@ -41,6 +41,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
+
 
 public class MyOrderFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "MyOrderFragment";
@@ -60,6 +62,8 @@ public class MyOrderFragment extends Fragment implements View.OnClickListener {
         rootView = inflater.inflate(R.layout.fragment_my_orders, container, false);
         if (intraction != null) {
             intraction.actionbarsetTitle("My Orders");
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
         init();
         setRecyclerView();

@@ -6,10 +6,10 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -42,6 +42,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
+
 
 public class MyReportsFragment extends Fragment implements View.OnClickListener {
 
@@ -55,7 +57,7 @@ public class MyReportsFragment extends Fragment implements View.OnClickListener 
     private ProgressBar progressBar;
     private String data;
     private CardView cardEmptyText;
-    private FloatingActionButton fabAdd;
+    private AppCompatButton btnAdd;
 
     @Nullable
     @Override
@@ -64,6 +66,8 @@ public class MyReportsFragment extends Fragment implements View.OnClickListener 
         rootView = inflater.inflate(R.layout.fragment_my_reports, container, false);
         if (intraction != null) {
             intraction.actionbarsetTitle("My Reports");
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
         init();
         setRecyclerView();
@@ -76,9 +80,9 @@ public class MyReportsFragment extends Fragment implements View.OnClickListener 
 
     private void init() {
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
-        fabAdd = (FloatingActionButton) rootView.findViewById(R.id.fabAdd);
+        btnAdd = rootView.findViewById(R.id.btnAdd);
         cardEmptyText = (CardView) rootView.findViewById(R.id.cardEmptyText);
-        fabAdd.setOnClickListener(this);
+        btnAdd.setOnClickListener(this);
     }
 
     private void setRecyclerView() {
@@ -175,7 +179,7 @@ public class MyReportsFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.fabAdd:
+            case R.id.btnAdd:
                 FragmentManager manager = getFragmentManager();
                 FragmentTransaction ft = manager.beginTransaction();
                 ft.replace(R.id.main_container, new AddReportFragment());

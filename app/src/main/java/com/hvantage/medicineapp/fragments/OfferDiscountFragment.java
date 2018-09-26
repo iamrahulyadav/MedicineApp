@@ -21,6 +21,8 @@ import com.hvantage.medicineapp.util.RecyclerItemClickListener;
 
 import java.util.ArrayList;
 
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
+
 
 public class OfferDiscountFragment extends Fragment implements View.OnClickListener {
 
@@ -42,6 +44,8 @@ public class OfferDiscountFragment extends Fragment implements View.OnClickListe
         rootView = inflater.inflate(R.layout.fragment_offers_discount, container, false);
         if (intraction != null) {
             intraction.actionbarsetTitle("Offers & Discounts");
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
         list.add(new OffersModel("FIRST50", "Use code FIRST50", "Get Rs. 50 off on your 1st Order. Minimun value Rs. 99. Max discount Rs. 100 per order", "31 August", ""));
         list.add(new OffersModel("FLAT20", "Use code FLAT20", "Get 20% off on every order. Minimun value Rs. 99. Max discount Rs. 100 per order", "31 August", ""));

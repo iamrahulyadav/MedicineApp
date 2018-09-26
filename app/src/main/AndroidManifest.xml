@@ -13,6 +13,8 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -102,9 +104,7 @@
         <activity
             android:name=".activity.SelectPrescActivity"
             android:label=""
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.AddAddressActivity"
             android:label=""
@@ -112,13 +112,22 @@
         <activity
             android:name=".activity.AddPrescActivity"
             android:label=""
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar" />
 
-        </activity>
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="46b22deb00c3fd241060e73dbd5f7205877688ec" />
+
+        <activity
+            android:name=".activity.SearchActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.AppCompat.Translucent"
+            android:windowSoftInputMode="stateAlwaysVisible" />
+
+        <activity
+            android:name=".activity.MoreProductsActivity"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>

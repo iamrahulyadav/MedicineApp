@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.DailyNeedProductAdapter;
+import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.ProductData;
 import com.hvantage.medicineapp.model.SubCategoryData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
@@ -38,6 +40,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
+
 
 public class ProductsFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "ProductsFragment";
@@ -50,6 +54,8 @@ public class ProductsFragment extends Fragment implements View.OnClickListener {
     private ProgressBar progressBar;
     private SubCategoryData data;
     private CardView cardEmptyText;
+    private DBHelper mydb;
+    private SwipeRefreshLayout refreshLayout;
 
     @Nullable
     @Override
@@ -64,22 +70,43 @@ public class ProductsFragment extends Fragment implements View.OnClickListener {
                 intraction.actionbarsetTitle(data.getSubCatName());
             else
                 intraction.actionbarsetTitle("Browse Products");
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
+        list = new ArrayList<ProductData>();
+        mydb = new DBHelper(context);
+        list = mydb.getCatProducts(data.getSubCatId());
         init();
+        getData();
+        return rootView;
+    }
+
+    private void getData() {
         if (Functions.isConnectingToInternet(context))
             new ProductTask().execute();
         else
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
-        return rootView;
     }
 
     private void init() {
+        if (list == null) {
+            list = new ArrayList<ProductData>();
+        }
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
         cardEmptyText = (CardView) rootView.findViewById(R.id.cardEmptyText);
+        refreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refreshLayout);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshLayout.setRefreshing(true);
+                getData();
+            }
+        });
         setRecyclerView();
     }
 
     private void setRecyclerView() {
+
         adapter = new DailyNeedProductAdapter(context, list);
         recylcer_view.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view.setAdapter(adapter);
@@ -129,7 +156,9 @@ public class ProductsFragment extends Fragment implements View.OnClickListener {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            showProgressDialog();
+            if (list.size() == 0)
+                showProgressDialog();
+
         }
 
         @Override
@@ -150,11 +179,14 @@ public class ProductsFragment extends Fragment implements View.OnClickListener {
                     try {
                         JSONObject jsonObject = new JSONObject(resp);
                         if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            Log.e(TAG, "onResponse: " + mydb.deleteCatProducts(data.getSubCatId()));
                             JSONArray jsonArray = jsonObject.getJSONArray("result");
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 Gson gson = new Gson();
-                                ProductData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), ProductData.class);
-                                list.add(data);
+                                ProductData newdata = gson.fromJson(jsonArray.getJSONObject(i).toString(), ProductData.class);
+                                list.add(newdata);
+                                if (i < 10)
+                                    mydb.saveCatProduct(newdata, data.getSubCatId());
                             }
                             publishProgress("200", "");
                         } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
@@ -179,6 +211,7 @@ public class ProductsFragment extends Fragment implements View.OnClickListener {
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
             hideProgressDialog();
+            refreshLayout.setRefreshing(false);
             adapter.notifyDataSetChanged();
             String status = values[0];
             String msg = values[1];

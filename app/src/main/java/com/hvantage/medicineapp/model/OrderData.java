@@ -274,4 +274,28 @@ public class OrderData implements Parcelable {
             return new OrderData[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "OrderData{" +
+                "orderId='" + orderId + '\'' +
+                ", address='" + address + '\'' +
+                ", note='" + note + '\'' +
+                ", orderType='" + orderType + '\'' +
+                ", orderStatus='" + orderStatus + '\'' +
+                ", totalAmount='" + totalAmount + '\'' +
+                ", paymentMode='" + paymentMode + '\'' +
+                ", paymentType='" + paymentType + '\'' +
+                ", payableAmount='" + payableAmount + '\'' +
+                ", promoCodeApplied='" + promoCodeApplied + '\'' +
+                ", codCharges='" + codCharges + '\'' +
+                ", gstTaxAmt='" + gstTaxAmt + '\'' +
+                ", otherTaxAmt='" + otherTaxAmt + '\'' +
+                ", paymentStatus='" + paymentStatus + '\'' +
+                ", datdateTimee='" + datdateTimee + '\'' +
+                ", prescriptionData=" + prescriptionData +
+                ", addressData=" + addressData +
+                ", items=" + items +
+                '}';
+    }
 }

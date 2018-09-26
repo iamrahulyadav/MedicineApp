@@ -34,6 +34,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
+
 
 public class AddDoctorFragment extends Fragment implements View.OnClickListener {
 
@@ -64,6 +66,8 @@ public class AddDoctorFragment extends Fragment implements View.OnClickListener 
                 intraction.actionbarsetTitle("Add Doctor");
             else
                 intraction.actionbarsetTitle("Doctor Details");
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
 
 

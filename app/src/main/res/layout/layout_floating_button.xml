@@ -11,7 +11,7 @@
         android:id="@+id/background_dimmer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#74ffffff"
+        android:background="#8e000000"
         android:visibility="gone" />
 
     <com.github.clans.fab.FloatingActionMenu
@@ -26,26 +26,50 @@
         fab:menu_colorNormal="@color/colorPrimary"
         fab:menu_colorPressed="@color/colorPrimary"
         fab:menu_colorRipple="@color/colorPrimary"
-        fab:menu_icon="@drawable/fab_plus"
+        fab:menu_icon="@drawable/add_light_new"
         fab:menu_labels_ellipsize="end"
         fab:menu_labels_maxLines="1"
         fab:menu_labels_style="@style/MenuLabelsStyle">
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/material_design_floating_action_menu_item1"
+            android:id="@+id/fabHome"
             style="@style/MenuButtonsSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/fab_upload"
+            android:src="@drawable/home_light_new"
+            fab:fab_label="Home" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabSearch"
+            style="@style/MenuButtonsSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/action_search_light_new"
+            fab:fab_label="Search" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabCallOrder"
+            style="@style/MenuButtonsSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/call_light_new"
+            fab:fab_label="Order on Call" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabUpload"
+            style="@style/MenuButtonsSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/upload_light_new"
             fab:fab_label="Upload Prescription" />
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/material_design_floating_action_menu_item2"
+            android:id="@+id/fabMyPresc"
             style="@style/MenuButtonsSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/action_cart_light"
-            fab:fab_label="Order with Prescription" />
+            android:src="@drawable/docs_light_new"
+            fab:fab_label="My Prescription" />
     </com.github.clans.fab.FloatingActionMenu>
 
 

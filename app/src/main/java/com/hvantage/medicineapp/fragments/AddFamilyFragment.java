@@ -34,6 +34,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
+
 
 public class AddFamilyFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "AddFamilyFragment";
@@ -55,6 +57,8 @@ public class AddFamilyFragment extends Fragment implements View.OnClickListener 
         if (getArguments() != null) {
             data = (FamilyData) getArguments().getParcelable("data");
             Log.e(TAG, "onCreateView: data >> " + data);
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
 
         if (intraction != null) {

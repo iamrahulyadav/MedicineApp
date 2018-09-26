@@ -7,12 +7,18 @@
 
     <include layout="@layout/empty_text" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recylcer_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorWhite"
-        android:overScrollMode="never"
-        android:visibility="visible" />
 
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/refreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recylcer_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorWhite"
+            android:overScrollMode="never"
+            android:visibility="visible" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 </android.support.constraint.ConstraintLayout>

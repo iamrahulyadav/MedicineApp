@@ -2,6 +2,7 @@ package com.hvantage.medicineapp.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -9,12 +10,21 @@ import android.util.Log;
 import android.view.View;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.database.DBHelper;
-import com.hvantage.medicineapp.services.DBService;
+import com.hvantage.medicineapp.retrofit.ApiClient;
+import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
+import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import io.fabric.sdk.android.Fabric;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -38,8 +48,42 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         context = this;
         try {
-          /*  if (new DBHelper(context).getMedicines() == null)
-                startService(new Intent(context, DBService.class));*/
+            new AsyncTask<Void, String, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    JsonObject jsonObject = new JsonObject();
+                    jsonObject.addProperty("method", AppConstants.METHODS.GET_SLIDER_IMAGES);
+                    Log.e(TAG, "GetSliderTask: Request >> " + jsonObject.toString());
+
+                    MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+                    Call<JsonObject> call = apiService.general(jsonObject);
+                    call.enqueue(new Callback<JsonObject>() {
+                        @Override
+                        public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                            try {
+                                Log.e(TAG, "GetSliderTask: Response >> " + response.body().toString());
+                                String resp = response.body().toString();
+                                JSONObject jsonObject = new JSONObject(resp);
+                                if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                                    JSONArray jsonArray = jsonObject.getJSONArray("result");
+                                    AppPreferences.setSliderData(context, String.valueOf(jsonArray));
+                                } else {
+                                }
+                            } catch (JSONException e) {
+                                Log.e(TAG, "GetSliderTask: onFailure: " + e.getMessage());
+                            } catch (Exception e) {
+                                Log.e(TAG, "GetSliderTask: onFailure: " + e.getMessage());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<JsonObject> call, Throwable t) {
+                            Log.e(TAG, "GetSliderTask: onFailure: " + t.getMessage());
+                        }
+                    });
+                    return null;
+                }
+            }.execute();
         } catch (Exception ex) {
             Log.e(TAG, "run: exc >> " + ex.getMessage());
         }

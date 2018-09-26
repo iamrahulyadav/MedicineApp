@@ -1,29 +1,41 @@
-<?xml version="1.0" encoding="utf-8"?><!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorWhite"
-    android:orientation="horizontal">
-
-    <ImageView
-        android:id="@+id/imgThumb"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_gravity="center_vertical"
-        android:src="@drawable/no_image_placeholder" />
+    app:cardBackgroundColor="@color/colorWhite"
+    app:cardCornerRadius="2dp"
+    app:cardElevation="0dp"
+    app:contentPaddingLeft="5dp"
+    app:contentPaddingRight="5dp"
+    app:contentPaddingTop="5dp">
 
     <RelativeLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="5dp"
-        android:layout_toRightOf="@id/imgThumb">
+        android:background="@color/colorWhite"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/imgThumb"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginRight="5dp"
+            android:background="@color/colorWhite"
+            android:src="@drawable/no_image_placeholder" />
 
         <TextView
             android:id="@+id/tvName"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
-            android:text="text medicine"
+            android:layout_gravity="center_horizontal"
+            android:layout_toRightOf="@id/imgThumb"
+            android:background="@color/colorWhite"
+            android:maxLines="2"
+            android:text="abc"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textColor="@color/colorTextHeading"
             android:textStyle="bold" />
@@ -33,64 +45,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvName"
-            android:text="text medicine"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textColor="@color/colorTextSubHeading" />
-
-        <TextView
-            android:id="@+id/tvPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tvName"
-            android:layout_marginLeft="8dp"
-            android:layout_toRightOf="@id/tvPriceDrop"
-            android:text="text medicine"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textColor="@color/colorTextSubHeading"
-            android:textStyle="bold" />
-    </RelativeLayout>
-</RelativeLayout>-->
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="5dp"
-    app:cardBackgroundColor="@color/colorWhite"
-    app:cardCornerRadius="2dp"
-    app:cardElevation="1dp"
-    app:contentPadding="5dp">
-
-    <RelativeLayout
-        android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/imgThumb"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/no_image_placeholder" />
-
-        <TextView
-            android:id="@+id/tvName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
             android:layout_toRightOf="@id/imgThumb"
-            android:maxLines="2"
-            android:text="abc"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvPriceDrop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tvName"
-            android:layout_toRightOf="@id/imgThumb"
+            android:background="@color/colorWhite"
             android:maxLines="1"
             android:padding="3dp"
             android:text="Rs. 00"
@@ -104,6 +60,7 @@
             android:layout_below="@id/tvName"
             android:layout_marginLeft="2dp"
             android:layout_toRightOf="@id/tvPriceDrop"
+            android:background="@color/colorWhite"
             android:maxLines="2"
             android:padding="3dp"
             android:text="Rs. 00"
@@ -117,6 +74,7 @@
             android:layout_below="@id/tvPrice"
             android:layout_marginTop="3dp"
             android:layout_toRightOf="@id/imgThumb"
+            android:background="@color/colorWhite"
             android:orientation="horizontal"
             android:weightSum="3.2">
 
@@ -145,6 +103,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1.2"
+                android:background="@color/colorWhite"
                 android:gravity="center"
                 android:maxLength="2"
                 android:text="1"
@@ -174,36 +133,30 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <android.support.v7.widget.CardView
+
+        <android.support.v7.widget.AppCompatTextView
             android:id="@+id/btnAddToCart"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:layout_alignParentEnd="true"
             android:layout_below="@id/tvPrice"
-            android:layout_marginBottom="2dp"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="2dp"
-            app:cardBackgroundColor="@color/colorPrimary"
-            app:cardCornerRadius="2dp"
-            app:cardElevation="1dp">
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:singleLine="true"
+            android:text="Add To Cart"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@color/colorToolbarTitle"
+            android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/tvBtnText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:maxLines="1"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:singleLine="true"
-                android:text="Add To Cart"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:textColor="@color/colorToolbarTitle"
-                android:textStyle="bold" />
-        </android.support.v7.widget.CardView>
-
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/btnAddToCart"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorDivider" />
     </RelativeLayout>
 </android.support.v7.widget.CardView>
 

@@ -18,6 +18,8 @@ import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
+
 
 public class VaultFragment extends Fragment implements View.OnClickListener {
 
@@ -35,6 +37,8 @@ public class VaultFragment extends Fragment implements View.OnClickListener {
         rootView = inflater.inflate(R.layout.fragment_vault, container, false);
         if (intraction != null) {
             intraction.actionbarsetTitle("Vault");
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
         init();
         if (!Functions.isConnectingToInternet(context))

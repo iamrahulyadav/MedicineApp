@@ -9,7 +9,9 @@
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
         android:elevation="0dp"
+        android:orientation="vertical"
         android:theme="@style/AppTheme.AppBarOverlay"
         app:elevation="0dp">
 
@@ -18,15 +20,11 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:contentInsetLeft="0dp"
-            app:contentInsetStart="0dp"
-            app:contentInsetStartWithNavigation="0dp"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
-            <!--<include layout="@layout/toolbar_title"></include>-->
             <TextView xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/toolbar_title"
-                style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+                style="@style/TextAppearance.AppCompat.Light.SearchResult.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -35,8 +33,50 @@
                 android:maxLines="1"
                 android:singleLine="true"
                 android:text="@string/app_name"
-                android:textColor="@color/colorToolbarTitle" />
+                android:textColor="@color/colorToolbarTitle"
+                android:textStyle="bold" />
+
         </android.support.v7.widget.Toolbar>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/round_edge"
+            android:paddingRight="5dp"
+            app:layout_scrollFlags="scroll|enterAlways|snap">
+
+            <android.support.v7.widget.AppCompatAutoCompleteTextView
+                android:id="@+id/etSearch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:background="@null"
+                android:drawableLeft="@drawable/action_search_dark"
+                android:drawablePadding="5dp"
+                android:fontFamily="@font/quicksand"
+                android:hint="@string/search_box_hint"
+                android:inputType="textCapSentences"
+                android:maxLines="1"
+                android:overScrollMode="never"
+                android:scrollbars="none"
+                android:singleLine="true"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+            <ImageView
+                android:id="@+id/btnVoiceInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="@color/colorWhite"
+                android:padding="3dp"
+                android:src="@drawable/mic_black_new" />
+        </RelativeLayout>
+
 
     </android.support.design.widget.AppBarLayout>
 
@@ -52,6 +92,8 @@
             layout="@layout/content_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+
+        <include layout="@layout/layout_floating_button" />
 
 
         <android.support.design.widget.NavigationView
@@ -104,5 +146,6 @@
         </android.support.design.widget.NavigationView>
 
     </android.support.v4.widget.DrawerLayout>
+
 
 </android.support.design.widget.CoordinatorLayout>

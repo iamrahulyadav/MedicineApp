@@ -1,6 +1,11 @@
 package com.hvantage.medicineapp.activity;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,17 +31,21 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.view.animation.OvershootInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.database.DBHelper;
+import com.hvantage.medicineapp.fragments.AddPrescrFragment;
 import com.hvantage.medicineapp.fragments.HomeFragment;
 import com.hvantage.medicineapp.fragments.MyAccountFragment;
 import com.hvantage.medicineapp.fragments.MyOrderFragment;
@@ -65,15 +74,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private static final String TAG = "MainActivity";
     private static final int REQUEST_ALL_PERMISSIONS = 100;
-    static Button notifCount;
-    static int mNotifCount = 0;
     private static Context context;
     private static TextView textCartItemCount;
+    public static MenuItem menuSearch = null;
     private static int mCartItemCount = 0;
     private TextView toolbar_title;
     private NavigationView navigationView;
     private TextView tvLogin, tvUsername;
     private String mToken;
+    private FloatingActionMenu floatingActionMenu;
 
     public static void setupBadge() {
         if (textCartItemCount != null) {
@@ -90,17 +99,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 mCartItemCount = 0;
                 textCartItemCount.setVisibility(View.GONE);
             }
-
-         /*   if (mCartItemCount == 0) {
-                if (textCartItemCount.getVisibility() != View.GONE) {
-                    textCartItemCount.setVisibility(View.GONE);
-                }
-            } else {
-                textCartItemCount.setText(String.valueOf(mCartItemCount));
-                if (textCartItemCount.getVisibility() != View.VISIBLE) {
-                    textCartItemCount.setVisibility(View.VISIBLE);
-                }
-            }*/
         }
     }
 
@@ -135,6 +133,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.e(TAG, "onCreate: name >> " + AppPreferences.getUserName(context));
             tvUsername.setText("Hello, " + AppPreferences.getUserName(context));
         }
+
+
+        setFloatingButton();
+
     }
 
     private boolean checkPermission() {
@@ -192,7 +194,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ft.commitAllowingStateLoss();
     }
 
-
     private void initDrawer(Toolbar toolbar) {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -240,14 +241,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         final MenuItem menuItem = menu.findItem(R.id.action_cart);
-
+        menuSearch = menu.findItem(R.id.action_search);
         View actionView = MenuItemCompat.getActionView(menuItem);
         textCartItemCount = (TextView) actionView.findViewById(R.id.cart_badge);
-
-
         actionView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -255,14 +253,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
         setupBadge();
-
         return true;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        invalidateOptionsMenu();
         setupBadge();
     }
 
@@ -271,12 +267,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
         switch (id) {
             case R.id.action_cart:
-                //openCartFragment();
                 if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
                     startActivity(new Intent(context, CartActivity.class));
                 } else {
                     startActivity(new Intent(MainActivity.this, SignupActivity.class));
                 }
+                break;
+            case R.id.action_search:
+                startActivity(new Intent(context, SearchActivity.class));
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -433,4 +431,131 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return null;
         }
     }
+
+    private void setFloatingButton() {
+        new FloatingButton().showFloatingButton(MainActivity.this);
+        new FloatingButton().setFloatingButtonControls(MainActivity.this);
+    }
+
+    private void createCustomAnimation() {
+        AnimatorSet set = new AnimatorSet();
+        ObjectAnimator scaleOutX = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleX", 1.0f, 0.2f);
+        ObjectAnimator scaleOutY = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleY", 1.0f, 0.2f);
+        ObjectAnimator scaleInX = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleX", 0.2f, 1.0f);
+        ObjectAnimator scaleInY = ObjectAnimator.ofFloat(floatingActionMenu.getMenuIconView(), "scaleY", 0.2f, 1.0f);
+
+        scaleOutX.setDuration(50);
+        scaleOutY.setDuration(50);
+
+        scaleInX.setDuration(150);
+        scaleInY.setDuration(150);
+
+        scaleInX.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                floatingActionMenu.getMenuIconView().setImageResource(floatingActionMenu.isOpened()
+                        ? R.drawable.back_light_new : R.drawable.add_light_new);
+            }
+        });
+
+        set.play(scaleOutX).with(scaleOutY);
+        set.play(scaleInX).with(scaleInY).after(scaleOutX);
+        set.setInterpolator(new OvershootInterpolator(2));
+        floatingActionMenu.setIconToggleAnimatorSet(set);
+    }
+
+    public class FloatingButton {
+        FrameLayout bckgroundDimmer;
+        FloatingActionButton fabHome, fabSearch, fabCallOrder, fabUpload, fabMyPresc;
+
+        public void showFloatingButton(Activity activity) {
+
+            floatingActionMenu = (FloatingActionMenu) activity.findViewById(R.id.material_design_android_floating_action_menu);
+            fabHome = (FloatingActionButton) activity.findViewById(R.id.fabHome);
+            fabSearch = (FloatingActionButton) activity.findViewById(R.id.fabSearch);
+            fabCallOrder = (FloatingActionButton) activity.findViewById(R.id.fabCallOrder);
+            fabUpload = (FloatingActionButton) activity.findViewById(R.id.fabUpload);
+            fabMyPresc = (FloatingActionButton) activity.findViewById(R.id.fabMyPresc);
+            createCustomAnimation();
+
+            fabHome.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    floatingActionMenu.close(true);
+                    FragmentManager manager = getSupportFragmentManager();
+                    FragmentTransaction ft = manager.beginTransaction();
+                    Fragment fragment = new HomeFragment();
+                    ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+                    ft.replace(R.id.main_container, fragment);
+                    ft.commitAllowingStateLoss();
+                    clearBackStack();
+                }
+            });
+
+            fabCallOrder.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    floatingActionMenu.close(true);
+                    Functions.callOrder(context);
+                }
+            });
+
+            fabSearch.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    floatingActionMenu.close(true);
+                    startActivity(new Intent(context, SearchActivity.class));
+                }
+            });
+
+            fabUpload.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    floatingActionMenu.close(true);
+                    FragmentManager manager = getSupportFragmentManager();
+                    FragmentTransaction ft = manager.beginTransaction();
+                    Fragment fragment = new AddPrescrFragment();
+                    ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+                    ft.replace(R.id.main_container, fragment);
+                    ft.addToBackStack(null);
+                    ft.commitAllowingStateLoss();
+                }
+            });
+
+            fabMyPresc.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    floatingActionMenu.close(true);
+                    FragmentManager manager = getSupportFragmentManager();
+                    FragmentTransaction ft = manager.beginTransaction();
+                    Fragment fragment = new MyPrescriptionFragment();
+                    ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+                    ft.replace(R.id.main_container, fragment);
+                    ft.addToBackStack(null);
+                    ft.commitAllowingStateLoss();
+                }
+            });
+        }
+
+        public void setFloatingButtonControls(Activity activity) {
+            bckgroundDimmer = (FrameLayout) activity.findViewById(R.id.background_dimmer);
+            floatingActionMenu = (FloatingActionMenu) activity.findViewById(R.id.material_design_android_floating_action_menu);
+            floatingActionMenu.setOnMenuToggleListener(new FloatingActionMenu.OnMenuToggleListener() {
+                @Override
+                public void onMenuToggle(boolean opened) {
+                    if (opened) {
+                        bckgroundDimmer.setVisibility(View.VISIBLE);
+                    } else {
+                        bckgroundDimmer.setVisibility(View.GONE);
+                    }
+                }
+            });
+            bckgroundDimmer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (floatingActionMenu.isOpened()) {
+                        floatingActionMenu.close(true);
+                        bckgroundDimmer.setVisibility(View.GONE);
+                        //menu opened
+                    }
+                }
+            });
+        }
+    }
+
 }

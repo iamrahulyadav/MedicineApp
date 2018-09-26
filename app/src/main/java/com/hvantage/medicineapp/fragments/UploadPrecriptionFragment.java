@@ -21,6 +21,8 @@ import com.hvantage.medicineapp.activity.SelectPrescActivity;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.ProgressBar;
 
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
+
 
 public class UploadPrecriptionFragment extends Fragment implements View.OnClickListener {
 
@@ -46,6 +48,8 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
         rootView = inflater.inflate(R.layout.fragment_upload_prescription, container, false);
         if (intraction != null) {
             intraction.actionbarsetTitle("Upload Prescription");
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
         init();
         return rootView;

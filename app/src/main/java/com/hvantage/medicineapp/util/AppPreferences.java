@@ -19,6 +19,7 @@ public class AppPreferences {
     public static final String ORDER_TYPE = "order_type";
     public static final String SELECTED_PRES_ID = "selected_pres_id";
     public static final String SELECTED_ADD_ID = "selected_add_id";
+    public static final String SLIDER_DATA = "slider_data";
 
 
     public static final String SELECTED_ADD = "selected_add";
@@ -144,6 +145,20 @@ public class AppPreferences {
         SharedPreferences pereference = context.getSharedPreferences(
                 PREFERENCES, 0);
         return pereference.getString(SELECTED_ADD, "");
+    }
+
+    public static void setSliderData(Context context, String value) {
+        SharedPreferences preferences = context.getSharedPreferences(
+                PREFERENCES, 0);
+        Editor editor = preferences.edit();
+        editor.putString(SLIDER_DATA, value);
+        editor.commit();
+    }
+
+    public static String getSliderData(Context context) {
+        SharedPreferences pereference = context.getSharedPreferences(
+                PREFERENCES, 0);
+        return pereference.getString(SLIDER_DATA, "");
     }
 
     public static void clearPreference(Context context) {

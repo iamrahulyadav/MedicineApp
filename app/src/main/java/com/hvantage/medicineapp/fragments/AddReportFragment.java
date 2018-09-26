@@ -58,6 +58,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
 
 
 public class AddReportFragment extends Fragment implements View.OnClickListener {
@@ -86,6 +87,8 @@ public class AddReportFragment extends Fragment implements View.OnClickListener 
         if (getArguments() != null) {
             data = (ReportData) getArguments().getParcelable("data");
             Log.e(TAG, "onCreateView: data >> " + data);
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
 
         if (intraction != null) {

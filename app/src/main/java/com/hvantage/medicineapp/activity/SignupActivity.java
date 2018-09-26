@@ -51,6 +51,9 @@ import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
@@ -277,15 +280,13 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-
                             Log.e(TAG, "signInWithCredential:success");
-                            FirebaseUser user = task.getResult().getUser();
                             toolbar_title.setText("Your Details");
                             viewMobile.setVisibility(View.GONE);
                             viewVerify.setVisibility(View.GONE);
                             viewProfile.setVisibility(View.VISIBLE);
                             hideProgressDialog();
-
+                            new CheckMobileNoTask().execute();
                         } else {
                             hideProgressDialog();
                             // Sign in failed, display a message and update the UI
@@ -366,14 +367,23 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     Log.e(TAG, "CheckMobileNoTask: Response >> " + response.body().toString());
-                    JsonObject jsonObject = response.body();
-                    if (jsonObject.get("status").getAsString().equals("200")) {
-                        publishProgress("200", "");
-
-                    } else {
-                        JsonArray jsonArray = jsonObject.getAsJsonArray("result");
-                        JsonObject result = jsonArray.get(0).getAsJsonObject();
-                        publishProgress("400", result.get("msg").getAsString());
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = new JSONObject(response.body().toString());
+                        if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            String name = jsonObject.getJSONArray("result").getJSONObject(0).getString("name");
+                            String email = jsonObject.getJSONArray("result").getJSONObject(0).getString("email");
+                            publishProgress("200", name, email);
+                        } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
+                            String msg = jsonObject.getJSONArray("result").getJSONObject(0).getString("msg");
+                            publishProgress("400", msg);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getResources().getString(R.string.api_error_msg));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        publishProgress("400", getResources().getString(R.string.api_error_msg));
                     }
                 }
 
@@ -390,17 +400,10 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             super.onProgressUpdate(values);
             hideProgressDialog();
             String status = values[0];
-            String msg = values[1];
             if (status.equalsIgnoreCase("200")) {
-                startPhoneNumberVerification("+91" + etPhoneNo.getText().toString());
+                etName.setText(values[1]);
+                etEmail.setText(values[2]);
             } else if (status.equalsIgnoreCase("400")) {
-                /*LENGTH_INDEFINITE*/
-                Snackbar.make(findViewById(android.R.id.content), msg, Snackbar.LENGTH_INDEFINITE).setAction("RETRY", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        new SignupTask().execute();
-                    }
-                }).show();
             }
         }
     }
@@ -478,5 +481,4 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
     }
-
 }

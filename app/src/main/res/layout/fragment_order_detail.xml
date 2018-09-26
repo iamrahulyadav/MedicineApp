@@ -265,7 +265,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -273,12 +272,18 @@
                         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                         android:textColor="@color/colorPrimary" />
 
+                    <ImageView
+                        android:id="@+id/imgPrescription"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:src="@drawable/no_image_placeholder" />
+
                     <android.support.v4.widget.NestedScrollView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
                         <android.support.v7.widget.RecyclerView
-                            android:id="@+id/recylcer_view_precs"
+                            android:id="@+id/recylcer_view_precs_meds"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
                     </android.support.v4.widget.NestedScrollView>
@@ -286,7 +291,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Medicines"
+                        android:text="Items"
                         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                         android:textColor="@color/colorPrimary" />
 

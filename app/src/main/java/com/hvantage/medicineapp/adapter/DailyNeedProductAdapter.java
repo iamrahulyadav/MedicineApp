@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
-import android.support.v7.widget.CardView;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,7 +35,6 @@ public class DailyNeedProductAdapter extends RecyclerView.Adapter<DailyNeedProdu
     ArrayList<ProductData> arrayList;
     private ProgressBar progressBar;
 
-
     public DailyNeedProductAdapter(Context context, ArrayList<ProductData> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
@@ -43,7 +42,7 @@ public class DailyNeedProductAdapter extends RecyclerView.Adapter<DailyNeedProdu
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.product_item_layout2, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.daily_need_prodcuts_item_layout, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }
@@ -57,13 +56,12 @@ public class DailyNeedProductAdapter extends RecyclerView.Adapter<DailyNeedProdu
         holder.tvPriceDrop.setText("Rs. " + data.getPriceMrp());
         holder.tvOffers.setText(data.getDiscountText());
         holder.tvPriceDrop.setPaintFlags(holder.tvPriceDrop.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-        //double discount_amt = data.getPrice() * 10 / 100;
-        //holder.tvPrice.setText("Rs. " + Functions.roundTwoDecimals(data.getPrice() - discount_amt));
 
         if (!data.getImage().equalsIgnoreCase("")) {
             Glide.with(context)
                     .load(data.getImage())
                     .crossFade()
+//                    .override(100, 100)
                     .into(holder.img);
         }
 
@@ -95,32 +93,9 @@ public class DailyNeedProductAdapter extends RecyclerView.Adapter<DailyNeedProdu
             }
         });
 
-       /* holder.btnAddToCart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!AppPreferences.getUserId(context).equalsIgnoreCase("")) {
-                    double item_total = Integer.parseInt(holder.tvQty.getText().toString()) * Double.parseDouble(data.getPriceDiscount());
-                    CartData model = new CartData(
-                            data.getProductId(),
-                            data.getName(),
-                            data.getImage(),
-                            Integer.parseInt(holder.tvQty.getText().toString()),
-                            Double.parseDouble(data.getPriceDiscount()),
-                            item_total
-                    );
-                    if (new DBHelper(context).addToCart(model))
-                        Toast.makeText(context, "Added", Toast.LENGTH_SHORT).show();
-                    else
-                        Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(context, "Please Login", Toast.LENGTH_SHORT).show();
-                    context.startActivity(new Intent(context, LoginActivity.class));
-                }
-            }
-        });*/
         if (data.getTotalAvailable() > 0) {
-            holder.btnAddToCart.setCardBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
-            holder.tvBtnText.setText("Add To Cart");
+            holder.btnAddToCart.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
+            holder.btnAddToCart.setText("Add To Cart");
             holder.btnAddToCart.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -147,8 +122,8 @@ public class DailyNeedProductAdapter extends RecyclerView.Adapter<DailyNeedProdu
                 }
             });
         } else {
-            holder.btnAddToCart.setCardBackgroundColor(context.getResources().getColor(R.color.colorSuccess));
-            holder.tvBtnText.setText("Sold Out");
+            holder.btnAddToCart.setBackgroundColor(context.getResources().getColor(R.color.colorSuccess));
+            holder.btnAddToCart.setText("Sold Out");
             holder.btnAddToCart.setOnClickListener(null);
         }
     }
@@ -176,9 +151,9 @@ public class DailyNeedProductAdapter extends RecyclerView.Adapter<DailyNeedProdu
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView img;
-        TextView tvTitle, tvPriceDrop, tvOffers, tvPrice, tvQty, tvMinus, tvPlus, tvBtnText;
+        TextView tvTitle, tvPriceDrop, tvOffers, tvPrice, tvQty, tvMinus, tvPlus;
         RelativeLayout container;
-        CardView btnAddToCart;
+        AppCompatTextView btnAddToCart;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -192,8 +167,7 @@ public class DailyNeedProductAdapter extends RecyclerView.Adapter<DailyNeedProdu
             tvMinus = (TextView) itemView.findViewById(R.id.tvMinus);
             tvPlus = (TextView) itemView.findViewById(R.id.tvPlus);
             tvPlus = (TextView) itemView.findViewById(R.id.tvPlus);
-            btnAddToCart = (CardView) itemView.findViewById(R.id.btnAddToCart);
-            tvBtnText = (TextView) itemView.findViewById(R.id.tvBtnText);
+            btnAddToCart = (AppCompatTextView) itemView.findViewById(R.id.btnAddToCart);
         }
     }
 }

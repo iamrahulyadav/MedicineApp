@@ -19,7 +19,6 @@ import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -550,6 +549,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             String msg = values[1];
             if (status.equalsIgnoreCase("200")) {
                 dialogOrderSent();
+                Log.e(TAG, "onProgressUpdate: emptyCart >> " + new DBHelper(context).emptyCart());
 //                startActivity(new Intent(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
             } else if (status.equalsIgnoreCase("400")) {
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
@@ -622,6 +622,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
             String msg = values[1];
             if (status.equalsIgnoreCase("200")) {
                 dialogOrderSent();
+                Log.e(TAG, "onProgressUpdate: emptyCart >> " + new DBHelper(context).emptyCart());
                 //startActivity(new Intent(context, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
             } else if (status.equalsIgnoreCase("400")) {
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
@@ -700,7 +701,7 @@ public class ConfirmOrderActivity extends AppCompatActivity implements View.OnCl
                 TextView tvMinus = (TextView) view.findViewById(R.id.tvMinus);
                 final TextView tvQty = (TextView) view.findViewById(R.id.tvQty);
                 ImageView imgThumb = (ImageView) view.findViewById(R.id.imgThumb);
-                CardView btnAddToCart = (CardView) view.findViewById(R.id.btnAddToCart);
+                AppCompatButton btnAddToCart = (AppCompatButton) view.findViewById(R.id.btnAddToCart);
                 if (tvName != null) {
                     tvName.setText(people.getName());
                     tvPrice.setText("Rs." + Functions.roundTwoDecimals(Double.parseDouble(people.getPriceDiscount())));

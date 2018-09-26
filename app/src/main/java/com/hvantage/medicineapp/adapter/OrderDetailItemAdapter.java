@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.model.Item;
 import com.hvantage.medicineapp.util.Functions;
@@ -32,7 +33,6 @@ public class OrderDetailItemAdapter extends RecyclerView.Adapter<OrderDetailItem
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_detail_item_layout, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
@@ -40,18 +40,18 @@ public class OrderDetailItemAdapter extends RecyclerView.Adapter<OrderDetailItem
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-
         final Item data = arrayList.get(position);
         Log.e(TAG, position + " data : " + data);
         holder.tvTitle.setText(data.getItem());
         holder.tvQty.setText("Quantity : " + data.getQty());
         holder.tvPrice.setText("Rs. " + Functions.roundTwoDecimals(Double.parseDouble(data.getItemTotalPrice())));
         holder.tvTotalPrice.setText("Rs. " + Functions.roundTwoDecimals(Double.parseDouble(data.getItemTotalPrice())));
-        /*if (!data.getImage().equalsIgnoreCase(""))
-            holder.imageThumb.setImageBitmap(Functions.base64ToBitmap(data.getImage()));
-        else*/
-
-        holder.imageThumb.setImageResource(R.drawable.no_image_placeholder);
+        if (!data.getImage().equalsIgnoreCase(""))
+            Glide.with(context)
+                    .load(data.getImage())
+                    .placeholder(R.drawable.no_image_placeholder)
+                    .crossFade()
+                    .into(holder.imageThumb);
 
     }
 

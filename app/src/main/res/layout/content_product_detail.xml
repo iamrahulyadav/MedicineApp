@@ -234,7 +234,6 @@
                             android:layout_height="wrap_content"
                             android:layout_below="@id/tvPrice"
                             android:layout_weight="1"
-                            android:drawableLeft="@drawable/action_add_to_cart_light"
                             android:drawablePadding="5dp"
                             android:gravity="center_vertical"
                             android:paddingBottom="3dp"

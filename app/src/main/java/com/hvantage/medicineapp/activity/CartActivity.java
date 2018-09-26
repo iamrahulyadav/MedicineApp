@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -207,10 +208,36 @@ public class CartActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.cart, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home)
             onBackPressed();
-        else if (item.getItemId() == R.id.action_cart) {
+        else if (item.getItemId() == R.id.action_search) {
+            startActivity(new Intent(context, SearchActivity.class));
+        } else if (item.getItemId() == R.id.action_clear_cart) {
+            new AlertDialog.Builder(context)
+                    .setMessage("Clear cart?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (new DBHelper(context).emptyCart() > 0) {
+                                list.clear();
+                                adapter.notifyDataSetChanged();
+                            }
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    })
+                    .show();
         }
         return super.onOptionsItemSelected(item);
     }

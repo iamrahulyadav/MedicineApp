@@ -4,33 +4,33 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.OrderDetailItemAdapter;
-import com.hvantage.medicineapp.adapter.OrderDetailPresAdapter;
+import com.hvantage.medicineapp.adapter.OrderDetailPresMedsAdapter;
 import com.hvantage.medicineapp.model.AddressData;
 import com.hvantage.medicineapp.model.Item;
 import com.hvantage.medicineapp.model.OrderData;
+import com.hvantage.medicineapp.model.PreMedicineData;
 import com.hvantage.medicineapp.model.PrescriptionData;
-import com.hvantage.medicineapp.util.AppPreferences;
 import com.hvantage.medicineapp.util.FragmentIntraction;
-import com.hvantage.medicineapp.util.GridSpacingItemDecoration;
 import com.hvantage.medicineapp.util.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
 
 
 public class OrderDetailFragment extends Fragment implements View.OnClickListener {
@@ -42,16 +42,17 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
     private View rootView;
     private FragmentIntraction intraction;
     private OrderDetailItemAdapter adapter;
-    private List<Item> list = new ArrayList<Item>();
+    private List<Item> listItems;
     private ProgressBar progressBar;
     private OrderData data;
-    private CardView cardEmptyText;
-    private FloatingActionButton fabAdd;
     private RecyclerView recylcer_view_items;
     private LinearLayout llAmount;
-    private RecyclerView recylcer_view_precs;
-    private OrderDetailPresAdapter adapterPres;
-    private List<PrescriptionData> presList = new ArrayList<PrescriptionData>();
+    private RecyclerView recylcer_view_precs_meds;
+    private OrderDetailPresMedsAdapter adapterPresMeds;
+    private List<PrescriptionData> presList;
+    private PrescriptionData prescriptionData;
+    private ImageView imgPrescription;
+    private ArrayList<PreMedicineData> medList;
 
     @Nullable
     @Override
@@ -60,13 +61,20 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         rootView = inflater.inflate(R.layout.fragment_order_detail, container, false);
         if (intraction != null) {
             intraction.actionbarsetTitle("Order Detail");
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
         if (getArguments() != null) {
             data = (OrderData) getArguments().getParcelable("data");
             Log.e(TAG, "onCreateView: data >> " + data);
         }
+        listItems = new ArrayList<Item>();
+        presList = new ArrayList<PrescriptionData>();
+        medList = new ArrayList<PreMedicineData>();
+        Log.e(TAG, "onCreateView: prescriptionData >> " + prescriptionData);
 
         init();
+
         if (data != null) {
             tvOrderID.setText("ORD" + data.getOrderId().replace(",", ""));
             tvStatus.setText(data.getOrderStatus());
@@ -82,17 +90,24 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
                 tvAddress3.setText(deliveryData.getCity() + ", " + deliveryData.getPincode());
                 tvAddress4.setText(deliveryData.getState() + ", " + "India");
             }
-            list = data.getItems();
-            if (list.contains(null))
-                list.remove(null);
+            listItems = data.getItems();
+            if (listItems.contains(null))
+                listItems.remove(null);
             presList = data.getPrescriptionData();
-            if (data.getOrderType().equalsIgnoreCase(String.valueOf(AppPreferences.getOrderType(context))))
-                llAmount.setVisibility(View.GONE);
-            else
-                llAmount.setVisibility(View.VISIBLE);
+            prescriptionData = presList.get(0);
+            medList = prescriptionData.getMedicineDetails();
+            if (medList.contains(null))
+                medList.remove(null);
+            llAmount.setVisibility(View.VISIBLE);
             setRecyclerView();
-            setRecyclerViewPrecs();
-
+            setRecyclerViewPrecsMeds();
+            if (!prescriptionData.getImage().equalsIgnoreCase("")) {
+                Glide.with(context)
+                        .load(prescriptionData.getImage())
+                        .crossFade()
+                        .placeholder(R.drawable.no_image_placeholder)
+                        .into(imgPrescription);
+            }
         }
         return rootView;
     }
@@ -112,24 +127,22 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
         tvPayMode = (TextView) rootView.findViewById(R.id.tvPayMode);
         llAmount = (LinearLayout) rootView.findViewById(R.id.llAmount);
         recylcer_view_items = (RecyclerView) rootView.findViewById(R.id.recylcer_view_items);
-        recylcer_view_precs = (RecyclerView) rootView.findViewById(R.id.recylcer_view_precs);
+        recylcer_view_precs_meds = (RecyclerView) rootView.findViewById(R.id.recylcer_view_precs_meds);
+        imgPrescription = (ImageView) rootView.findViewById(R.id.imgPrescription);
     }
 
     private void setRecyclerView() {
-        adapter = new OrderDetailItemAdapter(context, list);
+        adapter = new OrderDetailItemAdapter(context, listItems);
         recylcer_view_items.setLayoutManager(new LinearLayoutManager(context));
         recylcer_view_items.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }
 
-    private void setRecyclerViewPrecs() {
-        int spacing = 30, spanCount = 3;
-        boolean includeEdge = true;
-        adapterPres = new OrderDetailPresAdapter(context, presList);
-        recylcer_view_precs.setLayoutManager(new GridLayoutManager(context, spanCount));
-        recylcer_view_precs.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
-        recylcer_view_precs.setAdapter(adapterPres);
-        adapterPres.notifyDataSetChanged();
+    private void setRecyclerViewPrecsMeds() {
+        adapterPresMeds = new OrderDetailPresMedsAdapter(context, medList);
+        recylcer_view_precs_meds.setLayoutManager(new LinearLayoutManager(context));
+        recylcer_view_precs_meds.setAdapter(adapterPresMeds);
+        adapterPresMeds.notifyDataSetChanged();
     }
 
     @Override
@@ -152,9 +165,6 @@ public class OrderDetailFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.fabAdd:
-
-                break;
         }
     }
 

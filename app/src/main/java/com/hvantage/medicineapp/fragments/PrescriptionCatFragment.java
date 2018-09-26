@@ -23,6 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.PrescriptionCatAdapter;
+import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.CategoryData;
 import com.hvantage.medicineapp.model.SubCategoryData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
@@ -46,6 +47,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
+
 
 public class PrescriptionCatFragment extends Fragment implements View.OnClickListener {
 
@@ -60,6 +63,7 @@ public class PrescriptionCatFragment extends Fragment implements View.OnClickLis
     private Typeface typeface;
     private ArrayList<SubCategoryData> list;
     private CategoryData data;
+    private DBHelper mydb;
 
     @Nullable
     @Override
@@ -70,30 +74,40 @@ public class PrescriptionCatFragment extends Fragment implements View.OnClickLis
         Log.e(TAG, "onCreateView: data >> " + data);
         if (intraction != null) {
             intraction.actionbarsetTitle(data.getCatName());
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
-        init();
-//        ArrayList<ProductData> list = new DBHelper(context).getMedicinesAll();
-        /*Log.e(TAG, "onCreateView: list >> " + list);
-        if (list != null)*/
         list = new ArrayList<SubCategoryData>();
-        //setRecyclerView(list);
+        mydb = new DBHelper(context);
+        list = mydb.getSubCategory(data.getCatId());
+        init();
+        getData();
+        return rootView;
+    }
+
+    private void getData() {
         if (Functions.isConnectingToInternet(context))
             new SubCategoryTask().execute();
         else {
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
         }
-        return rootView;
     }
 
     private void init() {
+        if (list == null) {
+            list = new ArrayList<SubCategoryData>();
+        }
         cardEmptyText = (CardView) rootView.findViewById(R.id.cardEmptyText);
+        setRecyclerView(list);
     }
 
     class SubCategoryTask extends AsyncTask<Void, String, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-//            showProgressDialog();
+            if (list.size() == 0) {
+                showProgressDialog();
+            }
         }
 
         @Override
@@ -108,18 +122,19 @@ public class PrescriptionCatFragment extends Fragment implements View.OnClickLis
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    response = null;
                     try {
                         Log.e(TAG, "SubCategoryTask: Response >> " + response.body().toString());
                         String resp = response.body().toString();
                         list.clear();
                         JSONObject jsonObject = new JSONObject(resp);
                         if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            Log.e(TAG, "onResponse: " + mydb.deleteSubCategory(data.getCatId()));
                             JSONArray jsonArray = jsonObject.getJSONArray("result");
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 Gson gson = new Gson();
-                                SubCategoryData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), SubCategoryData.class);
-                                list.add(data);
+                                SubCategoryData newData = gson.fromJson(jsonArray.getJSONObject(i).toString(), SubCategoryData.class);
+                                list.add(newData);
+                                mydb.saveSubCategory(newData, data.getCatId());
                             }
                             publishProgress("200", "");
                         } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
@@ -146,12 +161,10 @@ public class PrescriptionCatFragment extends Fragment implements View.OnClickLis
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-//            hideProgressDialog();
+            hideProgressDialog();
             Log.e(TAG, "onProgressUpdate: list.size >> " + list.size());
             String status = values[0];
             String msg = values[1];
-            /*if (adapter.getItemCount() > 0)
-                cardEmptyText.setVisibility(View.GONE);*/
             if (status.equalsIgnoreCase("200")) {
                 cardEmptyText.setVisibility(View.GONE);
                 setRecyclerView(list);
@@ -257,5 +270,6 @@ public class PrescriptionCatFragment extends Fragment implements View.OnClickLis
         if (progressBar != null)
             progressBar.dismiss();
     }
+
 
 }

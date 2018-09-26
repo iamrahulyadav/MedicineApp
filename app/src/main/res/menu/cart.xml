@@ -3,9 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_search"
-        android:icon="@drawable/action_search_light"
+        android:icon="@drawable/action_search_light_new"
         android:iconTint="@color/colorWhite"
         android:orderInCategory="100"
         android:title="Search"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/action_clear_cart"
+        android:icon="@drawable/delete_light_new"
+        android:iconTint="@color/colorWhite"
+        android:orderInCategory="100"
+        android:title="Empty"
+        app:showAsAction="always" />
+
 </menu>

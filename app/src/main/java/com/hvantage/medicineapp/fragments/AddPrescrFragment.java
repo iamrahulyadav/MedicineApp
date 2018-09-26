@@ -94,6 +94,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
 
 
 public class AddPrescrFragment extends Fragment implements View.OnClickListener {
@@ -154,6 +155,8 @@ public class AddPrescrFragment extends Fragment implements View.OnClickListener 
             from = getArguments().getString("from");
             Log.e(TAG, "onCreateView: data >> " + data);
             Log.e(TAG, "onCreateView: from >> " + from);
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
 
         if (intraction != null) {

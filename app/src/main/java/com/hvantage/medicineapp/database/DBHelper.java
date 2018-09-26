@@ -71,6 +71,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String TABLE_CART = "cart";
     private static final String TABLE_CATEGORY = "category ";
     private static final String TABLE_SUBCATEGORY = "subcategory ";
+    private static final String TABLE_CAT_PRODUCTS = "cat_products";
 
     private static final String TAG = "DBHelper";
     private static final int DATABASE_VERSION = 1;
@@ -95,7 +96,8 @@ public class DBHelper extends SQLiteOpenHelper {
             + KEY_PRODUCT_TYPE + " TEXT,"
             + KEY_PACKAGING_CONTAIN + " TEXT,"
             + KEY_PRESCRIPTION_REQUIRED + " TEXT,"
-            + KEY_TOTAL_AVAILABLE + " TEXT "
+            + KEY_TOTAL_AVAILABLE + " TEXT, "
+            + KEY_SUBCAT_ID + " TEXT "
             + ")";
 
     String CREATE_TABLE_CART = "CREATE TABLE " + TABLE_CART +
@@ -120,7 +122,31 @@ public class DBHelper extends SQLiteOpenHelper {
             "( " + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + KEY_SUBCAT_ID + " TEXT, "
             + KEY_SUBCAT_NAME + " TEXT, "
-            + KEY_SUBCAT_IMAGE + " TEXT "
+            + KEY_SUBCAT_IMAGE + " TEXT, "
+            + KEY_CAT_ID + " TEXT "
+            + ")";
+
+    //create table structers
+    String CREATE_TABLE_CAT_PRODUCTS = "CREATE TABLE " + TABLE_CAT_PRODUCTS +
+            "( " + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + KEY_PRODUCT_ID + " TEXT, "
+            + KEY_CATEGORY_NAME + " TEXT, "
+            + KEY_SUB_CATEGORY_NAME + " TEXT, "
+            + KEY_SHORT_DESCRIPTION + " TEXT, "
+            + KEY_LONG_DESCRIPTION + " TEXT, "
+            + KEY_IMAGE + " TEXT, "
+            + KEY_MANUFACTURER + " TEXT, "
+            + KEY_NAME + " TEXT, "
+            + KEY_POWER + " TEXT, "
+            + KEY_PRICE_MRP + " TEXT, "
+            + KEY_PRICE_DISCOUNT + " TEXT, "
+            + KEY_DISCOUNT_PERCENTAGE + " TEXT,"
+            + KEY_DISCOUNT_TEXT + " TEXT,"
+            + KEY_PRODUCT_TYPE + " TEXT,"
+            + KEY_PACKAGING_CONTAIN + " TEXT,"
+            + KEY_PRESCRIPTION_REQUIRED + " TEXT,"
+            + KEY_TOTAL_AVAILABLE + " TEXT, "
+            + KEY_SUBCAT_ID + " TEXT "
             + ")";
 
 
@@ -134,6 +160,7 @@ public class DBHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(CREATE_TABLE_CART);
         sqLiteDatabase.execSQL(CREATE_TABLE_CATEGORY);
         sqLiteDatabase.execSQL(CREATE_TABLE_SUBCATEGORY);
+        sqLiteDatabase.execSQL(CREATE_TABLE_CAT_PRODUCTS);
     }
 
     public void saveMedicine(ProductData modal) {
@@ -156,6 +183,7 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(KEY_PACKAGING_CONTAIN, modal.getPackagingContain());
         values.put(KEY_PRESCRIPTION_REQUIRED, modal.getPrescriptionRequired() + "");
         values.put(KEY_TOTAL_AVAILABLE, modal.getTotalAvailable() + "");
+        values.put(KEY_SUBCAT_ID, "");
         Log.d(TAG, "saveMedicine: values >> " + values.toString());
         boolean bb = db.insert(TABLE_MEDICINE, null, values) > 0;
         if (bb) {
@@ -166,11 +194,21 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+
     public int deleteMedicineData() {
         int rowCount = 0;
         SQLiteDatabase db = this.getWritableDatabase();
         rowCount = db.delete(TABLE_MEDICINE, "1", null);
         Log.e(TAG, "deleteMedicineData: rowCount" + rowCount);
+        db.close();
+        return rowCount;
+    }
+
+    public int emptyCart() {
+        int rowCount = 0;
+        SQLiteDatabase db = this.getWritableDatabase();
+        rowCount = db.delete(TABLE_CART, "1", null);
+        Log.e(TAG, "emptyCart: rowCount" + rowCount);
         db.close();
         return rowCount;
     }
@@ -327,7 +365,7 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(KEY_CAT_NAME, modal.getCatName());
         values.put(KEY_CAT_IMAGE, modal.getCatImage());
         Log.d(TAG, "saveCategory: values >> " + values.toString());
-        boolean bb = db.insert(TABLE_MEDICINE, null, values) > 0;
+        boolean bb = db.insert(TABLE_CATEGORY, null, values) > 0;
         if (bb) {
             Log.d("saveCategory : ", "Inserted");
         } else {
@@ -336,14 +374,69 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void saveSubCategory(SubCategoryData modal) {
+    public ArrayList<CategoryData> getCategory() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<CategoryData> list = null;
+        String query = "SELECT * FROM " + TABLE_CATEGORY;
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor == null) {
+            return list;
+        }
+
+        if (cursor.moveToFirst()) {
+            list = new ArrayList<CategoryData>();
+            do {
+                CategoryData d = new CategoryData();
+                d.setCatId(cursor.getString(cursor.getColumnIndex(KEY_CAT_ID)));
+                d.setCatName(cursor.getString(cursor.getColumnIndex(KEY_CAT_NAME)));
+                d.setCatImage(cursor.getString(cursor.getColumnIndex(KEY_CAT_IMAGE)));
+                list.add(d);
+            } while (cursor.moveToNext());
+        }
+        return list;
+    }
+
+    public ArrayList<SubCategoryData> getSubCategory(String cat_id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<SubCategoryData> list = null;
+        String query = "SELECT * FROM " + TABLE_SUBCATEGORY + " WHERE " + KEY_CAT_ID + "=" + cat_id;
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor == null) {
+            return list;
+        }
+
+        if (cursor.moveToFirst()) {
+            list = new ArrayList<SubCategoryData>();
+            do {
+                SubCategoryData d = new SubCategoryData();
+                d.setSubCatId(cursor.getString(cursor.getColumnIndex(KEY_SUBCAT_ID)));
+                d.setSubCatName(cursor.getString(cursor.getColumnIndex(KEY_SUBCAT_NAME)));
+                d.setSubCatImage(cursor.getString(cursor.getColumnIndex(KEY_SUBCAT_IMAGE)));
+                list.add(d);
+            } while (cursor.moveToNext());
+        }
+        return list;
+    }
+
+
+    public int deleteCategory() {
+        int rowCount = 0;
+        SQLiteDatabase db = this.getWritableDatabase();
+        rowCount = db.delete(TABLE_CATEGORY, "1", null);
+        Log.e(TAG, "emptyCart: rowCount" + rowCount);
+        db.close();
+        return rowCount;
+    }
+
+    public void saveSubCategory(SubCategoryData modal, String cat_id) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_CAT_ID, modal.getSubCatId());
-        values.put(KEY_CAT_NAME, modal.getSubCatName());
-        values.put(KEY_CAT_IMAGE, modal.getSubCatImage());
+        values.put(KEY_SUBCAT_ID, modal.getSubCatId());
+        values.put(KEY_SUBCAT_NAME, modal.getSubCatName());
+        values.put(KEY_SUBCAT_IMAGE, modal.getSubCatImage());
+        values.put(KEY_CAT_ID, cat_id);
         Log.d(TAG, "saveSubCategory: values >> " + values.toString());
-        boolean bb = db.insert(TABLE_MEDICINE, null, values) > 0;
+        boolean bb = db.insert(TABLE_SUBCATEGORY, null, values) > 0;
         if (bb) {
             Log.d("saveSubCategory : ", "Inserted");
         } else {
@@ -352,5 +445,88 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public int deleteSubCategory(String cat_id) {
+        int rowCount = 0;
+        SQLiteDatabase db = this.getWritableDatabase();
+        rowCount = db.delete(TABLE_SUBCATEGORY, KEY_CAT_ID + "=?", new String[]{cat_id});
+        Log.e(TAG, "emptyCart: rowCount" + rowCount);
+        db.close();
+        return rowCount;
+    }
 
+    public void saveCatProduct(ProductData modal, String subCatID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_PRODUCT_ID, modal.getProductId());
+        values.put(KEY_CATEGORY_NAME, modal.getCategoryName());
+        values.put(KEY_SUB_CATEGORY_NAME, modal.getSubCategoryName());
+        values.put(KEY_SHORT_DESCRIPTION, modal.getShortDescription());
+        values.put(KEY_LONG_DESCRIPTION, modal.getLongDescription());
+        values.put(KEY_IMAGE, modal.getImage());
+        values.put(KEY_MANUFACTURER, modal.getManufacturer());
+        values.put(KEY_NAME, modal.getName());
+        values.put(KEY_POWER, modal.getPower());
+        values.put(KEY_PRICE_MRP, modal.getPriceMrp());
+        values.put(KEY_PRICE_DISCOUNT, modal.getPriceDiscount() + "");
+        values.put(KEY_DISCOUNT_PERCENTAGE, modal.getDiscountPercentage());
+        values.put(KEY_DISCOUNT_TEXT, modal.getDiscountText());
+        values.put(KEY_PRODUCT_TYPE, modal.getProductType());
+        values.put(KEY_PACKAGING_CONTAIN, modal.getPackagingContain());
+        values.put(KEY_PRESCRIPTION_REQUIRED, modal.getPrescriptionRequired() + "");
+        values.put(KEY_TOTAL_AVAILABLE, modal.getTotalAvailable() + "");
+        values.put(KEY_SUBCAT_ID, subCatID);
+        Log.d(TAG, "saveCatProduct: values >> " + values.toString());
+        boolean bb = db.insert(TABLE_CAT_PRODUCTS, null, values) > 0;
+        if (bb) {
+            Log.d("saveCatProduct : ", "Inserted");
+        } else {
+            Log.d("saveCatProduct : ", "Not inserted");
+        }
+        db.close();
+    }
+
+    public ArrayList<ProductData> getCatProducts(String subcat_id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<ProductData> list = null;
+        String query = "SELECT * FROM " + TABLE_CAT_PRODUCTS + " WHERE " + KEY_SUBCAT_ID + "=" + subcat_id;
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor == null) {
+            return list;
+        }
+        if (cursor.moveToFirst()) {
+            list = new ArrayList<ProductData>();
+            do {
+                ProductData d = new ProductData();
+                d.setProductId(cursor.getString(cursor.getColumnIndex(KEY_PRODUCT_ID)));
+                d.setCategoryName(cursor.getString(cursor.getColumnIndex(KEY_CATEGORY_NAME)));
+                d.setSubCategoryName(cursor.getString(cursor.getColumnIndex(KEY_SUB_CATEGORY_NAME)));
+                d.setShortDescription(cursor.getString(cursor.getColumnIndex(KEY_SHORT_DESCRIPTION)));
+                d.setLongDescription(cursor.getString(cursor.getColumnIndex(KEY_LONG_DESCRIPTION)));
+                d.setImage(cursor.getString(cursor.getColumnIndex(KEY_IMAGE)));
+                d.setManufacturer(cursor.getString(cursor.getColumnIndex(KEY_MANUFACTURER)));
+                d.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+                d.setPower(cursor.getString(cursor.getColumnIndex(KEY_POWER)));
+                d.setPriceMrp(cursor.getString(cursor.getColumnIndex(KEY_PRICE_MRP)));
+                d.setPriceDiscount(cursor.getString(cursor.getColumnIndex(KEY_PRICE_DISCOUNT)));
+                d.setDiscountPercentage(cursor.getString(cursor.getColumnIndex(KEY_DISCOUNT_PERCENTAGE)));
+                d.setDiscountText(cursor.getString(cursor.getColumnIndex(KEY_DISCOUNT_TEXT)));
+                d.setProductType(cursor.getString(cursor.getColumnIndex(KEY_PRODUCT_TYPE)));
+                d.setPackagingContain(cursor.getString(cursor.getColumnIndex(KEY_PACKAGING_CONTAIN)));
+                d.setPrescriptionRequired(Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex(KEY_PACKAGING_CONTAIN))));
+                d.setTotalAvailable(Integer.parseInt(cursor.getString(cursor.getColumnIndex(KEY_TOTAL_AVAILABLE))));
+                list.add(d);
+            } while (cursor.moveToNext());
+        }
+        return list;
+    }
+
+
+    public int deleteCatProducts(String subcat_id) {
+        int rowCount = 0;
+        SQLiteDatabase db = this.getWritableDatabase();
+        rowCount = db.delete(TABLE_CAT_PRODUCTS, KEY_SUBCAT_ID + "=?", new String[]{subcat_id});
+        Log.e(TAG, "deleteCatProducts: rowCount" + rowCount);
+        db.close();
+        return rowCount;
+    }
 }

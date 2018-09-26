@@ -43,6 +43,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
+
 
 public class MyAccountFragment extends Fragment implements View.OnClickListener {
 
@@ -66,6 +68,8 @@ public class MyAccountFragment extends Fragment implements View.OnClickListener 
         rootView = inflater.inflate(R.layout.fragment_my_account, container, false);
         if (intraction != null) {
             intraction.actionbarsetTitle("My Account");
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
         list = new ArrayList<AddressData>();
         init();

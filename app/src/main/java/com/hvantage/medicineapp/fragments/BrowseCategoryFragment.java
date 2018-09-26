@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.adapter.BrowseCategoryAdapter;
+import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.model.CategoryData;
 import com.hvantage.medicineapp.model.SubCategoryData;
 import com.hvantage.medicineapp.retrofit.ApiClient;
@@ -41,6 +43,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
+
 
 public class BrowseCategoryFragment extends Fragment implements View.OnClickListener {
 
@@ -50,10 +54,12 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
     private FragmentIntraction intraction;
     private RecyclerView recylcer_view;
     private BrowseCategoryAdapter adapter;
-    private ArrayList<SubCategoryData> list = new ArrayList<SubCategoryData>();
+    private ArrayList<SubCategoryData> list;
     private ProgressBar progressBar;
     private CategoryData data;
     private CardView cardEmptyText;
+    private DBHelper mydb;
+    private SwipeRefreshLayout refreshLayout;
 
     @Nullable
     @Override
@@ -65,19 +71,40 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
         Log.e(TAG, "onCreateView: data >> " + data);
         if (intraction != null) {
             intraction.actionbarsetTitle(data.getCatName());
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
+        list = new ArrayList<SubCategoryData>();
+        mydb = new DBHelper(context);
+        list = mydb.getSubCategory(data.getCatId());
         init();
+        Log.e(TAG, "onCreateView: list >> " + list);
+        getData();
+        return rootView;
+    }
+
+    private void getData() {
         if (Functions.isConnectingToInternet(context))
             new CategoryTask().execute();
         else {
             Toast.makeText(context, getResources().getString(R.string.no_internet_text), Toast.LENGTH_SHORT).show();
         }
-        return rootView;
     }
 
     private void init() {
+        if (list == null) {
+            list = new ArrayList<SubCategoryData>();
+        }
         recylcer_view = (RecyclerView) rootView.findViewById(R.id.recylcer_view);
         cardEmptyText = (CardView) rootView.findViewById(R.id.cardEmptyText);
+        refreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.refreshLayout);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshLayout.setRefreshing(true);
+                getData();
+            }
+        });
         setRecyclerView();
     }
 
@@ -150,7 +177,9 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            showProgressDialog();
+            if (list.size() == 0) {
+                showProgressDialog();
+            }
         }
 
         @Override
@@ -171,11 +200,13 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
                     try {
                         JSONObject jsonObject = new JSONObject(resp);
                         if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                            Log.e(TAG, "onResponse: " + mydb.deleteSubCategory(data.getCatId()));
                             JSONArray jsonArray = jsonObject.getJSONArray("result");
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 Gson gson = new Gson();
-                                SubCategoryData data = gson.fromJson(jsonArray.getJSONObject(i).toString(), SubCategoryData.class);
-                                list.add(data);
+                                SubCategoryData newData = gson.fromJson(jsonArray.getJSONObject(i).toString(), SubCategoryData.class);
+                                list.add(newData);
+                                mydb.saveSubCategory(newData, data.getCatId());
                             }
                             publishProgress("200", "");
                         } else if (jsonObject.getString("status").equalsIgnoreCase("400")) {
@@ -200,6 +231,7 @@ public class BrowseCategoryFragment extends Fragment implements View.OnClickList
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
             hideProgressDialog();
+            refreshLayout.setRefreshing(false);
             adapter.notifyDataSetChanged();
             String status = values[0];
             String msg = values[1];

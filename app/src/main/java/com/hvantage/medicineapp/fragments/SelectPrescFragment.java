@@ -30,6 +30,8 @@ import com.hvantage.medicineapp.util.TouchImageView;
 
 import java.util.ArrayList;
 
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
+
 
 public class SelectPrescFragment extends Fragment implements View.OnClickListener {
 
@@ -52,6 +54,8 @@ public class SelectPrescFragment extends Fragment implements View.OnClickListene
         rootView = inflater.inflate(R.layout.fragment_select_prescription, container, false);
         if (intraction != null) {
             intraction.actionbarsetTitle("Select Prescriptions");
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
 
 
@@ -197,13 +201,6 @@ public class SelectPrescFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.fabAdd:
-                FragmentManager manager = getFragmentManager();
-                FragmentTransaction ft = manager.beginTransaction();
-                ft.replace(R.id.main_container, new AddPrescrFragment());
-                ft.addToBackStack(null);
-                ft.commitAllowingStateLoss();
-                break;
         }
     }
 

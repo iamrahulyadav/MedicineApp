@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
+
 
 public class AllPrescriptionFragment extends Fragment implements View.OnClickListener {
 
@@ -52,6 +54,8 @@ public class AllPrescriptionFragment extends Fragment implements View.OnClickLis
         rootView = inflater.inflate(R.layout.fragment_all_prescription, container, false);
         if (intraction != null) {
             intraction.actionbarsetTitle("All Prescriptions");
+            if (menuSearch != null)
+                menuSearch.setVisible(true);
         }
         init();
 //        ArrayList<ProductData> list = new DBHelper(context).getMedicinesAll();
