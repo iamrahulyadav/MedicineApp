@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.activity.MainActivity;
 import com.hvantage.medicineapp.activity.ProductDetailActivity;
@@ -57,13 +58,13 @@ public class DailyNeedProductAdapter extends RecyclerView.Adapter<DailyNeedProdu
         holder.tvOffers.setText(data.getDiscountText());
         holder.tvPriceDrop.setPaintFlags(holder.tvPriceDrop.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
-        if (!data.getImage().equalsIgnoreCase("")) {
-            Glide.with(context)
-                    .load(data.getImage())
-                    .crossFade()
-//                    .override(100, 100)
-                    .into(holder.img);
-        }
+        Glide.with(context)
+                .load(data.getImage())
+                .crossFade()
+                .placeholder(R.drawable.no_image_placeholder)
+                .override(150, 150)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(holder.img);
 
         holder.container.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -39,12 +39,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         final CategoryData data = arrayList.get(position);
         Log.d(TAG, position + " data : " + data);
         holder.tvTitle.setText(data.getCatName());
-        if (!data.getCatImage().equalsIgnoreCase(""))
-            Glide.with(context)
-                    .load(data.getCatImage())
-                    .crossFade()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(holder.img);
+        Glide.with(context)
+                .load(data.getCatImage())
+                .crossFade()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .override(100, 100)
+                .into(holder.img);
     }
 
     @Override

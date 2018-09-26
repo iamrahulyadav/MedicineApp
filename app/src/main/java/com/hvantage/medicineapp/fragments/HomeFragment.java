@@ -140,7 +140,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 Log.d(TAG, "onScrollChange: oldScrollX >> " + oldScrollX);
                 Log.d(TAG, "onScrollChange: oldScrollY >> " + oldScrollY);
 
-                if (scrollY > 100) {
+                if (scrollY > 200) {
                     if (viewPagerOffers.getVisibility() == View.VISIBLE) {
                         llSearchBar.setVisibility(View.GONE);
                         menuSearch.setVisible(true);
@@ -188,7 +188,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         recylcer_view_daily.setHasFixedSize(true);
         recylcer_view_daily.setItemViewCacheSize(30);
         recylcer_view_daily.setDrawingCacheEnabled(true);
-        recylcer_view_daily.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        recylcer_view_daily.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
         productAdapter.notifyDataSetChanged();
     }
 
@@ -278,6 +278,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         categoryAdapter = new CategoryAdapter(context, catList);
         recylcer_view.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         recylcer_view.setAdapter(categoryAdapter);
+        recylcer_view.setHasFixedSize(true);
+        recylcer_view.setItemViewCacheSize(30);
+        recylcer_view.setDrawingCacheEnabled(true);
+        recylcer_view.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
         recylcer_view.addOnItemTouchListener(new RecyclerItemClickListener(context, recylcer_view, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -420,9 +424,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     productList.clear();
-                    Log.e(TAG, "ProductTask: Response >> " + response.body().toString());
-                    String resp = response.body().toString();
+
                     try {
+                        Log.e(TAG, "ProductTask: Response >> " + response.body().toString());
+                        String resp = response.body().toString();
                         JSONObject jsonObject = new JSONObject(resp);
                         if (jsonObject.getString("status").equalsIgnoreCase("200")) {
                             JSONArray jsonArray = jsonObject.getJSONArray("result");
@@ -440,6 +445,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                             publishProgress("400", msg);
                         }
                     } catch (JSONException e) {
+                        e.printStackTrace();
+                        publishProgress("400", getActivity().getResources().getString(R.string.api_error_msg));
+                    } catch (Exception e) {
                         e.printStackTrace();
                         publishProgress("400", getActivity().getResources().getString(R.string.api_error_msg));
                     }
