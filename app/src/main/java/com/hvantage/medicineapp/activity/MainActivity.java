@@ -46,11 +46,11 @@ import com.google.gson.JsonObject;
 import com.hvantage.medicineapp.R;
 import com.hvantage.medicineapp.database.DBHelper;
 import com.hvantage.medicineapp.fragments.AddPrescrFragment;
+import com.hvantage.medicineapp.fragments.BrowseCatFragment;
 import com.hvantage.medicineapp.fragments.HomeFragment;
 import com.hvantage.medicineapp.fragments.MyAccountFragment;
 import com.hvantage.medicineapp.fragments.MyOrderFragment;
 import com.hvantage.medicineapp.fragments.MyPrescriptionFragment;
-import com.hvantage.medicineapp.fragments.OfferDiscountFragment;
 import com.hvantage.medicineapp.fragments.UploadPrecriptionFragment;
 import com.hvantage.medicineapp.fragments.VaultFragment;
 import com.hvantage.medicineapp.model.CartData;
@@ -133,10 +133,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.e(TAG, "onCreate: name >> " + AppPreferences.getUserName(context));
             tvUsername.setText("Hello, " + AppPreferences.getUserName(context));
         }
-
-
         setFloatingButton();
-
+        // checkPermission();
     }
 
     private boolean checkPermission() {
@@ -294,6 +292,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ft.commitAllowingStateLoss();
                 clearBackStack();
                 break;
+            case R.id.nav_category:
+                fragment = new BrowseCatFragment();
+                ft.replace(R.id.main_container, fragment);
+                ft.addToBackStack(null);
+                ft.commitAllowingStateLoss();
+                break;
             case R.id.nav_my_pre:
                 fragment = new MyPrescriptionFragment();
                 ft.replace(R.id.main_container, fragment);
@@ -330,10 +334,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ft.commitAllowingStateLoss();
                 break;
             case R.id.nav_discount_offer:
-                fragment = new OfferDiscountFragment();
+               /* fragment = new OfferDiscountFragment();
                 ft.replace(R.id.main_container, fragment);
                 ft.addToBackStack(null);
-                ft.commitAllowingStateLoss();
+                ft.commitAllowingStateLoss();*/
+                startActivity(new Intent(context, OffersActivity.class));
                 break;
             case R.id.nav_logout:
                 logoutAlert();

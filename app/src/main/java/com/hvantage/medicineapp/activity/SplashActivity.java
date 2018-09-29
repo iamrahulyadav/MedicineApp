@@ -1,6 +1,7 @@
 package com.hvantage.medicineapp.activity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.gson.JsonObject;
@@ -16,6 +18,7 @@ import com.hvantage.medicineapp.retrofit.ApiClient;
 import com.hvantage.medicineapp.retrofit.MyApiEndpointInterface;
 import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.AppPreferences;
+import com.hvantage.medicineapp.util.Functions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,42 +51,47 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         context = this;
         try {
-            new AsyncTask<Void, String, Void>() {
-                @Override
-                protected Void doInBackground(Void... voids) {
-                    JsonObject jsonObject = new JsonObject();
-                    jsonObject.addProperty("method", AppConstants.METHODS.GET_SLIDER_IMAGES);
-                    Log.e(TAG, "GetSliderTask: Request >> " + jsonObject.toString());
 
-                    MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
-                    Call<JsonObject> call = apiService.general(jsonObject);
-                    call.enqueue(new Callback<JsonObject>() {
-                        @Override
-                        public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                            try {
-                                Log.e(TAG, "GetSliderTask: Response >> " + response.body().toString());
-                                String resp = response.body().toString();
-                                JSONObject jsonObject = new JSONObject(resp);
-                                if (jsonObject.getString("status").equalsIgnoreCase("200")) {
-                                    JSONArray jsonArray = jsonObject.getJSONArray("result");
-                                    AppPreferences.setSliderData(context, String.valueOf(jsonArray));
-                                } else {
+            if (Functions.isConnectingToInternet(context)) {
+                new AsyncTask<Void, String, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.addProperty("method", AppConstants.METHODS.GET_SLIDER_IMAGES);
+                        Log.e(TAG, "GetSliderTask: Request >> " + jsonObject.toString());
+
+                        MyApiEndpointInterface apiService = ApiClient.getClient().create(MyApiEndpointInterface.class);
+                        Call<JsonObject> call = apiService.general(jsonObject);
+                        call.enqueue(new Callback<JsonObject>() {
+                            @Override
+                            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                                try {
+                                    Log.e(TAG, "GetSliderTask: Response >> " + response.body().toString());
+                                    String resp = response.body().toString();
+                                    JSONObject jsonObject = new JSONObject(resp);
+                                    if (jsonObject.getString("status").equalsIgnoreCase("200")) {
+                                        JSONArray jsonArray = jsonObject.getJSONArray("result");
+                                        //AppPreferences.setSliderData(context, String.valueOf(jsonArray));
+                                    } else {
+                                    }
+                                } catch (JSONException e) {
+                                    Log.e(TAG, "GetSliderTask: onFailure: " + e.getMessage());
+                                } catch (Exception e) {
+                                    Log.e(TAG, "GetSliderTask: onFailure: " + e.getMessage());
                                 }
-                            } catch (JSONException e) {
-                                Log.e(TAG, "GetSliderTask: onFailure: " + e.getMessage());
-                            } catch (Exception e) {
-                                Log.e(TAG, "GetSliderTask: onFailure: " + e.getMessage());
                             }
-                        }
 
-                        @Override
-                        public void onFailure(Call<JsonObject> call, Throwable t) {
-                            Log.e(TAG, "GetSliderTask: onFailure: " + t.getMessage());
-                        }
-                    });
-                    return null;
-                }
-            }.execute();
+                            @Override
+                            public void onFailure(Call<JsonObject> call, Throwable t) {
+                                Log.e(TAG, "GetSliderTask: onFailure: " + t.getMessage());
+                            }
+                        });
+                        return null;
+                    }
+                }.execute();
+            } else {
+//                ErrorDialog.setDialog(SplashActivity.this, getString(R.string.api_error_msg), errorListener);
+            }
         } catch (Exception ex) {
             Log.e(TAG, "run: exc >> " + ex.getMessage());
         }
@@ -102,4 +110,14 @@ public class SplashActivity extends AppCompatActivity {
             }
         }, SPLASH_TIME_OUT);
     }
+
+    DialogInterface.OnClickListener errorListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            Toast.makeText(context, "Clieckeddddd", Toast.LENGTH_SHORT).show();
+        }
+
+    };
+
+
 }

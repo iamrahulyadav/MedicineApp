@@ -20,4 +20,6 @@
     <color name="semiTransparent">#d5111111</color>
     <color name="colorFabRipple">#4089d4</color>
     <color name="black_overlay">#66000000</color>
+    <color name="colorYello">#ed9a09</color>
+    <color name="whatsapp_green">#32C755</color>
 </resources>

@@ -34,4 +34,5 @@
     <string name="prescription_details_missing">Your prescription details are missing! Do you want to add it or skip and continue ordering? </string>
     <string name="facebook_page_url">https://www.facebook.com/OnlineMedicineDeliveryApp/</string>
     <string name="instagram_page_url">https://www.instagram.com/onlinemedicinedeliveryapp</string>
+    <string name="whatsapp_not_found">Can\'t perform this action make sure you have installed whatsapp.</string>
 </resources>

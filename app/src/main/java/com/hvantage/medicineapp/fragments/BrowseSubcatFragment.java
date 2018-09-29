@@ -46,9 +46,9 @@ import retrofit2.Response;
 import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
 
 
-public class BrowseCategoryFragment extends Fragment implements View.OnClickListener {
+public class BrowseSubcatFragment extends Fragment implements View.OnClickListener {
 
-    private static final String TAG = "BrowseCategoryFragment";
+    private static final String TAG = "BrowseSubcatFragment";
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;

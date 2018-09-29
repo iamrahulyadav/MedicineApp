@@ -65,4 +65,6 @@ public class OfferDiscountAdapter extends RecyclerView.Adapter<OfferDiscountAdap
             tvDate = (TextView) itemView.findViewById(R.id.tvDate);
         }
     }
+
+
 }

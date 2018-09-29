@@ -70,6 +70,9 @@ public class ProductData implements Parcelable {
     @SerializedName("total_available")
     @Expose
     private int totalAvailable;
+    @SerializedName("flag")
+    @Expose
+    private String flag = "";
 
     public ProductData() {
     }
@@ -92,6 +95,7 @@ public class ProductData implements Parcelable {
         this.productType = in.readString();
         this.packagingContain = in.readString();
         this.totalAvailable = in.readInt();
+        this.flag = in.readString();
     }
 
     public String getCategoryName() {
@@ -230,6 +234,14 @@ public class ProductData implements Parcelable {
         this.totalAvailable = totalAvailable;
     }
 
+    public String getFlag() {
+        return flag;
+    }
+
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -254,6 +266,8 @@ public class ProductData implements Parcelable {
         dest.writeString(this.productType);
         dest.writeString(this.packagingContain);
         dest.writeInt(this.totalAvailable);
+        dest.writeString(this.flag);
+
     }
 
     @Override
@@ -276,6 +290,7 @@ public class ProductData implements Parcelable {
                 ", productType='" + productType + '\'' +
                 ", packagingContain='" + packagingContain + '\'' +
                 ", totalAvailable=" + totalAvailable +
+                ", flag=" + flag +
                 '}';
     }
 }

@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,15 +13,19 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatTextView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.hvantage.medicineapp.R;
-import com.hvantage.medicineapp.activity.SelectPrescActivity;
+import com.hvantage.medicineapp.util.AppConstants;
 import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.ProgressBar;
+
+import java.net.URLEncoder;
 
 import static com.hvantage.medicineapp.activity.MainActivity.menuSearch;
 
@@ -34,7 +40,7 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private View rootView;
     private FragmentIntraction intraction;
 
-    private RelativeLayout btnUpload, btnChoose;
+    private RelativeLayout btnUpload, btnChoose, btnWhatsApp;
     private ProgressBar progressBar;
     private String userChoosenTask;
     private double total = 0;
@@ -91,9 +97,11 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
     private void init() {
         btnUpload = (RelativeLayout) rootView.findViewById(R.id.btnUpload);
         btnChoose = (RelativeLayout) rootView.findViewById(R.id.btnChoose);
+        btnWhatsApp = (RelativeLayout) rootView.findViewById(R.id.btnWhatsapp);
         tvInstructions = (AppCompatTextView) rootView.findViewById(R.id.tvInstructions);
         btnUpload.setOnClickListener(this);
         btnChoose.setOnClickListener(this);
+        btnWhatsApp.setOnClickListener(this);
         tvInstructions.setOnClickListener(this);
     }
 
@@ -139,6 +147,24 @@ public class UploadPrecriptionFragment extends Fragment implements View.OnClickL
                 ft.replace(R.id.main_container, fragment);
                 ft.addToBackStack(null);
                 ft.commitAllowingStateLoss();
+                break;
+            case R.id.btnWhatsapp:
+                PackageManager packageManager = context.getPackageManager();
+                Intent i = new Intent(Intent.ACTION_VIEW);
+
+                try {
+                    i.setPackage("com.whatsapp");
+                    String url = "https://api.whatsapp.com/send?phone=" + AppConstants.WHATSAPP_NO + "&text=" + URLEncoder.encode("Hello ", "UTF-8");
+                    i.setData(Uri.parse(url));
+                    if (i.resolveActivity(packageManager) != null) {
+                        context.startActivity(i);
+                    } else {
+                        Log.e(TAG, "onClick: WhatsApp Not Found");
+                        Toast.makeText(context, getResources().getString(R.string.whatsapp_not_found), Toast.LENGTH_LONG).show();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.tvInstructions:
                 dialogPrescGuide();

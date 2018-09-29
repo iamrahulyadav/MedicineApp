@@ -26,13 +26,6 @@ public class SliderUtil {
 
     public static void setSlider(final Context context, final ViewPager viewPagerOffers) {
 
-
-     /*   ArrayList<String> list = new ArrayList<String>();
-        list.add("https://www.onlinemedicineapp.com/images/slide_img7.jpg");
-        list.add("https://www.onlinemedicineapp.com/images/p2.jpg");
-        list.add("https://www.onlinemedicineapp.com/images/111.jpg");
-        slide(list, context, viewPagerOffers);*/
-
         new AsyncTask<Void, String, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
@@ -52,6 +45,7 @@ public class SliderUtil {
                             if (jsonObject.getString("status").equalsIgnoreCase("200")) {
                                 ArrayList<String> list = new ArrayList<String>();
                                 JSONArray jsonArray = jsonObject.getJSONArray("result");
+                                AppPreferences.setSliderData(context, String.valueOf(jsonArray));
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     String data = jsonArray.getJSONObject(i).getString("slider_image");
                                     list.add(data);

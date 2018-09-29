@@ -2,13 +2,13 @@ package com.hvantage.medicineapp.adapter;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.v7.widget.AppCompatImageView;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.hvantage.medicineapp.R;
@@ -52,7 +52,6 @@ public class OrderDetailItemAdapter extends RecyclerView.Adapter<OrderDetailItem
                     .placeholder(R.drawable.no_image_placeholder)
                     .crossFade()
                     .into(holder.imageThumb);
-
     }
 
     private void showProgressDialog() {
@@ -76,16 +75,16 @@ public class OrderDetailItemAdapter extends RecyclerView.Adapter<OrderDetailItem
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvTitle, tvPrice, tvTotalPrice, tvQty;
-        ImageView imageThumb;
+        AppCompatTextView tvTitle, tvPrice, tvTotalPrice, tvQty;
+        AppCompatImageView imageThumb;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
-            tvPrice = (TextView) itemView.findViewById(R.id.tvPrice);
-            tvTotalPrice = (TextView) itemView.findViewById(R.id.tvTotalPrice);
-            tvQty = (TextView) itemView.findViewById(R.id.tvQty);
-            imageThumb = (ImageView) itemView.findViewById(R.id.imageThumb);
+            tvTitle = itemView.findViewById(R.id.tvTitle);
+            tvPrice = itemView.findViewById(R.id.tvPrice);
+            tvTotalPrice = itemView.findViewById(R.id.tvTotalPrice);
+            tvQty = itemView.findViewById(R.id.tvQty);
+            imageThumb = itemView.findViewById(R.id.imageThumb);
         }
     }
 }

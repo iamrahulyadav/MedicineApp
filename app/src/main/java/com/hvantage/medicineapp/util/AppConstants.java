@@ -4,6 +4,7 @@ public class AppConstants {
 
     public static final String APP_NAME = "medicine_app";
     public static final String BASE_URL = "https://onlinemedicineapp.com/APP/";
+    public static final String WHATSAPP_NO = "+918962720727";
 
 
     public class FIREBASE_KEY {

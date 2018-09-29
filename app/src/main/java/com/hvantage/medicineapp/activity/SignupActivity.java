@@ -12,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -22,7 +23,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -84,7 +84,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
     private TextView toolbar_title;
     private LinearLayout viewProfile;
     private TextView btnSkip;
-    private CheckBox checkBox;
+    private AppCompatCheckBox checkBox;
 //    private AppCompatEditText etPassword;
 
     @Override
@@ -115,7 +115,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
                 if (e instanceof FirebaseAuthInvalidCredentialsException) {
                     Snackbar.make(findViewById(android.R.id.content), "Invalid mobile no.", Snackbar.LENGTH_SHORT).show();
                 } else if (e instanceof FirebaseTooManyRequestsException) {
-                    Snackbar.make(findViewById(android.R.id.content), "Quota exceeded, please contact developer.",
+                    Snackbar.make(findViewById(android.R.id.content), "Try with another number.",
                             Snackbar.LENGTH_SHORT).show();
                 }
             }
@@ -164,7 +164,7 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
         etName = (AppCompatEditText) findViewById(R.id.etName);
         etEmail = (AppCompatEditText) findViewById(R.id.etEmail);
 //        etPassword = (AppCompatEditText) findViewById(R.id.etPassword);
-        checkBox = (CheckBox) findViewById(R.id.checkBox);
+        checkBox = findViewById(R.id.checkBox);
         btnSave = (CardView) findViewById(R.id.btnSave);
         btnSave.setOnClickListener(this);
         String checkBoxText = "I agree to <u> <a href='http://www.hvantagetechnologies.com'>Terms of Use</a></u> and " +

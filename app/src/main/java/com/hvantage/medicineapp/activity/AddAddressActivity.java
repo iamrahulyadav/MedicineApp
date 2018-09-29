@@ -186,5 +186,4 @@ public class AddAddressActivity extends AppCompatActivity implements View.OnClic
             }
         }
     }
-
 }

@@ -307,7 +307,6 @@ public class MoreProductsActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-
     private void setCatAdapter() {
         adapterCat = new SpinnerCatAdapter(MoreProductsActivity.this, R.layout.spinner_cat_item_layout, R.id.tvTitle, catList);
         spinnerCat.setAdapter(adapterCat);
@@ -336,7 +335,11 @@ public class MoreProductsActivity extends AppCompatActivity implements View.OnCl
                 selectedSubcatId = subcatList.get(position).getSubCatId();
                 Log.e(TAG, "onItemSelected: selectedCatId >> " + selectedSubcatId);
                 Log.e(TAG, "onItemSelected: selectedCatId >> " + selectedCatId);
-                //new ProductTaskCat().execute();
+                if (selectedSubcatId.equalsIgnoreCase("") || selectedSubcatId.equalsIgnoreCase("0"))
+                    Toast.makeText(context, "Select Filters", Toast.LENGTH_SHORT).show();
+                else {
+                    new ProductTaskCat().execute();
+                }
             }
 
             @Override

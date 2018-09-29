@@ -48,7 +48,7 @@
             android:name=".activity.MainActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustPan" />
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity
             android:name=".activity.SplashActivity"
             android:theme="@style/AppTheme.NoActionBar"
@@ -126,6 +126,11 @@
 
         <activity
             android:name=".activity.MoreProductsActivity"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".activity.OffersActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar" />
     </application>

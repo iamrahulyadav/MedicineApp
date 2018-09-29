@@ -55,7 +55,13 @@ public class DailyNeedProductAdapter extends RecyclerView.Adapter<DailyNeedProdu
         holder.tvTitle.setText(data.getName());
         holder.tvPrice.setText("Rs. " + data.getPriceDiscount());
         holder.tvPriceDrop.setText("Rs. " + data.getPriceMrp());
-        holder.tvOffers.setText(data.getDiscountText());
+        if (!data.getDiscountText().equalsIgnoreCase("")) {
+            holder.tvOffers.setVisibility(View.VISIBLE);
+            holder.tvOffers.setText(data.getDiscountText());
+        } else {
+            holder.tvOffers.setVisibility(View.GONE);
+        }
+
         holder.tvPriceDrop.setPaintFlags(holder.tvPriceDrop.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
         Glide.with(context)

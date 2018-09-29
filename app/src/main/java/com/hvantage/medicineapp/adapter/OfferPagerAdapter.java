@@ -69,4 +69,8 @@ public class OfferPagerAdapter extends android.support.v4.view.PagerAdapter {
     public int getItemPosition(Object object) {
         return android.support.v4.view.PagerAdapter.POSITION_NONE;
     }
+
+    public interface OfferDiscountListener {
+        void click(View v, int position);
+    }
 }

@@ -16,20 +16,20 @@ import com.hvantage.medicineapp.model.CategoryData;
 
 import java.util.ArrayList;
 
-public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
+public class CategoryAdapter2 extends RecyclerView.Adapter<CategoryAdapter2.ViewHolder> {
 
     private static final String TAG = "CategoryAdapter";
     Context context;
     ArrayList<CategoryData> arrayList;
 
-    public CategoryAdapter(Context context, ArrayList<CategoryData> arrayList) {
+    public CategoryAdapter2(Context context, ArrayList<CategoryData> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.category_item_layout, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.category_item_layout2, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }

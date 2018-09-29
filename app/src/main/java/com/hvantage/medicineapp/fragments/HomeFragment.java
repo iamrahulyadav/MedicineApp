@@ -23,6 +23,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -63,6 +64,7 @@ import com.hvantage.medicineapp.util.FragmentIntraction;
 import com.hvantage.medicineapp.util.Functions;
 import com.hvantage.medicineapp.util.ProgressBar;
 import com.hvantage.medicineapp.util.RecyclerItemClickListener;
+import com.hvantage.medicineapp.util.SliderUtil;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -91,7 +93,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private Context context;
     private View rootView;
     private FragmentIntraction intraction;
-    private CardView btnUpload;
+    private AppCompatButton btnUpload;
     private ImageView btnVoiceInput;
     private AppCompatAutoCompleteTextView etSearch;
     private ArrayList<ProductData> searchList;
@@ -99,13 +101,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private ViewPager viewPagerOffers;
     private AppCompatButton btnBrowseMore;
     private LinearLayout llSearchBar;
-    private android.support.design.widget.FloatingActionButton fabScrollUp;
-    private NestedScrollView nsview;
+    private AppCompatImageView btnScrollUp;
     private DBHelper mydb;
     private ArrayList<String> list;
+    private NestedScrollView nScrollView;
 
-    @TargetApi(Build.VERSION_CODES.M)
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         context = container.getContext();
@@ -121,44 +121,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         catList = mydb.getCategory();
         init();
         getData();
-
-        etSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(context, SearchActivity.class));
-            }
-        });
+        etSearch.setOnClickListener(this);
 
         AppPreferences.setSelectedPresId(context, "");
         CartActivity.selectedPresc = null;
-        llSearchBar = (LinearLayout) rootView.findViewById(R.id.llSearchBar);
-        ((NestedScrollView) rootView.findViewById(R.id.container)).setOnScrollChangeListener(new View.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                Log.d(TAG, "onScrollChange: scrollX >> " + scrollX);
-                Log.d(TAG, "onScrollChange: scrollY >> " + scrollY);
-                Log.d(TAG, "onScrollChange: oldScrollX >> " + oldScrollX);
-                Log.d(TAG, "onScrollChange: oldScrollY >> " + oldScrollY);
 
-                if (scrollY > 200) {
-                    if (viewPagerOffers.getVisibility() == View.VISIBLE) {
-                        llSearchBar.setVisibility(View.GONE);
-                        menuSearch.setVisible(true);
-                    }
-                } else {
-                    if (viewPagerOffers.getVisibility() == View.VISIBLE) {
-                        llSearchBar.setVisibility(View.VISIBLE);
-                        menuSearch.setVisible(false);
-                    }
-                }
-
-                if (scrollY > 500) {
-                    fabScrollUp.setVisibility(View.VISIBLE);
-                } else {
-                    fabScrollUp.setVisibility(View.GONE);
-                }
-            }
-        });
         return rootView;
     }
 
@@ -196,7 +163,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         viewPagerOffers = (ViewPager) rootView.findViewById(R.id.viewPagerOffers);
         TabLayout tabLayout = (TabLayout) rootView.findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPagerOffers, true);
-        //SliderUtil.setSlider(context, viewPagerOffers);
         list = new ArrayList<String>();
         Log.e(TAG, "doInBackground: " + AppPreferences.getSliderData(context));
         if (!AppPreferences.getSliderData(context).equalsIgnoreCase("")) {
@@ -214,6 +180,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 e.printStackTrace();
                 viewPagerOffers.setVisibility(View.GONE);
             }
+        } else {
+            SliderUtil.setSlider(context, viewPagerOffers);
         }
 
     }
@@ -232,21 +200,23 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             progressBar.dismiss();
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
     private void init() {
         if (catList == null)
             catList = new ArrayList<CategoryData>();
         etSearch = (AppCompatAutoCompleteTextView) rootView.findViewById(R.id.etSearch);
-        btnUpload = (CardView) rootView.findViewById(R.id.btnUpload);
+        btnUpload = rootView.findViewById(R.id.btnUpload);
         btnBrowseMore = (AppCompatButton) rootView.findViewById(R.id.btnBrowseMore);
         btnVoiceInput = (ImageView) rootView.findViewById(R.id.btnVoiceInput);
-        fabScrollUp = rootView.findViewById(R.id.fabScrollUp);
-        nsview = (NestedScrollView) rootView.findViewById(R.id.container);
+        btnScrollUp = rootView.findViewById(R.id.btnScrollUp);
+        llSearchBar = (LinearLayout) rootView.findViewById(R.id.llSearchBar);
+        nScrollView = (NestedScrollView) rootView.findViewById(R.id.container);
         btnUpload.setOnClickListener(this);
         btnBrowseMore.setOnClickListener(this);
         btnVoiceInput.setOnClickListener(this);
-        fabScrollUp.setOnClickListener(this);
-        fabScrollUp.setVisibility(View.GONE);
-        ((NestedScrollView) rootView.findViewById(R.id.container)).setOnTouchListener(new View.OnTouchListener() {
+        btnScrollUp.setOnClickListener(this);
+        btnScrollUp.setVisibility(View.GONE);
+        (nScrollView).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 Functions.hideSoftKeyboard(context, view);
@@ -259,7 +229,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 if (checkCallPermission())
                     Functions.callOrder(context);
                 else {
-                    /*Toast.makeText(context, "Call Permission Denied!", Toast.LENGTH_SHORT).show();*/
                     ActivityCompat.requestPermissions(getActivity(),
                             new String[]{
                                     Manifest.permission.CALL_PHONE
@@ -268,9 +237,42 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 }
             }
         });
+
+
+        nScrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                Log.d(TAG, "onScrollChange: scrollX >> " + scrollX);
+                Log.d(TAG, "onScrollChange: scrollY >> " + scrollY);
+                Log.d(TAG, "onScrollChange: oldScrollX >> " + oldScrollX);
+                Log.d(TAG, "onScrollChange: oldScrollY >> " + oldScrollY);
+
+                if (scrollY > 200) {
+                    if (viewPagerOffers.getVisibility() == View.VISIBLE) {
+                        llSearchBar.setVisibility(View.GONE);
+                        if (menuSearch != null)
+                            menuSearch.setVisible(true);
+                    }
+                } else {
+                    if (viewPagerOffers.getVisibility() == View.VISIBLE) {
+                        llSearchBar.setVisibility(View.VISIBLE);
+                        if (menuSearch != null)
+                            menuSearch.setVisible(false);
+                    }
+                }
+
+                if (scrollY > 500) {
+                    btnScrollUp.setVisibility(View.VISIBLE);
+                } else {
+                    btnScrollUp.setVisibility(View.GONE);
+                }
+            }
+        });
+
         setSlider();
         setCategoryAdapter();
         setProductAdapter();
+
     }
 
     private void setCategoryAdapter() {
@@ -296,7 +298,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                     ft.addToBackStack(null);
                     ft.commitAllowingStateLoss();
                 } else {
-                    BrowseCategoryFragment fragment = new BrowseCategoryFragment();
+                    BrowseSubcatFragment fragment = new BrowseSubcatFragment();
                     Bundle args = new Bundle();
                     args.putParcelable("data", catList.get(position));
                     fragment.setArguments(args);
@@ -353,9 +355,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             case R.id.btnBrowseMore:
                 startActivity(new Intent(context, MoreProductsActivity.class));
                 break;
-            case R.id.fabScrollUp:
-                nsview.fullScroll(View.FOCUS_UP);
-                nsview.scrollTo(0, 0);
+            case R.id.btnScrollUp:
+                nScrollView.fullScroll(View.FOCUS_UP);
+                nScrollView.scrollTo(0, 0);
+                break;
+            case R.id.etSearch:
+                startActivity(new Intent(context, SearchActivity.class));
                 break;
         }
     }
